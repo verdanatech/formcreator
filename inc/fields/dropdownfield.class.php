@@ -152,6 +152,7 @@ class PluginFormcreatorDropdownField extends PluginFormcreatorField
             $dparams_cond_crit = [];
             switch ($itemtype) {
                case Entity::class:
+               case Document::class:
                   unset($dparams['entity']);
 
                case User::class:
@@ -216,7 +217,6 @@ class PluginFormcreatorDropdownField extends PluginFormcreatorField
                               $groupFk => $groups,
                            ] + $dparams_cond_crit
                         ];
-                        $groups = implode("', '", $groups);
                      }
                      // Check if helpdesk availability is fine tunable on a per item basis
                      if ($DB->fieldExists($itemtype::getTable(), 'is_helpdesk_visible')) {
@@ -263,7 +263,6 @@ class PluginFormcreatorDropdownField extends PluginFormcreatorField
 
             $emptyItem = new $itemtype();
             $emptyItem->getEmpty();
-            $dparams['displaywith'] = [];
             if (isset($emptyItem->fields['serial'])) {
                $dparams['displaywith'][] = 'serial';
             }
@@ -453,7 +452,7 @@ class PluginFormcreatorDropdownField extends PluginFormcreatorField
             ],
          ],
          'WHERE' => [
-            $groupUserTable . '.id' => $userID,
+            $groupUserTable . '.users_id' => $userID,
          ] + $dbUtil->getEntitiesRestrictCriteria(
             $groupTable,
             '',
@@ -655,7 +654,7 @@ class PluginFormcreatorDropdownField extends PluginFormcreatorField
    }
 
    public function getHtmlIcon() {
-      return '<i class="fa fa-caret-down" aria-hidden="true"></i>';
+      return '<i class="fas fa-caret-square-down" aria-hidden="true"></i>';
    }
 
    /**

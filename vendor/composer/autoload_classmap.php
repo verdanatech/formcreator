@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'Docopt' => $vendorDir . '/docopt/docopt/src/docopt.php',
     'Docopt\\Argument' => $vendorDir . '/docopt/docopt/src/docopt.php',
     'Docopt\\BranchPattern' => $vendorDir . '/docopt/docopt/src/docopt.php',

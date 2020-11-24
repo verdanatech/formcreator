@@ -4,9 +4,10 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8a274decb225eecbafdd145d249846a9
+class ComposerStaticInit45649b7c161955f5e3ef42a25bb212cf
 {
     public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Docopt' => __DIR__ . '/..' . '/docopt/docopt/src/docopt.php',
         'Docopt\\Argument' => __DIR__ . '/..' . '/docopt/docopt/src/docopt.php',
         'Docopt\\BranchPattern' => __DIR__ . '/..' . '/docopt/docopt/src/docopt.php',
@@ -30,7 +31,7 @@ class ComposerStaticInit8a274decb225eecbafdd145d249846a9
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit8a274decb225eecbafdd145d249846a9::$classMap;
+            $loader->classMap = ComposerStaticInit45649b7c161955f5e3ef42a25bb212cf::$classMap;
 
         }, null, ClassLoader::class);
     }

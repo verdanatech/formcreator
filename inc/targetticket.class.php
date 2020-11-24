@@ -355,7 +355,17 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorTargetBase
 
    public function prepareInputForAdd($input) {
       $input = parent::prepareInputForAdd($input);
-
+      if ($input === false) {
+         return false;
+      }
+      if (!isset($input['type_rule'])) {
+         $input['type_rule'] = self::REQUESTTYPE_SPECIFIC;
+      }
+      if ($input['type_rule'] == self::REQUESTTYPE_SPECIFIC) {
+         if (!isset($input['type_question']) || !in_array($input['type_question'], [Ticket::INCIDENT_TYPE, Ticket::DEMAND_TYPE])) {
+            $input['type_question'] = Ticket::INCIDENT_TYPE;
+         }
+      }
       return $input;
    }
 
@@ -1097,6 +1107,10 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorTargetBase
          }
          /**@var PluginFormcreatorQuestion $question */
          $question = $linker->getObject($input[$fieldSetting['field']], PluginFormcreatorQuestion::class);
+         if ($question === false) {
+            $typeName = strtolower(self::getTypeName());
+            throw new ImportFailureException(sprintf(__('failed to add or update the %1$s %2$s: a question is missing and is used in a parameter of the target', 'formceator'), $typeName, $input['name']));
+         }
          $input[$fieldSetting['field']] = $question->getID();
       }
 

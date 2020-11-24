@@ -1,3 +1,58 @@
+## [2.10.4](https://github.com/pluginsglpi/formcreator/compare/v2.10.3...v2.10.4) (2020-11-09)
+
+
+### Bug Fixes
+
+* **dropdownfield:** compatibility with Document itemtype ([bdd533a](https://github.com/pluginsglpi/formcreator/commit/bdd533a2dcc4257258191ae287095c247292b7cb))
+* **form:** missinb closing tag ([faab454](https://github.com/pluginsglpi/formcreator/commit/faab454304907be07602557b75dc3289ed2ea8e8))
+* **formanswer:** uploads lost when re-submitting answers ([962eafa](https://github.com/pluginsglpi/formcreator/commit/962eafa6e6f74ee028a6bb1cdd57f1e165038831))
+* **issue:** enhance error message when canceling an issue ([cf21817](https://github.com/pluginsglpi/formcreator/commit/cf21817507b15caf33b8fe814e32b915b2f448a2))
+* **issue:** handle deletion of validation ([385eee4](https://github.com/pluginsglpi/formcreator/commit/385eee465eb2e76220ae6d4ad7292d5d4e52a995))
+* **issue:** update issue status on ticket validation update ([ca68eb4](https://github.com/pluginsglpi/formcreator/commit/ca68eb4f6402dbebef12f534aaa8ece3402c4c04))
+* **locales:** reapply bad translation fix ([b8d6466](https://github.com/pluginsglpi/formcreator/commit/b8d64662d011b41f4e036d2f1e2d57d88935efef))
+* **notificationtargetformanswer:** not rendered fullform tag ([f83ce3f](https://github.com/pluginsglpi/formcreator/commit/f83ce3f270b1edce3fda5d10d8dad9d0f5da118e))
+* **targetticket,targetchange:** handle import failure on missing question ([e17c5a3](https://github.com/pluginsglpi/formcreator/commit/e17c5a37adc6ab5bcd479f7d1e9a7e0a6206c935))
+* **wizard:** reservation search failure ([b6e0dd8](https://github.com/pluginsglpi/formcreator/commit/b6e0dd868a03bc5bdf6832e08b416e9c01b3b6ad))
+* update hooks ([d2d9980](https://github.com/pluginsglpi/formcreator/commit/d2d99805c63dd6a51edde6ab1da01733e8915cd2))
+
+
+### Features
+
+* **targetticket,targetchange:** add tag for notification ([9da6fb5](https://github.com/pluginsglpi/formcreator/commit/9da6fb5c71a87c105ee68a62ff85e7ccc90f120c))
+
+
+
+## [2.10.3](https://github.com/pluginsglpi/formcreator/compare/v2.10.2...v2.10.3) (2020-10-13)
+
+
+### Bug Fixes
+
+* **description:** simple text may render HTML tags ([dc82b19](https://github.com/pluginsglpi/formcreator/commit/dc82b1955148217f57d9f573408fc8b271dafe1a))
+* **dropdownfield:** bad entity restriction ([9f4b1ad](https://github.com/pluginsglpi/formcreator/commit/9f4b1addaaa39095a4a1ebcff5e64a579676bd20))
+* **dropdownfield:** SQL error to find curent user's groups ([c86bc4e](https://github.com/pluginsglpi/formcreator/commit/c86bc4e5880bf5bca15c4e3776991d89465dc5c8))
+* **form:** bad path to css ([ffff1b4](https://github.com/pluginsglpi/formcreator/commit/ffff1b4e55c9aaca6d0ef01eef534d1924cfb34b))
+* **form:** bad sharing URL ([6ea4dff](https://github.com/pluginsglpi/formcreator/commit/6ea4dff2a38b3c9c6b89aa27fdfe6b910470bb69))
+* **glpiselectfield:** missing caps un classnames ([203b5b9](https://github.com/pluginsglpi/formcreator/commit/203b5b9503d08bcf2fad1357a8970b93073311cf))
+* **issue:** update issue status on ticket validation update ([4819b26](https://github.com/pluginsglpi/formcreator/commit/4819b268824f45da3f97ca74ff7bcc858dc67c2c))
+* **locales:** bad locale string ([766cea3](https://github.com/pluginsglpi/formcreator/commit/766cea3cda586b3b2351e80ef0cbc37fce0f5355))
+* **targetticket:** undefined type after creation ([e3188ef](https://github.com/pluginsglpi/formcreator/commit/e3188efc2cd31329290f4a43e4c5a2d41b67591d))
+* **textfield,textareafield:** escaping problem when editing question ([231e9e4](https://github.com/pluginsglpi/formcreator/commit/231e9e4cef6db0ccd46466bebbfe2a39a4a81233))
+* **wizard:** missing HTML tag breaking footer ([a299a14](https://github.com/pluginsglpi/formcreator/commit/a299a141229762164bb8a55d67947542fdb4596b))
+
+
+### Features
+
+* use font awesome for all icons ([25cb6b7](https://github.com/pluginsglpi/formcreator/commit/25cb6b7fff47d6fe7a5f5c309cf8c1191fc20d94))
+* **descriptionfield:** allow description field in targets ([5fedd96](https://github.com/pluginsglpi/formcreator/commit/5fedd96aabf93671bb69b30cd9b1ab8fbd814a7c))
+* **question,section:** tip on conditions count ([303fe86](https://github.com/pluginsglpi/formcreator/commit/303fe860691dc4753a581c68c8be256ff388d4c7))
+
+
+### Performance Improvements
+
+* **condition:** conditions evaluation ([879bdaf](https://github.com/pluginsglpi/formcreator/commit/879bdaf1967278c7aaf9c320cfe32d89de0bdc09))
+
+
+
 ## [2.10.2](https://github.com/pluginsglpi/formcreator/compare/v2.10.1...v2.10.2) (2020-09-07)
 
 

@@ -915,7 +915,7 @@ function pluginFormcreatorInitializeField(fieldName, rand) {
  */
 function pluginFormcreatorInitializeActor(fieldName, rand, initialValue) {
    var field = $('select[name="' + fieldName + '[]"]');
-   dropdownMax = <?php echo $CFG_GLPI['dropdown_max'] ?>;
+   var dropdownMax = CFG_GLPI['dropdown_max'];
    field.select2({
       width: '80%',
       minimumInputLength: 0,
@@ -1331,6 +1331,6 @@ function plugin_formcreator_cancelMyTicket(id) {
    }).done(function(response) {
       window.location.replace(formcreatorRootDoc + '/front/issue.php?reset=reset');
    }).error(function(response) {
-      alert("<?php echo __('Failed to cancel the ticket', 'formcreator'); ?>");
+      alert(response.responseText);
    });
 }

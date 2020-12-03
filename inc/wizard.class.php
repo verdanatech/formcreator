@@ -127,7 +127,7 @@ class PluginFormcreatorWizard
       if (KnowbaseItem::canView()) {
          echo '<li class="' . ($activeMenuItem == self::MENU_FAQ ? 'plugin_formcreator_selectedMenuItem' : '') . '">';
          echo '<a href="' . FORMCREATOR_ROOTDOC . '/front/knowbaseitem.php' . '">';
-         echo '<span class="fa fa-question fc_list_icon" title="' . __('Consult FAQ', 'formcreator') . '"></span>';
+         echo '<span class="fa fa-question fc_list_icon" title="' . __('Consultar FAQ', 'formcreator') . '"></span>';
          echo '<span class="label">' . __('Consult FAQ', 'formcreator') . '</span>';
          echo '</a></li>';
       }

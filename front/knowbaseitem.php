@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -32,6 +33,7 @@
  */
 
 include("../../../inc/includes.php");
+Html::requireJs('jstree');
 
 // Check if plugin is activated...
 $plugin = new Plugin();

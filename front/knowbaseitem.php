@@ -42,7 +42,7 @@ if (!$plugin->isActivated('formcreator')) {
 }
 
 if (!plugin_formcreator_replaceHelpdesk()) {
-    Html::redirect($CFG_GLPI["root_doc"] . "/front/helpdesk.public.php");
+    Html::redirect(FORMCREATOR_ROOTDOC . "/front/helpdesk.public.php");
 }
 
 if (KnowbaseItem::canView()) {
@@ -74,7 +74,7 @@ if (KnowbaseItem::canView()) {
         unset($_GET['forcetab']);
     }
 
-    $kb = new Knowbase();
+    $kb = new PluginFormcreatorKnowbase();
     $kb->display($_GET);
 
 

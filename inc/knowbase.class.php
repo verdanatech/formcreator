@@ -154,7 +154,7 @@ class PluginFormcreatorKnowbase extends CommonGLPI
         global $CFG_GLPI;
 
         $rand        = mt_rand();
-        $ajax_url    = $CFG_GLPI["root_doc"] . "/ajax/knowbase.php";
+        $ajax_url    = FORMCREATOR_ROOTDOC . "/ajax/knowbase.php";
         $loading_txt = addslashes(__('Loading...'));
         $start       = isset($_REQUEST['start'])
             ? $_REQUEST['start']

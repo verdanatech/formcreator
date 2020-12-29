@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -29,7 +30,7 @@
  * ---------------------------------------------------------------------
  */
 
-include ("../../../inc/includes.php");
+include("../../../inc/includes.php");
 
 // Check if plugin is activated...
 $plugin = new Plugin();
@@ -51,7 +52,7 @@ if (isset($_GET["id"])) {
          $options[$key] = $_GET[$key];
       }
    }
-   $_SESSION['glpilisturl']['KnowbaseItem'] = FORMCREATOR_ROOTDOC."/front/wizard.php";
+   $_SESSION['glpilisturl']['KnowbaseItem'] = FORMCREATOR_ROOTDOC . "/front/wizard.php";
    $kb->display($options);
 
    PluginFormcreatorWizard::footer();

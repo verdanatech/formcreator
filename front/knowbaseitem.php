@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -32,6 +33,7 @@
  */
 
 include("../../../inc/includes.php");
+Html::requireJs('jstree');
 
 // Check if plugin is activated...
 $plugin = new Plugin();
@@ -40,7 +42,7 @@ if (!$plugin->isActivated('formcreator')) {
 }
 
 if (!plugin_formcreator_replaceHelpdesk()) {
-    Html::redirect($CFG_GLPI["root_doc"] . "/front/helpdesk.public.php");
+    Html::redirect(FORMCREATOR_ROOTDOC . "/front/helpdesk.public.php");
 }
 
 if (KnowbaseItem::canView()) {
@@ -72,7 +74,7 @@ if (KnowbaseItem::canView()) {
         unset($_GET['forcetab']);
     }
 
-    $kb = new Knowbase();
+    $kb = new PluginFormcreatorKnowbase();
     $kb->display($_GET);
 
 

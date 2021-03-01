@@ -176,6 +176,7 @@ class PluginFormcreatorTextareaField extends PluginFormcreatorTextField
       $rangeMin = $parameters['range']->fields['range_min'];
       $rangeMax = $parameters['range']->fields['range_max'];
 
+      $value = Html::clean($value);
       if ($rangeMin > 0 && strlen($value) < $rangeMin) {
          Session::addMessageAfterRedirect(sprintf(__('The text is too short (minimum %d characters): %s', 'formcreator'), $rangeMin, $this->question->fields['name']), false, ERROR);
          return false;

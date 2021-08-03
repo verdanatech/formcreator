@@ -167,7 +167,45 @@ class TextareaField extends TextField
          return false;
       }
 
+      if (!$this->isValidValue($this->value)) {
+         return false;
+      }
+
       // All is OK
+      return true;
+   }
+
+   public function isValidValue($value): bool {
+      if (strlen($value) == 0) {
+         return true;
+      }
+
+      $parameters = $this->getParameters();
+
+      // Check the field matches the format regex
+      $regex = $parameters['regex']->fields['regex'];
+      if ($regex !== null && strlen($regex) > 0) {
+         if (!preg_match($regex, $value)) {
+            Session::addMessageAfterRedirect(sprintf(__('Specific format does not match: %s', 'formcreator'), $this->question->fields['name']), false, ERROR);
+            return false;
+         }
+      }
+
+      // Check the field is in the range
+      $rangeMin = $parameters['range']->fields['range_min'];
+      $rangeMax = $parameters['range']->fields['range_max'];
+
+      $value = Html::clean($value);
+      if ($rangeMin > 0 && strlen($value) < $rangeMin) {
+         Session::addMessageAfterRedirect(sprintf(__('The text is too short (minimum %d characters): %s', 'formcreator'), $rangeMin, $this->question->fields['name']), false, ERROR);
+         return false;
+      }
+
+      if ($rangeMax > 0 && strlen($value) > $rangeMax) {
+         Session::addMessageAfterRedirect(sprintf(__('The text is too long (maximum %d characters): %s', 'formcreator'), $rangeMax, $this->question->fields['name']), false, ERROR);
+         return false;
+      }
+
       return true;
    }
 

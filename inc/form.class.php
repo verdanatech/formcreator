@@ -797,6 +797,7 @@ PluginFormcreatorConditionnableInterface
    public function showWizard($service_catalog = false) {
       echo '<div id="plugin_formcreator_wizard_categories">';
       echo '<div><h2>'._n("Category", "Categories", 2, 'formcreator').'</h2></div>';
+      echo "<br/>";
       echo '<div><a href="#" id="wizard_seeall">' . __('see all', 'formcreator') . '</a></div>';
       echo '</div>';
 

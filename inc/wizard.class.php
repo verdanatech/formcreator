@@ -107,13 +107,12 @@ class PluginFormcreatorWizard {
       echo '<span class="label">'.__('My requests for assistance', 'formcreator').'</span>';
       echo '</a></li>';
 
-      if (PluginFormcreatorEntityConfig::getUsedConfig('is_kb_separated', Session::getActiveEntity()) == PluginFormcreatorEntityConfig::CONFIG_KB_DISTINCT
-         && Session::haveRight('knowbase', KnowbaseItem::READFAQ)
-      ) {
+      //verdanatech
+      if (KnowbaseItem::canView()) {
          echo '<li class="' . ($activeMenuItem == self::MENU_FAQ ? 'plugin_formcreator_selectedMenuItem' : '') . '">';
-         echo '<a href="' . FORMCREATOR_ROOTDOC.'/front/knowbaseitem.php' . '">';
-         echo '<span class="fc_list_icon fas fa-question" title="'.__('Knowledge Base', 'formcreator').'"></span>';
-         echo '<span class="label">'.__('Knowledge Base', 'formcreator').'</span>';
+         echo '<a href="' . FORMCREATOR_ROOTDOC . '/front/knowbaseitem.php' . '">';
+         echo '<span class="fa fa-question fc_list_icon" title="' . __('Consultar FAQ', 'formcreator') . '"></span>';
+         echo '<span class="label">' . __('Consultar FAQ', 'formcreator') . '</span>';
          echo '</a></li>';
       }
 
@@ -275,12 +274,6 @@ class PluginFormcreatorWizard {
    }
 
    protected static function findActiveMenuItem() {
-      if (PluginFormcreatorEntityConfig::getUsedConfig('is_kb_separated', Session::getActiveEntity()) == PluginFormcreatorEntityConfig::CONFIG_KB_DISTINCT) {
-         if (strpos($_SERVER['REQUEST_URI'], "formcreator/front/knowbaseitem.php") !== false
-            || strpos($_SERVER['REQUEST_URI'], "formcreator/front/knowbaseitem.form.php") !== false) {
-            return self::MENU_FAQ;
-         }
-      }
       if (strpos($_SERVER['REQUEST_URI'], "formcreator/front/wizard.php") !== false
           || strpos($_SERVER['REQUEST_URI'], "formcreator/front/formdisplay.php") !== false
           || strpos($_SERVER['REQUEST_URI'], "formcreator/front/knowbaseitem.form.php") !== false) {
@@ -292,6 +285,13 @@ class PluginFormcreatorWizard {
       }
       if (strpos($_SERVER['REQUEST_URI'], "formcreator/front/reservationitem.php") !== false) {
          return self::MENU_RESERVATIONS;
+      }
+      // verdanatech
+      if (
+         strpos($_SERVER['REQUEST_URI'], "formcreator/front/knowbaseitem.php") !== false
+         || strpos($_SERVER['REQUEST_URI'], "formcreator/front/knowbaseitem.form.php") !== false
+      ) {
+         return self::MENU_FAQ;
       }
       if (strpos($_SERVER['REQUEST_URI'], "formcreator/front/wizardfeeds.php") !== false) {
          return self::MENU_FEEDS;

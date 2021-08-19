@@ -93,7 +93,6 @@ class DateField extends PluginFormcreatorAbstractField
       $fieldName = 'formcreator_field_' . $id;
 
       $html .= Html::showDateField($fieldName, [
-         'yearrange' => '-100:+10',
          'value'   => (strtotime($this->value) != '') ? $this->value : '',
          'rand'    => $rand,
          'display' => false,

@@ -30,6 +30,216 @@
 html, body {
     height: 100%;
 }
+/* ----------- new -------- */
+
+form[name="plugin_formcreator_form"] .select2-container .select2-selection--single {
+   height: 1.8rem !important;
+}
+
+form[name="plugin_formcreator_form"] .select2-selection.select2-selection--single {
+   max-width: 100% !important;
+}
+
+form[name="plugin_formcreator_form"] .select2-container {
+   max-width: 100% !important;
+}
+
+form[name="plugin_formcreator_form"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+   line-height: 28px !important;
+}
+
+form[name="plugin_formcreator_form"] .select2-container--default .select2-selection--single .select2-selection__arrow {
+   height: 1.8rem;
+   top: 1% !important;
+}
+
+.formcreator_form .form-group .form_field input.hasDatepicker {
+   width: 100%;
+   max-width: 271.25px !important;
+   font-size: 13px !important;
+}
+
+.formcreator_form .form-group .form_field input.hasDatepicker+button.ui-datepicker-trigger {
+   transform: translate3D(-35px, 2px, 0);
+}
+
+.formcreator_form .form-group .form_field input.hasDatepicker+button.ui-datepicker-trigger~span {
+   transform: translate3D(-30px, 4px, 0);
+}
+
+.formcreator_form .form-group .form_field input.hasDatepicker+button.ui-datepicker-trigger~span::before {
+   content: '\f00d';
+   font-size: 18px;
+}
+
+form[name="plugin_formcreator_form"] .line0:hover, .line1:hover {
+   background-color: rgba(360, 360, 360, .7)
+}
+
+.line1 {
+   background-color: #f5f5f5;
+}
+
+.line0 {
+   background-color: #efefef;
+}
+
+#plugin_formcreator_searchBar {
+   padding-bottom: 25px;
+   margin: 20px 6px;
+}
+
+.plugin_formcreator_formTile {
+   min-height: 127px !important;
+   background: linear-gradient(to bottom, rgb(231, 231, 231) 45.2%, white 45.2%) !important;
+   position: static !important;
+   display: inline-block;
+   margin-bottom: 8px;
+   width: 31%;
+}
+
+a.plugin_formcreator_formTile_title {
+   background: rgb(231, 231, 231);
+   font-size: 1.3em;
+   height: 32px;
+   max-height: 32px;
+   white-space: inherit;
+   overflow: hidden;
+   line-height: 16px;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-line-clamp: 2;
+   -webkit-box-orient: vertical;
+   padding: 10px 0px 0px 10px;
+   border-bottom: 15px solid rgb(231, 231, 231);
+   border-right: 23px solid transparent;
+   max-width: 29ch;
+}
+
+div.plugin_formcreator_formTile_description {
+   line-height: 1.5;
+   min-height: 33px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: inherit;
+   display: -webkit-box;
+   -webkit-line-clamp: 3;
+   -webkit-box-orient: vertical;
+}
+
+.plugin_formcreator_formTile i.fa, .plugin_formcreator_formTile i.fab, .plugin_formcreator_formTile i.fas {
+   font-size: 2.5em;
+   margin: 7px 8px 0 0;
+}
+
+div.plugin_formcreator_sort {
+   margin-bottom: 10px;
+   display: flex;
+   column-gap: 20px;
+   justify-content: center;
+   text-align: center;
+}
+
+div.plugin_formcreator_sort>span.formcreator_radios>input[type="radio"] {
+   display: none;
+   margin: 0 10px 0 0;
+}
+
+div.plugin_formcreator_sort>span.formcreator_radios>label:last-child {
+   margin: 0;
+   border: 1px solid #BBB;
+   border-radius: 3px;
+   padding: 4px 8px;
+   color: #595959;
+   width: 210px;
+}
+
+div.plugin_formcreator_sort>span.formcreator_radios>label:last-child:hover {
+   border-color: #777;
+   color: black;
+}
+
+div.plugin_formcreator_sort>span.formcreator_radios>input[type="radio"]:checked~label {
+   border-color: #777;
+   color: black;
+   background-color: #ebebeb;
+}
+
+#plugin_formcreator_wizard_right {
+   display: flex;
+   flex-direction: column;
+   margin-right: 10px;
+   padding-bottom: 15px;
+}
+
+div#plugin_formcreator_formlist {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: space-around;
+   align-items: center;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+   margin: 2px 3px 2px 2px;
+}
+
+.formcreator_form div.form_section>h2 {
+   color: white;
+   background: #223d82;
+   border-radius: 5px 5px 0 0;
+   border-bottom: 3px solid #4479ff;
+}
+
+input.submit {
+   padding: 6px 12px;
+}
+
+.plugin_formcreator_page::-webkit-scrollbar {
+   width: 8px;
+   background: transparent;
+}
+
+.plugin_formcreator_page::-webkit-scrollbar-thumb {
+   background-color: rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 900px) and (max-width: 1100px) {
+   div.plugin_formcreator_sort>span.formcreator_radios>label:last-child {
+      padding: 8px 0px;
+      width: 85%;
+   }
+   div.plugin_formcreator_sort {
+      flex-direction: column;
+      row-gap: 5px;
+      text-align: center;
+   }
+   div.plugin_formcreator_formTile {
+      width: 90%;
+   }
+}
+
+@media (max-width: 899.98px) {
+   #plugin_formcreator_wizard_right {
+      margin-left: 0;
+      padding-left: 0;
+   }
+   .plugin_formcreator_marginRight {
+      margin-right: 0;
+   }
+   div.plugin_formcreator_sort>span.formcreator_radios>label:last-child {
+      padding: 8px 0px;
+      width: 85%;
+   }
+   div.plugin_formcreator_sort {
+      flex-direction: column;
+      row-gap: 5px;
+      text-align: center;
+   }
+   div.plugin_formcreator_formTile {
+      width: 90%;
+   }
+}
+
 
 @-moz-keyframes ripple {
   0%, 100% {

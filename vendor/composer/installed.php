@@ -1,24 +1,24 @@
 <?php return array (
   'root' => 
   array (
-    'pretty_version' => 'dev-develop',
-    'version' => 'dev-develop',
+    'pretty_version' => 'dev-master',
+    'version' => 'dev-master',
     'aliases' => 
     array (
     ),
-    'reference' => '57459a3dca616e92d9132e45ef6cb9798a0b2499',
+    'reference' => '9c5857e7173f0a0ac8be152b98360a8c5328b4d8',
     'name' => 'glpi-plugin/formcreator',
   ),
   'versions' => 
   array (
     'glpi-plugin/formcreator' => 
     array (
-      'pretty_version' => 'dev-develop',
-      'version' => 'dev-develop',
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
       'aliases' => 
       array (
       ),
-      'reference' => '57459a3dca616e92d9132e45ef6cb9798a0b2499',
+      'reference' => '9c5857e7173f0a0ac8be152b98360a8c5328b4d8',
     ),
     'gregwar/captcha' => 
     array (

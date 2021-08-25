@@ -47,7 +47,8 @@ class TextareaField extends TextField
       '_tag_filename' => [],
    ];
 
-   public function getDesignSpecializationField(): array {
+   public function getDesignSpecializationField(): array
+   {
       $rand = mt_rand();
 
       $label = '';
@@ -84,7 +85,8 @@ class TextareaField extends TextField
       ];
    }
 
-   public function getRenderedHtml($domain, $canEdit = true): string {
+   public function getRenderedHtml($domain, $canEdit = true): string
+   {
       if (!$canEdit) {
          return Toolbox::getHtmlToDisplay($this->value);
       }
@@ -107,12 +109,14 @@ class TextareaField extends TextField
       ]);
       // The following file upload area is needed to allow embedded pics in the tetarea
       $html .=  '<div style="display:none;">';
-      Html::file(['editor_id'    => "$fieldName$rand",
-                  'filecontainer' => "filecontainer$rand",
-                  'onlyimages'    => true,
-                  'showtitle'     => false,
-                  'multiple'      => true,
-                  'display'       => false]);
+      Html::file([
+         'editor_id'    => "$fieldName$rand",
+         'filecontainer' => "filecontainer$rand",
+         'onlyimages'    => true,
+         'showtitle'     => false,
+         'multiple'      => true,
+         'display'       => false
+      ]);
       $html .=  '</div>';
       $html .= Html::scriptBlock("$(function() {
          pluginFormcreatorInitializeTextarea('$fieldName', '$rand');
@@ -121,11 +125,13 @@ class TextareaField extends TextField
       return $html;
    }
 
-   public static function getName(): string {
+   public static function getName(): string
+   {
       return __('Textarea', 'formcreator');
    }
 
-   public function serializeValue(): string {
+   public function serializeValue(): string
+   {
       if ($this->value === null || $this->value === '') {
          return '';
       }
@@ -143,13 +149,15 @@ class TextareaField extends TextField
       return Toolbox::addslashes_deep($this->value);
    }
 
-   public function deserializeValue($value) {
+   public function deserializeValue($value)
+   {
       $this->value = ($value !== null && $value !== '')
          ? $value
          : '';
    }
 
-   public function getValueForDesign(): string {
+   public function getValueForDesign(): string
+   {
       if ($this->value === null) {
          return '';
       }
@@ -157,7 +165,8 @@ class TextareaField extends TextField
       return $this->value;
    }
 
-   public function isValid(): bool {
+   public function isValid(): bool
+   {
       // If the field is required it can't be empty
       if ($this->isRequired() && $this->value == '') {
          Session::addMessageAfterRedirect(
@@ -167,12 +176,51 @@ class TextareaField extends TextField
          );
          return false;
       }
+      if (!$this->isValidValue($this->value)) {
+         return false;
+      }
+
 
       // All is OK
       return true;
    }
+   public function isValidValue($value): bool
+   {
+      if (strlen($value) == 0) {
+         return true;
+      }
 
-   public function prepareQuestionInputForSave($input): array {
+      $parameters = $this->getParameters();
+
+      // Check the field matches the format regex
+      $regex = $parameters['regex']->fields['regex'];
+      if ($regex !== null && strlen($regex) > 0) {
+         if (!preg_match($regex, $value)) {
+            Session::addMessageAfterRedirect(sprintf(__('Specific format does not match: %s', 'formcreator'), $this->question->fields['name']), false, ERROR);
+            return false;
+         }
+      }
+
+      // Check the field is in the range
+      $rangeMin = $parameters['range']->fields['range_min'];
+      $rangeMax = $parameters['range']->fields['range_max'];
+
+      $value = Html::clean($value);
+      if ($rangeMin > 0 && strlen($value) < $rangeMin) {
+         Session::addMessageAfterRedirect(sprintf(__('The text is too short (minimum %d characters): %s', 'formcreator'), $rangeMin, $this->question->fields['name']), false, ERROR);
+         return false;
+      }
+
+      if ($rangeMax > 0 && strlen($value) > $rangeMax) {
+         Session::addMessageAfterRedirect(sprintf(__('The text is too long (maximum %d characters): %s', 'formcreator'), $rangeMax, $this->question->fields['name']), false, ERROR);
+         return false;
+      }
+
+      return true;
+   }
+
+   public function prepareQuestionInputForSave($input): array
+   {
       $success = true;
       $fieldType = $this->getFieldTypeName();
       if (isset($input['_parameters'][$fieldType]['regex']['regex']) && !empty($input['_parameters'][$fieldType]['regex']['regex'])) {
@@ -199,11 +247,13 @@ class TextareaField extends TextField
       return $input;
    }
 
-   public function hasInput($input): bool {
+   public function hasInput($input): bool
+   {
       return isset($input['formcreator_field_' . $this->question->getID()]);
    }
 
-   public function parseAnswerValues($input, $nonDestructive = false): bool {
+   public function parseAnswerValues($input, $nonDestructive = false): bool
+   {
       parent::parseAnswerValues($input, $nonDestructive);
       $key = 'formcreator_field_' . $this->question->getID();
       if (isset($input['_tag_' . $key]) && isset($input['_' . $key]) && isset($input['_prefix_' . $key])) {
@@ -215,7 +265,8 @@ class TextareaField extends TextField
       return true;
    }
 
-   public function getValueForTargetText($domain, $richText): ?string {
+   public function getValueForTargetText($domain, $richText): ?string
+   {
       $value = $this->value;
       if (!$richText) {
          $value = Toolbox::unclean_cross_side_scripting_deep($value);
@@ -224,35 +275,43 @@ class TextareaField extends TextField
       return $value;
    }
 
-   public function equals($value): bool {
+   public function equals($value): bool
+   {
       return $this->value == $value;
    }
 
-   public function notEquals($value): bool {
+   public function notEquals($value): bool
+   {
       return !$this->equals($value);
    }
 
-   public function greaterThan($value): bool {
+   public function greaterThan($value): bool
+   {
       return $this->value > $value;
    }
 
-   public function lessThan($value): bool {
+   public function lessThan($value): bool
+   {
       return !$this->greaterThan($value) && !$this->equals($value);
    }
 
-   public function regex($value): bool {
+   public function regex($value): bool
+   {
       return (preg_grep($value, $this->value)) ? true : false;
    }
 
-   public function isAnonymousFormCompatible(): bool {
+   public function isAnonymousFormCompatible(): bool
+   {
       return true;
    }
 
-   public function getHtmlIcon(): string {
+   public function getHtmlIcon(): string
+   {
       return '<i class="far fa-comment-dots" aria-hidden="true"></i>';
    }
 
-   public function getTranslatableStrings(array $options = []) : array {
+   public function getTranslatableStrings(array $options = []): array
+   {
       $strings = parent::getTranslatableStrings($options);
 
       $params = [

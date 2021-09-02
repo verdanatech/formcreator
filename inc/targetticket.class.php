@@ -689,6 +689,7 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
       $form = $formanswer->getForm();
       $data = $this->getDefaultData($formanswer);
 
+
       // Parse data
       // TODO: generate instances of all answers of the form and use them for the fullform computation
       //       and the computation from a admin-defined target ticket template
@@ -745,6 +746,7 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
       $data = $this->setTargetUrgency($data, $formanswer);
       $data = $this->setTargetLocation($data, $formanswer);
       $data = $this->setTargetAssociatedItem($data, $formanswer);
+      $data = $this->setTargetType($data, $formanswer);
 
       // There is always at least one requester
       $data = $this->requesters + $data;

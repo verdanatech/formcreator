@@ -41,7 +41,6 @@ if (!(new Plugin())->isActivated('formcreator')) {
 $css = '/' . Plugin::getWebDir('formcreator', false) . '/inc/getBackgroundFormImage.php';
 echo Html::css($css);
 
-
 PluginFormcreatorForm::header();
 
 if (

@@ -31,6 +31,47 @@
 
 include ('../../../inc/includes.php');
 
+// Check if plugin is activated...
+if (!(new Plugin())->isActivated('formcreator')) {
+   http_response_code(404);
+   exit();
+}
+
+$formFk = PluginFormcreatorForm::getForeignKeyField();
+if (!isset($_POST[$formFk])) {
+   http_response_code(403);
+   exit();
+}
+
+$form = new PluginFormcreatorForm();
+$form->getFromDB((int) $_POST['plugin_formcreator_forms_id']);
+if (!Session::haveRight('entity', UPDATE) && ($form->isDeleted() || $form->fields['is_active'] == '0')) {
+   http_response_code(403);
+   exit();
+}
+
+if ($form->fields['access_rights'] != PluginFormcreatorForm::ACCESS_PUBLIC) {
+   // form is not public : login required and form must be accessible from the entityes of the user
+   if (Session::getLoginUserID() === false || !$form->checkEntity(true)) {
+      http_response_code(403);
+      exit();
+   }
+}
+
+if ($form->fields['access_rights'] == PluginFormcreatorForm::ACCESS_RESTRICTED) {
+   $iterator = $DB->request(PluginFormcreatorForm_Profile::getTable(), [
+      'WHERE' => [
+         'profiles_id'                 => $_SESSION['glpiactiveprofile']['id'],
+         'plugin_formcreator_forms_id' => $form->getID()
+      ],
+      'LIMIT' => 1
+   ]);
+   if (count($iterator) == 0) {
+      http_response_code(403);
+      exit();
+   }
+}
+
 try {
     $visibility = PluginFormcreatorFields::updateVisibility($_POST);
 } catch (Exception $e) {

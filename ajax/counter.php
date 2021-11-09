@@ -30,37 +30,21 @@
  */
 
 include ('../../../inc/includes.php');
-
-// Check if plugin is activated...
-if (!(new Plugin())->isActivated('formcreator')) {
-   Html::displayNotFoundError();
+// Check a user is logged in
+if (Session::getLoginUserID() === false) {
+    http_response_code(403);
+    die();
 }
+// Immediately close session to allow parallelization
+session_write_close();
 
-Session::checkRight('entity', UPDATE);
+$counter = $_GET['counter'] ?? null;
 
-$form = new PluginFormcreatorForm;
-$export_array = ['schema_version' => PLUGIN_FORMCREATOR_SCHEMA_VERSION, 'forms' => []];
-foreach ($_GET['plugin_formcreator_forms_id'] as $id) {
-   $form->getFromDB($id);
-   try {
-      $export_array['forms'][] = $form->export();
-   } catch (\RuntimeException $e) {
-      Session::addMessageAfterRedirect($e->getMessage(), false, ERROR, true);
-      Html::back();
-   }
-}
+// Validate parameters
+if (!in_array($counter, [null, 'incoming', 'waiting', 'to_validate', 'solved'])) {
+    http_response_code(400);
+    die();
+};
 
-$export_json = json_encode($export_array, JSON_UNESCAPED_UNICODE
-                                        | JSON_UNESCAPED_SLASHES
-                                        | JSON_NUMERIC_CHECK
-                                        | ($_SESSION['glpi_use_mode'] == Session::DEBUG_MODE
-                                             ? JSON_PRETTY_PRINT
-                                             : 0));
-
-header("Expires: Mon, 26 Nov 1962 00:00:00 GMT");
-header('Pragma: private');
-header('Cache-control: private, must-revalidate');
-header("Content-disposition: attachment; filename=\"export_formcreator_".date("Ymd_Hi").".json\"");
-header("Content-type: application/json");
-
-echo $export_json;
+$status = PluginFormcreatorIssue::getTicketSummary($counter);
+echo json_encode($status);

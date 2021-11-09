@@ -315,14 +315,14 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
       echo '<div style="display: none" id="plugin_formcreator_linked_items' . $rand . '">';
       Ticket_Ticket::dropdownLinks('_linktype');
       $elements = [
-         'PluginFormcreatorTargetTicket'  => __('An other destination of this form', 'formcreator'),
-         'Ticket'                         => __('An existing ticket', 'formcreator'),
+         PluginFormcreatorTargetTicket::class => __('An other destination of this form', 'formcreator'),
+         Ticket::class                        => __('An existing ticket', 'formcreator'),
+         PluginFormcreatorQuestion::class     => __('A ticket from an answer to a question'),
       ];
       Dropdown::showFromArray('_link_itemtype', $elements, [
-         'on_change' => "plugin_formcreator_updateCompositePeerType($rand)",
+         'on_change' => "plugin_formcreator_updateCompositePeerType(this)",
          'rand'      => $rand,
       ]);
-      echo Html::scriptBlock("plugin_formcreator_updateCompositePeerType($rand);");
       // get already linked items
       $targetTicketId = $this->getID();
       $rows = $DB->request([
@@ -345,7 +345,7 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
          }
       }
 
-      echo '<span id="plugin_formcreator_link_ticket">';
+      echo '<span id="plugin_formcreator_link_ticket" style="display: none">';
       $linkparam = [
          'name'        => '_link_tickets_id',
          'rand'        => $rand,
@@ -370,6 +370,20 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
          'condition'   => $condition,
       ]);
       echo '</span>';
+
+      // dropdown of questions of type GLPI Object / Ticket
+      echo '<span id="plugin_formcreator_link_question" style="display: none">';
+      PluginFormcreatorQuestion::dropdownForForm(
+         $this->getForm()->getID(),
+         [
+            'fieldtype' => ['glpiselect'],
+            'values'    => ['LIKE', '%"itemtype":"' . Ticket::class . '"%'],
+         ],
+         '_link_plugin_formcreator_questions_id',
+         $this->fields['destination_entity_value']
+      );
+      echo '</span>';
+
       echo '</div>';
 
       // show already linked items
@@ -396,6 +410,16 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
                break;
 
             case PluginFormcreatorTargetTicket::getType():
+               echo Ticket_Ticket::getLinkName($row['link']);
+               echo ' ';
+               echo $itemtype::getTypeName();
+               echo ' ';
+               echo '<span style="font-weight:bold">' . $item->getField('name') . '</span>';
+               echo ' ';
+               echo $icons;
+               break;
+
+            case PluginFormcreatorQuestion::getType():
                echo Ticket_Ticket::getLinkName($row['link']);
                echo ' ';
                echo $itemtype::getTypeName();
@@ -616,6 +640,10 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
             $itemId = (int) $input['_link_targettickets_id'];
             break;
 
+         case PluginFormcreatorQuestion::getType():
+            $itemId = (int) $input['_link_plugin_formcreator_questions_id'];
+            break;
+
          default:
             Session::addMessageAfterRedirect(__('Invalid linked item type', 'formcreator'), false, ERROR);
             return [];
@@ -689,7 +717,6 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
       $form = $formanswer->getForm();
       $data = $this->getDefaultData($formanswer);
 
-
       // Parse data
       // TODO: generate instances of all answers of the form and use them for the fullform computation
       //       and the computation from a admin-defined target ticket template
@@ -739,6 +766,7 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
       $data['users_id_recipient'] = $formanswer->fields['requester_id'];
       $data['users_id_lastupdater'] = Session::getLoginUserID();
 
+      $data = $this->setTargetType($data, $formanswer);
       $data = $this->setTargetEntity($data, $formanswer, $requesters_id);
       $data = $this->setTargetDueDate($data, $formanswer);
       $data = $this->setSLA($data, $formanswer);
@@ -746,7 +774,6 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
       $data = $this->setTargetUrgency($data, $formanswer);
       $data = $this->setTargetLocation($data, $formanswer);
       $data = $this->setTargetAssociatedItem($data, $formanswer);
-      $data = $this->setTargetType($data, $formanswer);
 
       // There is always at least one requester
       $data = $this->requesters + $data;
@@ -769,6 +796,24 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
       }
       if (count($this->assignedGroups['_groups_id_assign']) > 0) {
          $data = $this->assignedGroups + $data;
+      }
+
+      // emulate file uploads of inline images
+      $data['_content'] = [];
+      $data['_prefix_content'] = [];
+      $data['_tag_content'] = [];
+      // TODO: replace PluginFormcreatorCommon::getDocumentsFromTag by Toolbox::getDocumentsFromTag
+      // when is merged https://github.com/glpi-project/glpi/pull/9335
+      foreach (PluginFormcreatorCommon::getDocumentsFromTag($data['content']) as $document) {
+         $prefix = uniqid('', true);
+         $filename = $prefix . 'image_paste.' . pathinfo($document['filename'], PATHINFO_EXTENSION);
+         if (!copy(GLPI_DOC_DIR . '/' . $document['filepath'], GLPI_TMP_DIR . '/' . $filename)) {
+            continue;
+         }
+
+         $data['_content'][] = $filename;
+         $data['_prefix_content'][] = $prefix;
+         $data['_tag_content'][] = $document['tag'];
       }
 
       // Create the target ticket
@@ -960,7 +1005,7 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractTarget
          $this->getForm()->getID(),
          [
             'fieldtype' => 'glpiselect',
-            'values' => $CFG_GLPI['ticket_types']
+            //'values' => $CFG_GLPI['ticket_types']
          ],
          '_associate_question',
          $this->fields['associate_question']

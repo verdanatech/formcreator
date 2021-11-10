@@ -1835,11 +1835,16 @@ form[name="plugin_formcreator_form"] .select2-container--default .select2-select
 
 .plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(3) {
 	position: absolute;
+	transform: translate3D(-34px, 8px, 0);
+}
+
+#bloc .plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(3) {
+	position: absolute;
 	transform: translate3D(-34px, 11px, 0);
 }
 
 .plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(3) i::before {
-	font-size: 1.1em;
+	font-size: 15px;
 }
 
 .plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(4) {
@@ -1963,7 +1968,7 @@ div.plugin_formcreator_sort>span.formcreator_radios>input[type="radio"]:checked~
 div#plugin_formcreator_formlist {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-around;
+	justify-content: flex-start;
 	align-items: center;
 }
 
@@ -2117,12 +2122,12 @@ div#bloc::after {
 }
 
 #bloc form.plugin_formcreator_form {
-	margin: 10px auto 50px !important;
+	margin: 0 auto 0 !important;
 	display: block;
 	position: relative;
 	line-height: 1.4em;
 	z-index: 2;
-	transform: translateY(-80px);
+	transform: translateY(-20px);
 }
 
 #bloc form.plugin_formcreator_form .center input {
@@ -2196,8 +2201,10 @@ div#bloc::after {
 #bloc form#plugin_formcreator_form.plugin_formcreator_form>ol {
 	width: 38%;
 	float: right;
-	transform: translateY(-7vh);
+	top: 7px;
 	margin: 0;
+	position: absolute;
+	right: 5%;
 }
 
 #bloc form#plugin_formcreator_form.plugin_formcreator_form ol li.plugin_formcreator_section {
@@ -2254,6 +2261,9 @@ div#bloc::after {
 		width: inherit;
 		float: none;
 		transform: initial;
+		position: inherit;
+		top: 0;
+		right: 0;
 	}
 	#bloc form.plugin_formcreator_form .center {
 		width: inherit;

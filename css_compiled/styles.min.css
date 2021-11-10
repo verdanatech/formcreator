@@ -1826,21 +1826,28 @@ form[name="plugin_formcreator_form"] .select2-container--default .select2-select
 	top: 1% !important;
 }
 
-.formcreator_form .form-group .form_field input.hasDatepicker {
+.plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr input.flatpickr {
 	width: 100%;
 	max-width: 271.25px !important;
 	font-size: 13px !important;
+	height: 32px;
 }
 
-.formcreator_form .form-group .form_field input.hasDatepicker+button.ui-datepicker-trigger {
-	transform: translate3D(-35px, 2px, 0);
+.plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(3) {
+	position: absolute;
+	transform: translate3D(-34px, 11px, 0);
 }
 
-.formcreator_form .form-group .form_field input.hasDatepicker+button.ui-datepicker-trigger~span {
-	transform: translate3D(-30px, 4px, 0);
+.plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(3) i::before {
+	font-size: 1.1em;
 }
 
-.formcreator_form .form-group .form_field input.hasDatepicker+button.ui-datepicker-trigger~span::before {
+.plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(4) {
+	position: absolute;
+	transform: translate3D(-18px, 7px, 0);
+}
+
+.plugin_formcreator_section .form-group .form_field .no-wrap.flatpickr a:nth-child(4) i::before {
 	content: "\f00d";
 	font-size: 18px;
 }

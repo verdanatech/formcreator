@@ -37,6 +37,7 @@ html, body {
 	0%, 100% {
 		opacity: 0;
 	}
+
 	1% {
 		opacity: 1;
 	}
@@ -46,6 +47,7 @@ html, body {
 	0%, 100% {
 		opacity: 0;
 	}
+
 	1% {
 		opacity: 1;
 	}
@@ -55,6 +57,7 @@ html, body {
 	0%, 100% {
 		opacity: 0;
 	}
+
 	1% {
 		opacity: 1;
 	}
@@ -64,9 +67,11 @@ html, body {
 	0% {
 		opacity: 0;
 	}
+
 	99% {
 		opacity: 0;
 	}
+
 	100% {
 		opacity: 1;
 	}
@@ -76,9 +81,11 @@ html, body {
 	0% {
 		opacity: 1;
 	}
+
 	1% {
 		opacity: 0;
 	}
+
 	100% {
 		opacity: 0;
 	}
@@ -949,6 +956,7 @@ tr[data-itemtype="PluginFormcreatorCondition"]~tr[data-itemtype="PluginFormcreat
 		-webkit-transform: translate3d(0, 100%, 0);
 		transform: translate3d(0, 100%, 0);
 	}
+
 	to {
 		opacity: 1;
 		-webkit-transform: none;
@@ -998,7 +1006,7 @@ a.plugin_formcreator_formTile_title {
 }
 
 .plugin_formcreator_formTile_description {
-	padding: 0 15px 5px 15px;
+	padding: 0 15px 0px 15px;
 }
 
 .plugin_formcreator_formTile div:first-child {
@@ -1558,27 +1566,34 @@ span.fc_list_icon {
 	form#plugin_formcreator_form {
 		width: 100%;
 	}
+
 	#plugin_formcreator_form .form-group>label, #plugin_formcreator_form .form-group .form_field, #plugin_formcreator_form .form-group .form_field>input, #plugin_formcreator_form textarea, #plugin_formcreator_form select {
 		width: 100%;
 	}
+
 	#plugin_formcreator_form .form-group .form_field input.hasDatepicker {
 		width: 88%;
 	}
+
 	#plugin_formcreator_form .select2-container .select2-choice, #plugin_formcreator_form .select2-container-multi .select2-choices {
 		width: 96%;
 	}
+
 	#plugin_formcreator_lastForms {
 		position: static;
 		width: 100%;
 	}
+
 	.plugin_formcreator_marginRight {
 		margin-right: 0;
 	}
+
 	.plugin_formcreator_container .plugin_formcreator_leftHeader#header {
 		width: 100%;
 		height: 70px;
 		position: relative;
 	}
+
 	.formcreator_header_top#header_top {
 		display: none;
 		opacity: 0;
@@ -1586,23 +1601,29 @@ span.fc_list_icon {
 		background-color: transparent;
 		text-align: left;
 	}
+
 	#header_top .plugin_formcreator_entityProfile .profile-selector {
 		max-width: none;
 		padding: 0 !important;
 	}
+
 	.toggle_menu #c_menu li label {
 		display: inline-block;
 	}
+
 	#formcreator_servicecatalogue_ticket_summary {
 		width: 100%;
 		display: block;
 	}
+
 	.plugin_formcreator_container #footer {
 		display: none;
 	}
+
 	#formcreator-toggle-nav-desktop~.formcreator-nav-button {
 		display: none;
 	}
+
 	#formcreator-toggle-nav-responsive~.formcreator-nav-button {
 		display: inline-block;
 		position: fixed;
@@ -1610,12 +1631,15 @@ span.fc_list_icon {
 		right: 1rem;
 		z-index: 2000;
 	}
+
 	#formcreator-toggle-nav-responsive:checked~#header #c_menu {
 		transform: translateY(0);
 	}
+
 	#formcreator-toggle-nav-responsive:checked~#header .plugin_formcreator_services {
 		margin-top: 120px;
 	}
+
 	#formcreator-toggle-nav-responsive:checked~#header_top.formcreator_header_top {
 		display: block;
 		position: fixed;
@@ -1627,16 +1651,20 @@ span.fc_list_icon {
 		opacity: 1;
 		animation: fadeInd 0.3s;
 	}
+
 	#myname.plugin_formcreator_myname {
 		margin: 0 85px 0 105px;
 		width: calc(100% - 190px);
 	}
+
 	.plugin_formcreator_userMenu_icons li {
 		padding: 0;
 	}
+
 	#searchcriterias .tab_cadre_fixe td {
 		padding: 5px 0;
 	}
+
 	.plugin_formcreator_container .plugin_formcreator_leftHeader#header #c_menu {
 		position: absolute;
 		transform: translateY(-100%) translateZ(0);
@@ -1645,6 +1673,7 @@ span.fc_list_icon {
 		width: 100%;
 		height: 90vh;
 	}
+
 	#page.plugin_formcreator_page {
 		margin: 0;
 		width: 100%;
@@ -1652,16 +1681,20 @@ span.fc_list_icon {
 		min-height: calc(100% - 100px);
 		overflow-x: hidden;
 	}
+
 	.toggle_menu #page.plugin_formcreator_page {
 		width: 100%;
 		margin-left: 0;
 	}
+
 	.plugin_formcreator_page #formcreator_servicecatalogue {
 		width: 100%;
 	}
+
 	#formcreator_servicecatalogue_ticket_summary {
 		left: 100px;
 	}
+
 	#plugin_formcreator_wizard_categories {
 		height: inherit;
 		width: 100%;
@@ -1669,22 +1702,27 @@ span.fc_list_icon {
 		float: none;
 		min-height: initial;
 	}
+
 	#plugin_formcreator_wizard_categories .slinky-menu {
 		position: static;
 	}
+
 	.plugin_formcreator_page #plugin_formcreator_wizard {
 		width: 100%;
 		height: inherit;
 	}
+
 	#plugin_formcreator_wizard_right {
 		width: 94%;
 		height: inherit;
 		overflow: inherit;
 		margin: 0;
 	}
+
 	#plugin_formcreator_serviceCatalog #footer {
 		display: none;
 	}
+
 	#debug-float.plugin_formcreator_debug-float {
 		z-index: 1000;
 	}
@@ -2001,11 +2039,13 @@ input.submit {
 		padding: 8px 0px;
 		width: 85%;
 	}
+
 	div.plugin_formcreator_sort {
 		flex-direction: column;
 		row-gap: 5px;
 		text-align: center;
 	}
+
 	div.plugin_formcreator_formTile {
 		width: 90%;
 	}
@@ -2016,18 +2056,22 @@ input.submit {
 		margin-left: 0;
 		padding-left: 0;
 	}
+
 	.plugin_formcreator_marginRight {
 		margin-right: 0;
 	}
+
 	div.plugin_formcreator_sort>span.formcreator_radios>label:last-child {
 		padding: 8px 0px;
 		width: 85%;
 	}
+
 	div.plugin_formcreator_sort {
 		flex-direction: column;
 		row-gap: 5px;
 		text-align: center;
 	}
+
 	div.plugin_formcreator_formTile {
 		width: 90%;
 	}
@@ -2252,11 +2296,13 @@ div#bloc::after {
 		width: inherit;
 		float: none;
 	}
+
 	#bloc .plugin_formcreator_form>.form_header {
 		width: inherit;
 		float: none;
 		text-align: center;
 	}
+
 	#bloc form#plugin_formcreator_form.plugin_formcreator_form>ol {
 		width: inherit;
 		float: none;
@@ -2265,10 +2311,12 @@ div#bloc::after {
 		top: 0;
 		right: 0;
 	}
+
 	#bloc form.plugin_formcreator_form .center {
 		width: inherit;
 		float: none;
 	}
+
 	#bloc form.plugin_formcreator_form {
 		margin: 10px auto 20px !important;
 		padding: 0 40px;

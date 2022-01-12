@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'e14a585fe596fce7d5a8b6591c9b4382664c640f',
+        'reference' => '27b383c86abbce030ff406b560d10edc7caafe57',
         'name' => 'glpi-plugin/formcreator',
         'dev' => false,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'e14a585fe596fce7d5a8b6591c9b4382664c640f',
+            'reference' => '27b383c86abbce030ff406b560d10edc7caafe57',
             'dev_requirement' => false,
         ),
         'gregwar/captcha' => array(

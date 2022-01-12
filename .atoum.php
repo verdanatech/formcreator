@@ -29,33 +29,27 @@
  * ---------------------------------------------------------------------
  */
 
-include ('../../../inc/includes.php');
-Session::checkRight('entity', UPDATE);
+$tests_dir = __DIR__ . '/tests/';
+$coverage_dir = $tests_dir . 'code-coverage/';
 
-if (!isset($_REQUEST['id'])) {
-    echo __('Bad request', 'formcreator');
-   http_response_code(400);
-   exit();
-}
-$questionId = (int) $_REQUEST['id'];
-
-$question = new PluginFormcreatorQuestion();
-if (!$question->getFromDB($questionId)) {
-    http_response_code(404);
-    echo __('Question not found', 'formcreator');
-    exit;
+if (!file_exists($coverage_dir)) {
+    mkdir($coverage_dir);
 }
 
-if (!$question->canUpdate()) {
-    http_response_code(403);
-    echo __('You don\'t have right for this action', 'formcreator');
-    exit;
-}
+$coverageField = new atoum\atoum\report\fields\runner\coverage\html(
+    'Formcreator',
+    $coverage_dir
+);
+$coverageField->setRootUrl('file://' . realpath($coverage_dir));
 
-$success = $question->update($_REQUEST);
-if (!$success) {
-    http_response_code(500);
-    exit();
-}
-$question->getFromDB($question->getID()); // To remove if GLPI #9210 merged
-echo $question->fields['name'];
+$script
+    ->addDefaultReport()
+    ->addField($coverageField);
+
+$script->addDefaultReport();
+
+$cloverWriter = new atoum\atoum\writers\file($coverage_dir . 'clover.xml');
+$cloverReport = new atoum\atoum\reports\asynchronous\clover();
+$cloverReport->addWriter($cloverWriter);
+
+$runner->addReport($cloverReport);

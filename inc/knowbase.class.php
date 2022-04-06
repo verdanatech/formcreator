@@ -211,17 +211,24 @@ class PluginFormcreatorKnowbase {
       $formList = [];
       $result_faqs = $DB->request($query_faqs);
       foreach ($result_faqs as $faq) {
-         $formList[] = [
+         $faq_object = [
             'id'           => $faq['id'],
             'name'         => $faq['name'],
             'icon'         => '',
             'icon_color'   => '',
             'background_color'   => '',
+            'answer' => '',
             'description'  => '',
             'type'         => 'faq',
             'usage_count'  => $faq['view'],
             'is_default'   => false
          ];
+
+         if (!empty($faq["answer"])) {
+            $faq_object["answer"] = Html::clean($faq["answer"]);
+         }
+
+         $formList[] = $faq_object;
       }
 
       return ['default' => [], 'forms' => $formList];

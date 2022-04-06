@@ -172,5 +172,6 @@
             "install-path": "../xylemical/php-expressions"
         }
     ],
-    "dev": false
+    "dev": false,
+    "dev-package-names": []
 }

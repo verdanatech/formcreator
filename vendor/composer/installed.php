@@ -1,51 +1,50 @@
-<?php return array (
-  'root' => 
-  array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
-    'aliases' => 
-    array (
+<?php return array(
+    'root' => array(
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'reference' => '14f7aee62036424aca33514bc07eb4a4a5e6c1bd',
+        'name' => 'glpi-plugin/formcreator',
+        'dev' => false,
     ),
-    'reference' => '9c5857e7173f0a0ac8be152b98360a8c5328b4d8',
-    'name' => 'glpi-plugin/formcreator',
-  ),
-  'versions' => 
-  array (
-    'glpi-plugin/formcreator' => 
-    array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '9c5857e7173f0a0ac8be152b98360a8c5328b4d8',
+    'versions' => array(
+        'glpi-plugin/formcreator' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'reference' => '14f7aee62036424aca33514bc07eb4a4a5e6c1bd',
+            'dev_requirement' => false,
+        ),
+        'gregwar/captcha' => array(
+            'pretty_version' => 'v1.1.9',
+            'version' => '1.1.9.0',
+            'type' => 'captcha',
+            'install_path' => __DIR__ . '/../gregwar/captcha',
+            'aliases' => array(),
+            'reference' => '4bb668e6b40e3205a020ca5ee4ca8cff8b8780c5',
+            'dev_requirement' => false,
+        ),
+        'symfony/finder' => array(
+            'pretty_version' => 'v4.4.24',
+            'version' => '4.4.24.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/finder',
+            'aliases' => array(),
+            'reference' => 'a96bc19ed87c88eec78e1a4c803bdc1446952983',
+            'dev_requirement' => false,
+        ),
+        'xylemical/php-expressions' => array(
+            'pretty_version' => 'v1.0.3',
+            'version' => '1.0.3.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../xylemical/php-expressions',
+            'aliases' => array(),
+            'reference' => 'a97f86aa25926901031c053c8d3fa49410339024',
+            'dev_requirement' => false,
+        ),
     ),
-    'gregwar/captcha' => 
-    array (
-      'pretty_version' => 'v1.1.9',
-      'version' => '1.1.9.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '4bb668e6b40e3205a020ca5ee4ca8cff8b8780c5',
-    ),
-    'symfony/finder' => 
-    array (
-      'pretty_version' => 'v4.4.24',
-      'version' => '4.4.24.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'a96bc19ed87c88eec78e1a4c803bdc1446952983',
-    ),
-    'xylemical/php-expressions' => 
-    array (
-      'pretty_version' => 'v1.0.3',
-      'version' => '1.0.3.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'a97f86aa25926901031c053c8d3fa49410339024',
-    ),
-  ),
 );

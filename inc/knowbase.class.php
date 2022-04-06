@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -34,14 +33,12 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
 }
 
-class PluginFormcreatorKnowbase
-{
+class PluginFormcreatorKnowbase {
 
    /**
     * Show the list of forms to be displayed to the end-user
     */
-   public function showList()
-   {
+   public function showList() {
       echo '<div class="center" id="plugin_formcreator_wizard">';
 
       echo '<div class="plugin_formcreator_card">';
@@ -51,8 +48,7 @@ class PluginFormcreatorKnowbase
       echo '</div>';
    }
 
-   public function showServiceCatalog()
-   {
+   public function showServiceCatalog() {
       echo "<div id='formcreator_servicecatalogue'>";
 
       // show wizard
@@ -63,10 +59,9 @@ class PluginFormcreatorKnowbase
       echo '</div>'; // formcreator_servicecatalogue
    }
 
-   public function showWizard($service_catalog = false)
-   {
+   public function showWizard($service_catalog = false) {
       echo '<div id="plugin_formcreator_kb_categories">';
-      echo '<div><h2>' . _n("Category", "Categories", 2, 'formcreator') . '</h2></div>';
+      echo '<div><h2>'._n("Category", "Categories", 2, 'formcreator').'</h2></div>';
       echo '<div><a href="#" id="kb_seeall">' . __('see all', 'formcreator') . '</a></div>';
       echo '</div>';
 
@@ -87,12 +82,11 @@ class PluginFormcreatorKnowbase
       echo '</div>';
    }
 
-   protected function showSearchBar()
-   {
+   protected function showSearchBar() {
       echo '<form name="plugin_formcreator_search" onsubmit="javascript: return false;" >';
       echo '<input type="text" name="words" id="plugin_formcreator_search_input" required/>';
       echo '<span id="plugin_formcreator_search_input_bar"></span>';
-      echo '<label for="plugin_formcreator_search_input">' . __('Please, describe your need here', 'formcreator') . '</label>';
+      echo '<label for="plugin_formcreator_search_input">'.__('Please, describe your need here', 'formcreator').'</label>';
       echo '</form>';
    }
 
@@ -104,8 +98,7 @@ class PluginFormcreatorKnowbase
     *
     * @return array Tree of form categories as nested array
     */
-   public static function getCategoryTree()
-   {
+   public static function getCategoryTree() {
       global $DB;
 
       $cat_table = KnowbaseItemCategory::getTable();
@@ -196,8 +189,7 @@ class PluginFormcreatorKnowbase
       return $nodes;
    }
 
-   public static function getFaqItems($rootCategory = 0, $keywords = '')
-   {
+   public static function getFaqItems($rootCategory = 0, $keywords = '') {
       global $DB;
 
       $table_cat          = getTableForItemType('KnowbaseItemCategory');

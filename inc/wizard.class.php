@@ -284,6 +284,13 @@ class PluginFormcreatorWizard {
       if (strpos($_SERVER['REQUEST_URI'], "formcreator/front/reservationitem.php") !== false) {
          return self::MENU_RESERVATIONS;
       }
+      // verdanatech
+      if (
+         strpos($_SERVER['REQUEST_URI'], "formcreator/front/knowbaseitem.php") !== false
+         || strpos($_SERVER['REQUEST_URI'], "formcreator/front/knowbaseitem.form.php") !== false
+      ) {
+         return self::MENU_FAQ;
+      }
       if (strpos($_SERVER['REQUEST_URI'], "formcreator/front/wizardfeeds.php") !== false) {
          return self::MENU_FEEDS;
       }

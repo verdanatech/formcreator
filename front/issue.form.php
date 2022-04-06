@@ -37,6 +37,17 @@ if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
+Session::checkValidSessionId();
+
+// Accessing an issue from a tech profile, redirect to ticket page
+if (isset($_REQUEST['id']) && Session::getCurrentInterface() == 'central') {
+   /** @var PluginFormcreatorIssue $issue */
+   $issue = PluginFormcreatorIssue::getById((int) $_REQUEST['id']);
+   $id = $issue->fields['items_id'];
+   $itemtype = $issue->fields['itemtype'];
+   Html::redirect($itemtype::getFormUrlWithID($id));
+}
+
 // Show issue only if service catalog is enabled
 if (!plugin_formcreator_replaceHelpdesk()) {
    Html::redirect($CFG_GLPI['root_doc']."/front/helpdesk.public.php");

@@ -252,39 +252,7 @@ class DropdownField extends PluginFormcreatorAbstractField
 
          case User::class:
             $dparams['right'] = 'all';
-            $currentEntity = Session::getActiveEntity();
-            $ancestorEntities = getAncestorsOf(Entity::getTable(), $currentEntity);
-            $decodedValues['entity_restrict'] = $decodedValues['entity_restrict'] ?? self::ENTITY_RESTRICT_FORM;
-            switch ($decodedValues['entity_restrict']) {
-               case self::ENTITY_RESTRICT_FORM:
-                  $form = new PluginFormcreatorForm();
-                  $form->getFromDBByQuestion($this->getQuestion());
-                  $currentEntity = $form->fields['entities_id'];
-                  $ancestorEntities = getAncestorsOf(Entity::getTable(), $currentEntity);
-                  break;
-
-               case self::ENTITY_RESTRICT_BOTH:
-                  $form = new PluginFormcreatorForm();
-                  $form->getFromDBByQuestion($this->getQuestion());
-                  $currentEntity = [$currentEntity, $form->fields['entities_id']];
-                  $ancestorEntities = array_merge($ancestorEntities, getAncestorsOf(Entity::getTable(), $currentEntity));
-                  break;
-            }
-            $where = ['OR' => []];
-            $where['OR'][] = ['entities_id' => $currentEntity];
-            if (count($ancestorEntities) > 0) {
-               $where['OR'][] = [
-                  'entities_id' => $ancestorEntities,
-                  'is_recursive' => '1',
-               ];
-            }
-            $dparams_cond_crit = [
-               'id' => new QuerySubQuery([
-                  'SELECT' => 'users_id',
-                  'FROM' => Profile_User::getTable(),
-                  'WHERE' => $where,
-               ])
-            ];
+            
             break;
 
          case ITILCategory::class:

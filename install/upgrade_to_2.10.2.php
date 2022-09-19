@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -36,13 +36,10 @@ class PluginFormcreatorUpgradeTo2_10_2 {
     * @param Migration $migration
     */
    public function upgrade(Migration $migration) {
-      global $DB;
-
       $this->migration = $migration;
+   }
 
-      // Versioin 2.10.2 contains fixes on counters requiring repopulation of issues table
-      $table = 'glpi_plugin_formcreator_issues';
-      $DB->query("TRUNCATE `$table`");
-      PluginFormcreatorIssue::cronSyncIssues(new CronTask());
+   public function isResyncIssuesRequired() {
+      return true;
    }
 }

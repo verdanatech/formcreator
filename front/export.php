@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -32,16 +32,22 @@
 include ('../../../inc/includes.php');
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
-$form = new PluginFormcreatorForm;
-$export_array = ['schema_version' => PLUGIN_FORMCREATOR_SCHEMA_VERSION . '.0', 'forms' => []];
+Session::checkRight('entity', UPDATE);
+
+$form = PluginFormcreatorCommon::getForm();
+$export_array = ['schema_version' => PLUGIN_FORMCREATOR_SCHEMA_VERSION, 'forms' => []];
 foreach ($_GET['plugin_formcreator_forms_id'] as $id) {
    $form->getFromDB($id);
-   $export_array['forms'][] = $form->export();
+   try {
+      $export_array['forms'][] = $form->export();
+   } catch (\RuntimeException $e) {
+      Session::addMessageAfterRedirect($e->getMessage(), false, ERROR, true);
+      Html::back();
+   }
 }
 
 $export_json = json_encode($export_array, JSON_UNESCAPED_UNICODE

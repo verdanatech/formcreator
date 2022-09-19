@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -34,32 +34,27 @@ include ("../../../inc/includes.php");
 Session::redirectIfNotLoggedIn();
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated("formcreator")) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
-$formanswer = new PluginFormcreatorFormAnswer();
+$formanswer = PluginFormcreatorCommon::getFormAnswer();
 
-// Edit an existing target ticket
 if (isset($_POST['update'])) {
+   // Edit an existing target ticket
    $formanswer->update($_POST);
    Html::back();
 
 } else if (isset($_POST['refuse_formanswer'])) {
-
-   $formanswer->getFromDB(intval($_POST['id']));
-   $formanswer->refuseAnswers($_POST);
+   $formanswer->update($_POST);
    $formanswer->redirectToList();
 
 } else if (isset($_POST['accept_formanswer'])) {
-
-   $formanswer->getFromDB(intval($_POST['id']));
-   $formanswer->acceptAnswers($_POST);
+   $formanswer->update($_POST);
    $formanswer->redirectToList();
 
 } else if (isset($_POST['save_formanswer'])) {
-   if (!$formanswer->updateAnswers($_POST)) {
+   if (!$formanswer->update($_POST)) {
       Html::back();
    }
    if (plugin_formcreator_replaceHelpdesk()) {
@@ -69,35 +64,29 @@ if (isset($_POST['update'])) {
       $formanswer->redirectToList();
    }
 
-   // Show target ticket form
+}
+// Show target ticket form
+$formanswer->getFromDB((int) $_GET['id']);
+if (!$formanswer->checkEntity()) {
+   Html::displayRightError();
+}
+
+if (Session::getCurrentInterface() == 'helpdesk') {
+   Html::helpHeader(__('Service catalog', 'formcreator'));
 } else {
-   $formanswer->getFromDB((int) $_GET['id']);
-   if (!$formanswer->checkEntity()) {
-      Html::displayRightError();
-   }
-   if (plugin_formcreator_replaceHelpdesk()) {
-      PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
-   } else {
-      if ($_SESSION['glpiactiveprofile']['interface'] == 'helpdesk') {
-         Html::helpHeader(
-            __('Form Creator', 'formcreator'),
-            $_SERVER['PHP_SELF']
-         );
-      } else {
-         Html::header(
-            __('Form Creator', 'formcreator'),
-            $_SERVER['PHP_SELF'],
-            'helpdesk',
-            'PluginFormcreatorFormlist'
-         );
-      }
-   }
+   Html::header(
+      __('Form Creator', 'formcreator'),
+      '',
+      'admin',
+      'PluginFormcreatorForm'
+   );
+}
 
-   $formanswer->display($_REQUEST);
 
-   if (plugin_formcreator_replaceHelpdesk()) {
-      PluginFormcreatorWizard::footer();
-   } else {
-      Html::footer();
-   }
+$formanswer->display($_REQUEST);
+
+if (Session::getCurrentInterface() == 'helpdesk') {
+   Html::helpFooter();
+} else {
+   Html::footer();
 }

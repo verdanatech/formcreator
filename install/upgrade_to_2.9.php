@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -278,6 +278,9 @@ class PluginFormcreatorUpgradeTo2_9 {
 
       $table = 'glpi_plugin_formcreator_answers';
       $migration->changeField($table, 'answer', 'answer', 'longtext');
+      $migration->changeField($table, 'plugin_formcreator_formanswers_id', 'plugin_formcreator_formanswers_id', 'integer', ['value' => '0']);
+      $migration->changeField($table, 'plugin_formcreator_questions_id', 'plugin_formcreator_questions_id', 'integer', ['value' => '0']);
+
       $table = 'glpi_plugin_formcreator_issues';
       $migration->changeField($table, 'comment', 'comment', 'longtext');
 
@@ -292,6 +295,10 @@ class PluginFormcreatorUpgradeTo2_9 {
          $migration->changeField($table, 'plugin_formcreator_questions_id', 'items_id', 'integer', ['comment' => 'item ID of the item affected by the condition']);
       }
       $migration->migrationOneTable($table);
+
+      // Fix possible nulls (despite those lines are definetely broken not usable; maybe a form does not behaves properly showing / hiding a question)
+      $DB->query("UPDATE `$table` SET `show_field` = 0 WHERE `show_field` IS NULL");
+
       $migration->changeField($table, 'show_field', 'plugin_formcreator_questions_id', 'integer', ['value' => '0', 'comment' => 'question to test for the condition']);
       $migration->dropKey($table, 'plugin_formcreator_questions_id');
       $migration->migrationOneTable($table);
@@ -370,5 +377,9 @@ class PluginFormcreatorUpgradeTo2_9 {
             $options
          );
       }
+   }
+
+   public function isResyncIssuesRequired() {
+      return false;
    }
 }

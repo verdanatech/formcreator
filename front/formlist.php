@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -33,30 +33,26 @@ include ('../../../inc/includes.php');
 
 Session::checkLoginUser();
 
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+// Check if plugin is activated...
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
-if ($_SESSION['glpiactiveprofile']['interface'] == 'helpdesk') {
+if (Session::getCurrentInterface() == 'helpdesk') {
    if (plugin_formcreator_replaceHelpdesk()) {
       Html::redirect('issue.php');
    } else {
-      Html::helpHeader(
-         __('Form list', 'formcreator'),
-         $_SERVER['PHP_SELF']
-      );
+      Html::helpHeader(__('Form list', 'formcreator'));
    }
 } else {
-   Html::header(
-      __('Form list', 'formcreator'),
-      $_SERVER['PHP_SELF'],
-      'helpdesk',
-      'PluginFormcreatorFormlist'
-   );
+   Html::header(__('Form list', 'formcreator'));
 }
 
-$form = new PluginFormcreatorForm();
+$form = PluginFormcreatorCommon::getForm();
 $form->showList();
 
-Html::footer();
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpFooter();
+} else {
+   Html::footer();
+}

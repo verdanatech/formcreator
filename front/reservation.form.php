@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -36,17 +36,20 @@ include ("../../../inc/includes.php");
 Session::checkRight("reservation", ReservationItem::RESERVEANITEM);
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
 $rr = new Reservation();
 
-PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpHeader(__('Service catalog', 'formcreator'));
+} else {
+   Html::header(__('Service catalog', 'formcreator'));
+}
 
 if (isset($_POST["update"])) {
-   list($begin_year,$begin_month,$begin_day) = explode("-", $_POST['resa']["begin"]);
+   list($begin_year, $begin_month) = explode("-", $_POST['resa']["begin"]);
    Toolbox::manageBeginAndEndPlanDates($_POST['resa']);
    if (Session::haveRight("reservation", UPDATE)
        || (Session::getLoginUserID() === $_POST["users_id"])) {
@@ -69,7 +72,7 @@ if (isset($_POST["update"])) {
                          $reservationitems_id));
    }
 
-   list($begin_year,$begin_month,$begin_day) = explode("-", $rr->fields["begin"]);
+   list($begin_year, $begin_month) = explode("-", $rr->fields["begin"]);
    Html::redirect(FORMCREATOR_ROOTDOC."/front/reservation.php?reservationitems_id=".
                   "$reservationitems_id&mois_courant=$begin_month&annee_courante=$begin_year");
 
@@ -81,7 +84,7 @@ if (isset($_POST["update"])) {
    }
    Toolbox::manageBeginAndEndPlanDates($_POST['resa']);
    $dates_to_add = [];
-   list($begin_year,$begin_month,$begin_day) = explode("-", $_POST['resa']["begin"]);
+   list($begin_year, $begin_month) = explode("-", $_POST['resa']["begin"]);
    if (isset($_POST['resa']["end"])) {
       // Compute dates to add.
       $dates_to_add[$_POST['resa']["begin"]] = $_POST['resa']["end"];
@@ -155,4 +158,8 @@ if (isset($_POST["update"])) {
    }
 }
 
-PluginFormcreatorWizard::footer();
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpFooter();
+} else {
+   Html::footer();
+}

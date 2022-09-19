@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -30,6 +30,30 @@
  */
 
 include ('../../../inc/includes.php');
+
+// Check if plugin is activated...
+if (!(new Plugin())->isActivated('formcreator')) {
+   http_response_code(404);
+   exit();
+}
+
+$formFk = PluginFormcreatorForm::getForeignKeyField();
+if (!isset($_POST[$formFk])) {
+   http_response_code(403);
+   exit();
+}
+
+$form = PluginFormcreatorCommon::getForm();
+$form->getFromDB((int) $_POST['plugin_formcreator_forms_id']);
+if (!Session::haveRight('entity', UPDATE) && ($form->isDeleted() || $form->fields['is_active'] == '0')) {
+   http_response_code(403);
+   exit();
+}
+
+if (!$form->canViewForRequest()) {
+   http_response_code(403);
+   exit();
+}
 
 try {
     $visibility = PluginFormcreatorFields::updateVisibility($_POST);

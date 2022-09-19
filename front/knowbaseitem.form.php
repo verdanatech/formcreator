@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -22,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -30,30 +29,40 @@
  * ---------------------------------------------------------------------
  */
 
-include("../../../inc/includes.php");
+include ("../../../inc/includes.php");
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
 $kb = new KnowbaseItem();
 
-if (isset($_GET["id"])) {
-   $kb->check($_GET["id"], READ);
-
-   PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
-
-   $available_options = ['item_itemtype', 'item_items_id', 'id'];
-   $options           = [];
-   foreach ($available_options as $key) {
-      if (isset($_GET[$key])) {
-         $options[$key] = $_GET[$key];
-      }
-   }
-   $_SESSION['glpilisturl']['KnowbaseItem'] = FORMCREATOR_ROOTDOC . "/front/wizard.php";
-   $kb->display($options);
-
-   PluginFormcreatorWizard::footer();
+if (!isset($_GET["id"])) {
+   Html::displayNotFoundError();
 }
+
+$kb->check($_GET["id"], READ);
+
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpHeader(__('Service catalog', 'formcreator'));
+} else {
+   Html::header(__('Service catalog', 'formcreator'));
+}
+
+$available_options = ['item_itemtype', 'item_items_id', 'id'];
+$options           = [];
+foreach ($available_options as $key) {
+   if (isset($_GET[$key])) {
+      $options[$key] = $_GET[$key];
+   }
+}
+$_SESSION['glpilisturl']['KnowbaseItem'] = Plugin::getWebDir('formcreator') . "/front/wizard.php";
+$kb->showFull($options);
+
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpFooter();
+} else {
+   Html::footer();
+}
+

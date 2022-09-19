@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -34,18 +34,20 @@ if (!defined('GLPI_ROOT')) {
 
 interface PluginFormcreatorQuestionParameterInterface {
    /**
+    * set field and options related to this question parameter
+    *
+    * @param PluginFormcreatorFieldInterface $field
+    * @param array $options
+    * @return void
+    */
+   public function setField(PluginFormcreatorFieldInterface $field, array $options);
+
+   /**
     * Gets the HTML form part for the parameters
-    * @param PluginFormcreatorForm $form a form used as context when displaying parameters
     * @param PluginFormcreatorQuestion $question question associated to the field, itself associated to the parameter
     * @return string HTML
     */
-   public function getParameterForm(PluginFormcreatorForm $form, PluginFormcreatorQuestion $question);
-
-   /**
-    * Gets the Js selector containing the parameters to show or hide
-    * @return string JS code
-    */
-   public function getJsShowHideSelector();
+   public function getParameterForm(PluginFormcreatorQuestion $question);
 
    /**
     * Gets the name of the parameter

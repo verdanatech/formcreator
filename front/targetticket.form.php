@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -29,43 +29,64 @@
  * ---------------------------------------------------------------------
  */
 
-include ("../../../inc/includes.php");
+include ('../../../inc/includes.php');
 
-Session::checkRight("entity", UPDATE);
+Session::checkRight('entity', UPDATE);
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
-$targetticket = new PluginFormcreatorTargetTicket();
+$targetTicket = new PluginFormcreatorTargetTicket();
 
 // Edit an existing target ticket
 if (isset($_POST['update'])) {
-   $targetticket->update($_POST);
+   $targetTicket->getFromDB((int) $_POST['id']);
+   if (!$targetTicket->canUpdateItem()) {
+      Session::addMessageAfterRedirect(__('No right to update this item.', 'formcreator'), false, ERROR);
+   } else {
+      $targetTicket->update($_POST);
+   }
    Html::back();
 
 } else if (isset($_POST['actor_role'])) {
-   $id          = (int) $_POST['id'];
-   $actor_value = isset($_POST['actor_value_' . $_POST['actor_type']])
-                  ? $_POST['actor_value_' . $_POST['actor_type']]
-                  : '';
-   $use_notification = ($_POST['use_notification'] == 0) ? 0 : 1;
-   $targetTicket_actor = new PluginFormcreatorTargetTicket_Actor();
-   $targetTicket_actor->add([
-         'plugin_formcreator_targettickets_id'  => $id,
-         'actor_role'                           => $_POST['actor_role'],
-         'actor_type'                           => $_POST['actor_type'],
-         'actor_value'                          => $actor_value,
-         'use_notification'                     => $use_notification,
-   ]);
+   $id = (int) $_POST['id'];
+   $targetTicket->getFromDB($id);
+   if (!$targetTicket->canUpdateItem()) {
+      Session::addMessageAfterRedirect(__('No right to update this item.', 'formcreator'), false, ERROR);
+   } else {
+      $actor_value = $_POST['actor_value_' . $_POST['actor_type']] ?? 0;
+      $use_notification = ($_POST['use_notification'] == 0) ? 0 : 1;
+      $targetTicket_actor = new PluginFormcreatorTarget_Actor();
+      $targetTicket_actor->add([
+         'itemtype'         => $targetTicket->getType(),
+         'items_id'         => $id,
+         'actor_role'       => $_POST['actor_role'],
+         'actor_type'       => $_POST['actor_type'],
+         'actor_value'      => $actor_value,
+         'use_notification' => $use_notification,
+      ]);
+   }
    Html::back();
 
 } else if (isset($_GET['delete_actor'])) {
-   $targetTicket_actor = new PluginFormcreatorTargetTicket_Actor();
-   $targetTicket_actor->delete([
-         'id'                                   => (int) $_GET['delete_actor']
-   ]);
+   $requiredKeys = ['id'];
+   if (count(array_intersect(array_keys($_GET), $requiredKeys)) < count($requiredKeys)) {
+      Session::addMessageAfterRedirect(__('Bad request while deleting an actor.', 'formcreator'), false, ERROR);
+      Html::back();
+   }
+   $id = (int) $_GET['id'];
+   $targetTicket->getFromDB($id);
+   if (!$targetTicket->canUpdateItem()) {
+      Session::addMessageAfterRedirect(__('No right to update this item.', 'formcreator'), false, ERROR);
+   } else {
+      $targetTicket_actor = new PluginFormcreatorTarget_Actor();
+      $targetTicket_actor->delete([
+         'itemtype' => $targetTicket->getType(),
+         'items_id' => $id,
+         'id'       => (int) $_GET['delete_actor']
+      ]);
+   }
    Html::back();
 
    // Show target ticket form
@@ -77,17 +98,18 @@ if (isset($_POST['update'])) {
       'PluginFormcreatorForm'
    );
 
-   $itemtype = PluginFormcreatorTargetTicket::class;
-   $targetticket->getFromDB((int) $_REQUEST['id']);
-   $form = $targetticket->getForm();
 
-   $_SESSION['glpilisttitle'][$itemtype] = sprintf(
+   $targetTicket->getFromDB((int) $_REQUEST['id']);
+   $form = PluginFormcreatorForm::getByItem($targetTicket);
+   $_SESSION['glpilisttitle'][$targetTicket::getType()] = sprintf(
       __('%1$s = %2$s'),
       $form->getTypeName(1), $form->getName()
    );
-   $_SESSION['glpilisturl'][$itemtype]   = $form->getFormURL()."?id=".$form->getID();
+   $_SESSION['glpilisturl'][$targetTicket::getType()]   = $form->getFormURL()."?id=".$form->getID();
 
-   $targetticket->display($_REQUEST);
+   $targetTicket->display([
+      'id' => $_GET['id'],
+   ]);
 
    Html::footer();
 }

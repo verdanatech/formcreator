@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -34,12 +34,15 @@ include ("../../../inc/includes.php");
 Session::checkRightsOr('reservation', [READ, ReservationItem::RESERVEANITEM]);
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
-PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpHeader(__('Service catalog', 'formcreator'));
+} else {
+   Html::header(__('Service catalog', 'formcreator'));
+}
 
 $res = new ReservationItem();
 $res->display($_GET);
@@ -55,4 +58,8 @@ if (isset($_POST['submit'])) {
    unset($_SESSION['glpi_saved']['ReservationItem']);
 }
 
-PluginFormcreatorWizard::footer();
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpFooter();
+} else {
+   Html::footer();
+}

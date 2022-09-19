@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -33,45 +33,63 @@ global $CFG_GLPI;
 require_once ('../../../inc/includes.php');
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
-if (!isset($_REQUEST['sub_itemtype'])) {
-   Html::displayNotFoundError();
-}
+Session::checkValidSessionId();
 
-// force layout of glpi
-$layout = $_SESSION['glpilayout'];
-$_SESSION['glpilayout'] = "lefttab";
-
-$issue = new PluginFormcreatorIssue();
-if (isset($_POST['save_formanswer'])) {
-   $_POST['plugin_formcreator_forms_id'] = intval($_POST['formcreator_form']);
-   $_POST['status']                      = PluginFormcreatorFormAnswer::STATUS_WAITING;
-   $issue->saveAnswers($_POST);
-   Html::back();
-} else {
-
-   if (plugin_formcreator_replaceHelpdesk()) {
-      PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
+/** @var PluginFormcreatorIssue $issue */
+$issueId = $_REQUEST['id'] ?? null;
+$issue = PluginFormcreatorIssue::getById((int) $issueId);
+if ($issueId === null || !($issue instanceof PluginFormcreatorIssue)) {
+   $header = __('Item not found');
+   if (Session::getCurrentInterface() == "helpdesk") {
+      Html::helpHeader($header);
    } else {
-      Html::redirect($CFG_GLPI["root_doc"]."/front/helpdesk.public.php");
+      Html::header($header);
    }
-
-   $issue->getFromDBByCrit([
-      'original_id' => (int) $_REQUEST['id'],
-      'sub_itemtype' => $_REQUEST['sub_itemtype'],
-   ]);
-   $issue->display($_REQUEST);
-
-   if (plugin_formcreator_replaceHelpdesk()) {
-      PluginFormcreatorWizard::footer();
+   Html::displayNotFoundError();
+   if (Session::getCurrentInterface() == "helpdesk") {
+      Html::helpFooter();
    } else {
       Html::footer();
    }
 }
 
-// restore layout
-$_SESSION['glpilayout'] = $layout;
+// Accessing an issue from a tech profile, redirect to ticket or formanswer page
+if (isset($_REQUEST['id']) && Session::getCurrentInterface() == 'central') {
+   $id = $issue->fields['items_id'];
+   $itemtype = $issue->fields['itemtype'];
+   Html::redirect($itemtype::getFormURLWithID($id));
+}
+
+$itemtype = $issue->fields['itemtype'];
+
+// Trick to change the displayed id as Html::includeHeader() rely on request data
+$old_id = $_GET['id'];
+$_GET['id'] = $issue->fields['display_id'];
+
+// Specific case, viewing a ticket from a formanswer result
+if ($itemtype == PluginFormcreatorFormAnswer::class && isset($_GET['tickets_id'])) {
+   $itemtype = Ticket::class;
+   $_GET['id'] = "f_$_GET[tickets_id]";
+}
+
+$header = $itemtype::getTypeName(1);
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpHeader($header);
+} else {
+   Html::header($header);
+}
+
+// Reset request param in case some other code depends on it
+$_GET['id'] = $old_id;
+
+$issue->display($_REQUEST);
+
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpFooter();
+} else {
+   Html::footer();
+}

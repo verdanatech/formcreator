@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -37,5 +37,20 @@ interface PluginFormcreatorTargetInterface
 {
    public function save(PluginFormcreatorFormAnswer $formanswer);
 
-   public function addAttachedDocument($documentId);
+   public static function getTargetItemtypeName();
+
+   /**
+    * Tell the type of the target
+    *
+    * @return boolean true if the target does an action
+    */
+   public static function getTargetType(): int;
+
+   /**
+    * Find targets linked to a form answer
+    *
+    * @param PluginFormcreatorFormAnswer $formAnswer
+    * @return array
+    */
+   public static function findForFormAnswer(PluginFormcreatorFormAnswer $formAnswer): array;
 }

@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -32,37 +32,29 @@
 require_once ('../../../inc/includes.php');
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
-if (PluginFormcreatorFormAnswer::canView()) {
-   if (plugin_formcreator_replaceHelpdesk()) {
-      PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
-   } else {
-      if ($_SESSION['glpiactiveprofile']['interface'] == 'helpdesk') {
-         Html::helpHeader(
-            __('Form Creator', 'formcreator'),
-            $_SERVER['PHP_SELF']
-         );
-      } else {
-         Html::header(
-            __('Form Creator', 'formcreator'),
-            $_SERVER['PHP_SELF'],
-            'helpdesk',
-            'PluginFormcreatorFormlist'
-         );
-      }
-   }
-
-   Search::show(PluginFormcreatorFormAnswer::class);
-
-   if (plugin_formcreator_replaceHelpdesk()) {
-      PluginFormcreatorWizard::footer();
-   } else {
-      Html::footer();
-   }
-} else {
+if (!PluginFormcreatorFormAnswer::canView()) {
    Html::displayRightError();
+}
+
+if (Session::getCurrentInterface() == 'helpdesk') {
+   Html::helpHeader(__('Service catalog', 'formcreator'));
+} else {
+   Html::header(
+      __('Form Creator', 'formcreator'),
+      '',
+      'admin',
+      PluginFormcreatorForm::class
+   );
+}
+
+Search::show(PluginFormcreatorCommon::getFormanswerItemtype());
+
+if (Session::getCurrentInterface() == 'helpdesk') {
+   Html::helpFooter();
+} else {
+   Html::footer();
 }

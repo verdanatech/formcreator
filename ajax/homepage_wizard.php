@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -53,12 +53,11 @@ if ($_REQUEST['wizard'] == 'categories') {
 }
 
 function plugin_formcreator_showWizardCategories() {
-   $tree = PluginFormcreatorCategory::getCategoryTree(0, false);
+   $tree = PluginFormcreatorCategory::getCategoryTree();
    echo json_encode($tree, JSON_UNESCAPED_SLASHES);
 }
 
 function plugin_formcreator_showWizardForms($rootCategory = 0, $keywords = '', $helpdeskHome = false) {
-   $form = new PluginFormcreatorForm();
-   $formList = $form->showFormList($rootCategory, $keywords, $helpdeskHome);
+   $formList = PluginFormcreatorForm::getFormList($rootCategory, $keywords, $helpdeskHome);
    echo json_encode($formList, JSON_UNESCAPED_SLASHES);
 }

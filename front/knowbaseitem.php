@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -22,9 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @author    Thierry Bugier
- * @author    Jérémy Moreau
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -32,52 +29,27 @@
  * ---------------------------------------------------------------------
  */
 
-include("../../../inc/includes.php");
-Html::requireJs('jstree');
+include ('../../../inc/includes.php');
 
 // Check if plugin is activated...
 $plugin = new Plugin();
 if (!$plugin->isActivated('formcreator')) {
-    Html::displayNotFoundError();
+   Html::displayNotFoundError();
 }
 
-if (!plugin_formcreator_replaceHelpdesk()) {
-    Html::redirect(FORMCREATOR_ROOTDOC . "/front/helpdesk.public.php");
+if (Session::getCurrentInterface() == 'helpdesk') {
+   Html::helpHeader(__('Service catalog', 'formcreator'));
+} else {
+   Html::header(__('Service catalog', 'formcreator'));
 }
 
-if (KnowbaseItem::canView()) {
+PluginFormcreatorCommon::showMiniDashboard();
 
-    PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
+$kb = new PluginFormcreatorKnowbase();
+$kb->showServiceCatalog();
 
-
-
-    // Clean for search
-    $_GET = Toolbox::stripslashes_deep($_GET);
-
-    // Search a solution
-    if (
-        !isset($_GET["contains"])
-        && isset($_GET["item_itemtype"])
-        && isset($_GET["item_items_id"])
-    ) {
-
-        if ($item = getItemForItemtype($_GET["item_itemtype"])) {
-            if ($item->getFromDB($_GET["item_items_id"])) {
-                $_GET["contains"] = $item->getField('name');
-            }
-        }
-    }
-
-    // Manage forcetab : non standard system (file name <> class name)
-    if (isset($_GET['forcetab'])) {
-        Session::setActiveTab('Knowbase', $_GET['forcetab']);
-        unset($_GET['forcetab']);
-    }
-
-    $kb = new PluginFormcreatorKnowbase();
-    $kb->display($_GET);
-
-
-
-    PluginFormcreatorWizard::footer();
+if (Session::getCurrentInterface() == 'helpdesk') {
+   Html::helpFooter();
+} else {
+   Html::footer();
 }

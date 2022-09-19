@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -33,15 +33,15 @@ include ('../../../inc/includes.php');
 
 Session::checkRight('entity', UPDATE);
 
-$plugin = new Plugin();
-if ($plugin->isActivated('formcreator')) {
-   if (isset($_POST['purge'])) {
-      $item_targetTicket = new PluginFormcreatorItem_TargetTicket();
-      $item_targetTicket->delete($_POST, 1);
-      Html::back();
-   }
-   Html::displayErrorAndDie("lost");
-} else {
-   // Or display a "Not found" error
+// Check if plugin is activated...
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
+
+if (isset($_POST['purge'])) {
+   $item_targetTicket = new PluginFormcreatorItem_TargetTicket();
+   $item_targetTicket->delete($_POST, 1);
+   Html::back();
+}
+Html::displayErrorAndDie("lost");
+

@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -35,36 +35,64 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginFormcreatorComposite
 {
+   /**
+    * Undocumented variable
+    *
+    * @var PluginFormcreatorItem_TargetTicket
+    */
    private $item_targetTicket;
 
+   /**
+    * Undocumented variable
+    *
+    * @var PluginFormcreatorFormAnswer
+    */
    private $targets = [];
 
+   /**
+    * Undocumented variable
+    *
+    * @var Ticket_Ticket
+    */
    private $ticket_ticket;
 
-   public function __construct(PluginFormcreatorItem_TargetTicket $item_targetTicket, Ticket_Ticket $ticket_ticket) {
+   /**
+    * Undocumented variable
+    *
+    * @var PluginFormcreatorFormAnswer
+    */
+   private $formAnswer;
+
+   public function __construct(PluginFormcreatorItem_TargetTicket $item_targetTicket, Ticket_Ticket $ticket_ticket, PluginFormcreatorFormAnswer $formAnswer) {
       $this->item_targetTicket = $item_targetTicket;
       $this->ticket_ticket = $ticket_ticket;
+      $this->formAnswer = $formAnswer;
    }
 
    /**
     * Add a target and generated target
     *
-    * @param PluginFormcreatorTargetBase $target
+    * @param PluginFormcreatorAbstractTarget $target
     * @param CommonDBTM $generatedTarget
     */
-   public function addTarget(PluginFormcreatorTargetBase $target, CommonDBTM $generatedTarget) {
+   public function addTarget(PluginFormcreatorAbstractTarget $target, CommonDBTM $generatedTarget) {
       $itemtype = get_class($target);
       $this->targets[$itemtype][$target->getID()] = $generatedTarget;
    }
 
+   /**
+    * Undocumented function
+    *
+    * @return void
+    */
    public function buildCompositeRelations() {
       global $DB;
 
-      if (!isset($this->targets[PluginFormcreatorTargetTicket::class])) {
+      if (!isset($this->targets['PluginFormcreatorTargetTicket'])) {
          return;
       }
 
-      foreach ($this->targets[PluginFormcreatorTargetTicket::class] as $targetId => $generatedObject) {
+      foreach ($this->targets['PluginFormcreatorTargetTicket'] as $targetId => $generatedObject) {
          $rows = $DB->request([
             'SELECT' => [
                'itemtype',
@@ -87,11 +115,41 @@ class PluginFormcreatorComposite
                   break;
 
                case PluginFormcreatorTargetTicket::class:
-                  $ticket = $this->targets[PluginFormcreatorTargetTicket::class][$row['items_id']];
+                  $ticket = null;
+                  if (isset($this->targets['PluginFormcreatorTargetTicket'][$row['items_id']])) {
+                     $ticket = $this->targets['PluginFormcreatorTargetTicket'][$row['items_id']];
+                  }
+                  if ($ticket !== null) {
+                     $this->ticket_ticket->add([
+                        'link' => $row['link'],
+                        'tickets_id_1' => $generatedObject->getID(),
+                        'tickets_id_2' => $ticket->getID(),
+                     ]);
+                  }
+                  break;
+
+               case PluginFormcreatorQuestion::class:
+                  // Check the answer matches a question of type GLPI Object / Ticket
+                  $question = PluginFormcreatorQuestion::getById($row['items_id']);
+                  if (!($question instanceof PluginFormcreatorQuestion)) {
+                     break;
+                  }
+                  /** @var PluginFormcreatorQuestion $question */
+                  if (strpos($question->fields['itemtype'], Ticket::class) === false) {
+                     break;
+                  }
+                  $answer = new PluginFormcreatorAnswer();
+                  $answer->getFromDBByCrit([
+                     PluginFormcreatorQuestion::getForeignKeyField() => $row['items_id'],
+                     PluginFormcreatorFormAnswer::getForeignKeyField() => $this->formAnswer->getID(),
+                  ]);
+                  if ($answer->isNewItem()) {
+                     break;
+                  }
                   $this->ticket_ticket->add([
                      'link' => $row['link'],
                      'tickets_id_1' => $generatedObject->getID(),
-                     'tickets_id_2' => $ticket->getID(),
+                     'tickets_id_2' => $answer->fields['answer'],
                   ]);
                   break;
             }

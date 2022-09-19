@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -32,36 +32,42 @@
 require_once ('../../../inc/includes.php');
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
 if (!PluginFormcreatorIssue::canView()) {
    Html::displayRightError();
 }
-if (plugin_formcreator_replaceHelpdesk()) {
-   PluginFormcreatorWizard::header(__('Service catalog', 'formcreator'));
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpHeader(__('Service catalog', 'formcreator'));
 } else {
-   if ($_SESSION['glpiactiveprofile']['interface'] == 'helpdesk') {
-      Html::helpHeader(
-         __('Form Creator', 'formcreator'),
-         $_SERVER['PHP_SELF']
-      );
-   } else {
-      Html::header(
-         __('Form Creator', 'formcreator'),
-         $_SERVER['PHP_SELF'],
-         'helpdesk',
-         'PluginFormcreatorFormlist'
-      );
-   }
+   Html::header(
+      __('Service catalog', 'formcreator'),
+      '',
+      'admin',
+      PluginFormcreatorForm::class
+   );
+}
+
+if (Session::getCurrentInterface() == 'helpdesk') {
+   PluginFormcreatorCommon::showMiniDashboard();
+}
+
+//backup session value
+$save_session_fold_search = $_SESSION['glpifold_search'];
+//hide search if need
+if (PluginFormcreatorEntityconfig::getUsedConfig('is_search_issue_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_SEARCH_ISSUE_HIDDEN) {
+   $_SESSION['glpifold_search'] = true;
 }
 
 Search::show('PluginFormcreatorIssue');
 
-if (plugin_formcreator_replaceHelpdesk()) {
-   PluginFormcreatorWizard::footer();
+//restore session value
+$_SESSION['glpifold_search'] = $save_session_fold_search;
+
+if (Session::getCurrentInterface() == "helpdesk") {
+   Html::helpFooter();
 } else {
    Html::footer();
 }

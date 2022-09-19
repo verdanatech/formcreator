@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -34,15 +34,19 @@ include ("../../../inc/includes.php");
 Session::checkRight("entity", UPDATE);
 
 // Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isActivated('formcreator')) {
+if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
-$targetchange = new PluginFormcreatorTargetChange();
+$targetChange = new PluginFormcreatorTargetChange();
 
 // Edit an existing target change
 if (isset($_POST["update"])) {
-   $targetchange->update($_POST);
+   $targetChange->getFromDB((int) $_POST['id']);
+   if (!$targetChange->canUpdateItem()) {
+      Session::addMessageAfterRedirect(__('No right to update this item.', 'formcreator'), false, ERROR);
+   } else {
+      $targetChange->update($_POST);
+   }
    Html::back();
 
 } else if (isset($_POST['actor_role'])) {
@@ -51,20 +55,23 @@ if (isset($_POST["update"])) {
                   ? $_POST['actor_value_' . $_POST['actor_type']]
                   : '';
    $use_notification = ($_POST['use_notification'] == 0) ? 0 : 1;
-   $targetChange_actor = new PluginFormcreatorTargetChange_Actor();
+   $targetChange_actor = new PluginFormcreatorTarget_Actor();
    $targetChange_actor->add([
-      'plugin_formcreator_targetchanges_id'  => $id,
-      'actor_role'                           => $_POST['actor_role'],
-      'actor_type'                           => $_POST['actor_type'],
-      'actor_value'                          => $actor_value,
-      'use_notification'                     => $use_notification
+      'itemtype'         => $targetChange->getType(),
+      'items_id'         => $id,
+      'actor_role'       => $_POST['actor_role'],
+      'actor_type'       => $_POST['actor_type'],
+      'actor_value'      => $actor_value,
+      'use_notification' => $use_notification
    ]);
    Html::back();
 
 } else if (isset($_GET['delete_actor'])) {
-   $targetChange_actor = new PluginFormcreatorTargetChange_Actor();
+   $targetChange_actor = new PluginFormcreatorTarget_Actor();
    $targetChange_actor->delete([
-      'id'  => (int) $_GET['delete_actor']
+      'itemtype'  => $targetChange->getType(),
+      'items_id'  => $id,
+      'id'        => (int) $_GET['delete_actor']
    ]);
    Html::back();
 
@@ -77,15 +84,15 @@ if (isset($_POST["update"])) {
       'PluginFormcreatorForm'
    );
 
-   $itemtype = PluginFormcreatorTargetChange::class;
-   $targetchange->getFromDB((int) $_REQUEST['id']);
-   $form = $targetchange->getForm();
+   $targetChange->getFromDB((int) $_REQUEST['id']);
+   $form = PluginFormcreatorForm::getByItem($targetChange);
+   $_SESSION['glpilisttitle'][$targetChange::getType()] = sprintf(
+      __('%1$s = %2$s'),
+      $form->getTypeName(1), $form->getName()
+   );
+   $_SESSION['glpilisturl'][$targetChange::getType()]   = $form->getFormURL()."?id=".$form->getID();
 
-   $_SESSION['glpilisttitle'][$itemtype] = sprintf(__('%1$s = %2$s'),
-         $form->getTypeName(1), $form->getName());
-   $_SESSION['glpilisturl'][$itemtype]   = $form->getFormURL()."?id=".$form->getID();
-
-   $targetchange->display($_REQUEST);
+   $targetChange->display($_REQUEST);
 
    Html::footer();
 }

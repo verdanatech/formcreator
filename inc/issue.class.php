@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -30,11 +30,14 @@
  */
 
 if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access this file directly");
+   die("Sorry. You can'qt access this file directly");
 }
 
+use Glpi\RichText\RichText;
 class PluginFormcreatorIssue extends CommonDBTM {
    static $rightname = 'ticket';
+
+   protected static $showTitleInNavigationHeader = true;
 
    public static function getTypeName($nb = 0) {
       return _n('Issue', 'Issues', $nb, 'formcreator');
@@ -61,111 +64,211 @@ class PluginFormcreatorIssue extends CommonDBTM {
     * @return number
     */
    public static function cronSyncIssues(CronTask $task) {
-      global $DB;
 
       $task->log("Sync issues from forms answers and tickets");
-      $volume = 0;
+      $task->setVolume(self::syncIssues());
 
+      return 1;
+   }
+
+   /**
+    * Sync issues table
+    *
+    * @return AbstractQuery
+    */
+   public static function getSyncIssuesRequest() : AbstractQuery {
       // Request which merges tickets and formanswers
-      // 1 ticket not linked to a formanswer => 1 issue which is the ticket sub_itemtype
-      // 1 form_answer not linked to a ticket => 1 issue which is the formanswer sub_itemtype
-      // 1 ticket linked to 1 form_answer => 1 issue which is the ticket sub_itemtype
-      // several tickets linked to the same form_answer => 1 issue which is the form_answer sub_itemtype
-
+      // 1 ticket not linked to a formanswer => 1 issue which is the ticket itemtype
+      // 1 form_answer not linked to a ticket => 1 issue which is the formanswer itemtype
+      // 1 ticket linked to 1 form_answer => 1 issue which is the ticket itemtype
+      // several tickets linked to the same form_answer => 1 issue which is the form_answer itemtype
+      $formTable = PluginFormcreatorForm::getTable();
+      $formAnswerTable = PluginFormcreatorFormAnswer::getTable();
+      $itemTicketTable = Item_Ticket::getTable();
+      $ticketFk = Ticket::getForeignKeyField();
       // The columns status of the 2nd part of the UNNION statement
       // must match the same logic as PluginFormcreatorCommon::getTicketStatusForIssue()
       // @see PluginFormcreatorCommon::getTicketStatusForIssue()
-      $query = "SELECT DISTINCT
-                  NULL                            AS `id`,
-                  `f`.`name`                      AS `name`,
-                  CONCAT('f_',`fanswer`.`id`)     AS `display_id`,
-                  `fanswer`.`id`                  AS `original_id`,
-                  'PluginFormcreatorFormAnswer'   AS `sub_itemtype`,
-                  `fanswer`.`status`              AS `status`,
-                  `fanswer`.`request_date`        AS `date_creation`,
-                  `fanswer`.`request_date`        AS `date_mod`,
-                  `fanswer`.`entities_id`         AS `entities_id`,
-                  `fanswer`.`is_recursive`        AS `is_recursive`,
-                  `fanswer`.`requester_id`        AS `requester_id`,
-                  `fanswer`.`users_id_validator`  AS `users_id_validator`,
-                  `fanswer`.`groups_id_validator` AS `groups_id_validator`,
-                  `fanswer`.`comment`             AS `comment`
-               FROM `glpi_plugin_formcreator_formanswers` AS `fanswer`
-               LEFT JOIN `glpi_plugin_formcreator_forms` AS `f`
-                  ON`f`.`id` = `fanswer`.`plugin_formcreator_forms_id`
-               LEFT JOIN `glpi_items_tickets` AS `itic`
-                  ON `itic`.`items_id` = `fanswer`.`id`
-                  AND `itic`.`itemtype` = 'PluginFormcreatorFormAnswer'
-               GROUP BY `original_id`
-               HAVING COUNT(`itic`.`tickets_id`) != 1
 
-               UNION
+      // assistance requests having no or several tickets
+      $query1 = [
+         'SELECT' => [
+            new QueryExpression('NULL as `id`'),
+            new QueryExpression("IF(`$formAnswerTable`.`name` = '', CONCAT('(', `$formAnswerTable`.`id`, ')'), `$formAnswerTable`.`name`) as `name`"),
+            new QueryExpression("CONCAT('f_', `$formAnswerTable`.`id`) as `display_id`"),
+            "$formAnswerTable.id as items_id",
+            new QueryExpression("'" . PluginFormcreatorFormAnswer::getType() . "' as `itemtype`"),
+            $formAnswerTable => [
+               'status              as status',
+               'request_date        as date_creation',
+               'request_date        as date_mod',
+               'entities_id         as entities_d',
+               'is_recursive        as is_recursive',
+               'requester_id        as requester_id',
+               'users_id_validator  as users_id_validator',
+               'groups_id_validator as groups_id_validator',
+               'comment             as comment',
+               'requester_id        as users_id_recipient'
+            ],
+         ],
+         'DISTINCT' => true,
+         'FROM' => $formAnswerTable,
+         'LEFT JOIN' => [
+            $formTable => [
+               'FKEY' => [
+                  $formTable => 'id',
+                  $formAnswerTable => PluginFormcreatorForm::getForeignKeyField(),
+               ],
+            ],
+            $itemTicketTable => [
+               'FKEY' => [
+                  $itemTicketTable => 'items_id',
+                  $formAnswerTable => 'id',
+                  ['AND' => [
+                     "`$itemTicketTable`.`itemtype`" => PluginFormcreatorFormAnswer::getType()
+                  ]]
+               ]
+            ]
+         ],
+         'GROUPBY' => ["$formAnswerTable.id"],
+         'HAVING' => new QueryExpression("COUNT(`$itemTicketTable`.`$ticketFk`) != 1"),
+      ];
 
-               SELECT DISTINCT
-                  NULL                          AS `id`,
-                  `tic`.`name`                  AS `name`,
-                  CONCAT('t_',`tic`.`id`)       AS `display_id`,
-                  `tic`.`id`                    AS `original_id`,
-                  'Ticket'                      AS `sub_itemtype`,
-                  if(`tv`.`status` IS NULL,
-                     `tic`.`status`,
-                     if(`tv`.`status` IN ('1', '3'),
-                        `tic`.`status`,
-                        if(`tic`.`status` IN ('5', '6') AND `tv`.`status` = '4',
-                           `tic`.`status`,
-                           if(`tv`.`status` = '" . CommonITILValidation::WAITING . "',
-                              '" . PluginFormcreatorFormAnswer::STATUS_WAITING . "',
-                              '" . PluginFormcreatorFormAnswer::STATUS_REFUSED . "'
-                           )
-                        )
+      // tickets not generated by Formcreator
+      $ticketTable = Ticket::getTable();
+      $ticketValidationTable = TicketValidation::getTable();
+      $ticketUserTable = Ticket_User::getTable();
+      $query2 = [
+         'SELECT' => [
+            new QueryExpression('NULL as `id`'),
+            new QueryExpression("IF(`$ticketTable`.`name` = '', CONCAT('(', `$ticketTable`.`id`, ')'), `$ticketTable`.`name`) as `name`"),
+            new QueryExpression("CONCAT('t_', `$ticketTable`.`id`) as `display_id`"),
+            "$ticketTable.id as items_id",
+            new QueryExpression("'" . Ticket::getType() . "' as `itemtype`"),
+            new QueryExpression("IF(`$ticketValidationTable`.`status` IS NULL,
+               `$ticketTable`.`status`,
+               IF(`$ticketTable`.`global_validation` IN ('" . CommonITILValidation::NONE . "', '" . CommonITILValidation::ACCEPTED . "'),
+                  `$ticketTable`.`status`,
+                  IF(`$ticketTable`.`status` IN ('" . CommonITILObject::SOLVED . "', '" . CommonITILObject::CLOSED . "'),
+                     `$ticketTable`.`status`,
+                     IF(`$ticketTable`.`global_validation` = '" . CommonITILValidation::WAITING . "',
+                        '" . PluginFormcreatorFormAnswer::STATUS_WAITING . "',
+                        '" . PluginFormcreatorFormAnswer::STATUS_REFUSED . "'
                      )
-                  )                             AS `status`,
+                  )
+               )
+            ) AS `status`"),
+            $ticketTable => [
+               'date                                     as date_creation',
+               'date_mod                                 as date_mod',
+               'entities_id                              as entities_id'
+            ],
+            new QueryExpression('0                       as is_recursive'),
+            new QueryExpression("COALESCE(`$ticketUserTable`.`users_id`, 0) as `requester_id`"),
+            new QueryExpression("COALESCE(`$ticketValidationTable`.`users_id_validate`, 0) as `users_id_validator`"),
+            new QueryExpression('0                       as groups_id_validator'),
+            "$ticketTable.content                        as comment",
+            'users_id_recipient                          as users_id_recipient'
+         ],
+         'DISTINCT' => true,
+         'FROM' => $ticketTable,
+         'LEFT JOIN' => [
+            $itemTicketTable => [
+               'FKEY' => [
+                  $itemTicketTable => $ticketFk,
+                  $ticketTable => 'id',
+                  ['AND' => [
+                     "`$itemTicketTable`.`itemtype`" => PluginFormcreatorFormAnswer::getType(),
+                  ]],
+               ],
+            ],
+            [
+               'TABLE' => new QuerySubQuery([
+                  'SELECT' => ['users_id', $ticketFk],
+                  'DISTINCT' => true,
+                  'FROM'  => $ticketUserTable,
+                  'WHERE' => [
+                     'type' => CommonITILActor::REQUESTER,
+                  ],
+                  'GROUPBY' => 'tickets_id',
+                  'ORDER' => ['id ASC']
+               ], $ticketUserTable),
+               'FKEY' => [
+                  $ticketTable => 'id',
+                  $ticketUserTable => $ticketFk,
+               ],
+            ],
+            $ticketValidationTable => [
+               'FKEY' => [
+                  $ticketTable => 'id',
+                  $ticketValidationTable => $ticketFk,
+               ],
+            ],
+         ],
+         'WHERE' => [
+            "$ticketTable.is_deleted" => 0,
+         ],
+         'GROUPBY' => ["$ticketTable.id"],
+         'HAVING' => new QueryExpression("COUNT(`$itemTicketTable`.`items_id`) = 0")
+      ];
 
-                  `tic`.`date`                  AS `date_creation`,
-                  `tic`.`date_mod`              AS `date_mod`,
-                  `tic`.`entities_id`           AS `entities_id`,
-                  0                             AS `is_recursive`,
-                  `tu`.`users_id`               AS `requester_id`,
-                  `tv`.`users_id_validate`      AS `users_id_validator`,
-                  0                             AS `groups_id_validator`,
-                  `tic`.`content`               AS `comment`
-               FROM `glpi_tickets` AS `tic`
-               LEFT JOIN `glpi_items_tickets` AS `itic`
-                  ON `itic`.`tickets_id` = `tic`.`id`
-                  AND `itic`.`itemtype` = 'PluginFormcreatorFormAnswer'
-               LEFT JOIN (
-                  SELECT DISTINCT `users_id`, `tickets_id`
-                  FROM `glpi_tickets_users` AS `tu`
-                  WHERE `tu`.`type` = '"  . CommonITILActor::REQUESTER . "'
-                  ORDER BY `id` ASC
-               ) AS `tu` ON (`tic`.`id` = `tu`.`tickets_id`)
-               LEFT JOIN `glpi_ticketvalidations` as `tv`
-                  ON (`tic`.`id` = `tv`.`tickets_id`)
-               WHERE `tic`.`is_deleted` = 0
-               GROUP BY `original_id`
-               HAVING COUNT(`itic`.`items_id`) <= 1";
+      // assistance requests having only one generated ticket (reuse query2)
+      $query3 = [
+         'SELECT'     => $query2['SELECT'],
+         'FROM'       => $query2['FROM'],
+         'INNER JOIN' => [$itemTicketTable => $query2['LEFT JOIN'][$itemTicketTable]],
+         'LEFT JOIN'  => [
+            $query2['LEFT JOIN'][0], // This is the TABLE => [...] subquery
+            $ticketValidationTable => $query2['LEFT JOIN'][$ticketValidationTable],
+         ],
+         'WHERE'      => $query2['WHERE'],
+         'GROUPBY'    => ["$itemTicketTable.items_id"],
+         // Only 1 relation to a Formanswer object
+         'HAVING'     => new QueryExpression("COUNT(`$itemTicketTable`.`items_id`) = 1"),
+      ];
 
-      $countQuery = "SELECT COUNT(*) AS `cpt` FROM ($query) AS `issues`";
-      $result = $DB->query($countQuery);
-      if ($result !== false) {
-         if (version_compare(GLPI_VERSION, '9.5') < 0) {
-            $fa = 'fetch_assoc';
-         } else {
-            $fa = 'fetchAssoc';
-         }
-         $count = $DB->$fa($result);
-         $table = static::getTable();
-         if (countElementsInTable($table) != $count['cpt']) {
-            if ($DB->query("TRUNCATE `$table`")) {
-               $DB->query("INSERT INTO `$table` SELECT * FROM ($query) as `dt`");
-               $volume = 1;
-            }
-            Toolbox::logError("Plugin Formcreator: Automatic action SyncIssue detected an inconsticency. Issues were rebuilt.");
-         }
+      // Union of the 3 previous queries
+      $union = new QueryUnion([
+         new QuerySubQuery($query1),
+         new QuerySubQuery($query2),
+         new QuerySubQuery($query3)
+      ], true);
+
+      return $union;
+   }
+
+   /**
+    * Sync issues table
+    *
+    * @return int
+    */
+   public static function syncIssues() {
+      global $DB;
+      $volume = 0;
+
+      $result = $DB->request([
+         'COUNT' => 'cpt',
+         'FROM'  => self::getSyncIssuesRequest()
+      ]);
+      if ($result === false) {
+         return 0;
       }
-      $task->setVolume($volume);
 
-      return 1;
+      $row = $result->current();
+      $count = $row['cpt'];
+      $table = static::getTable();
+      if (countElementsInTable($table) == $count) {
+         return 0;
+      }
+
+      $volume = 0;
+      if ($DB->truncate($table) !== false) {
+         $rawQuery = self::getSyncIssuesRequest()->getQuery();
+         $DB->query("INSERT INTO `$table` SELECT * FROM $rawQuery");
+         $volume = 1;
+      }
+
+      return $volume;
    }
 
    public static function hook_update_ticket(CommonDBTM $item) {
@@ -176,28 +279,36 @@ class PluginFormcreatorIssue extends CommonDBTM {
     * @see CommonGLPI::display()
     */
    public function display($options = []) {
-      $itemtype = $options['sub_itemtype'];
-      if (!in_array($itemtype, [Ticket::class, PluginFormcreatorFormAnswer::class])) {
-         html::displayRightError();
-      }
       Html::requireJs('tinymce');
+      if (!isset($this->fields['itemtype'])) {
+         Html::displayNotFoundError();
+      }
+      $itemtype = $this->fields['itemtype'];
+      if (!class_exists($itemtype)) {
+         Html::displayNotFoundError();
+      }
+      /** @var CommonDBTM $item */
+      $item = new $itemtype();
+      if (!$item->getFromDB($this->fields['items_id'])) {
+         Html::displayNotFoundError();
+      }
       if (plugin_formcreator_replaceHelpdesk() == PluginFormcreatorEntityconfig::CONFIG_SIMPLIFIED_SERVICE_CATALOG) {
-         $this->displaySimplified($options);
+         $this->displaySimplified($item, $options);
       } else {
-         $this->displayExtended($options);
+         $this->displayExtended($item, $options);
       }
    }
 
-   public function displayExtended($options = []) {
-      $item = new $options['sub_itemtype'];
-
-      if (isset($options['id'])
-            && !$item->isNewID($options['id'])) {
-         if (!$item->getFromDB($options['id'])) {
-            Html::displayNotFoundError();
-         }
-      }
-
+   /**
+    * Display an issue in extended service catalog mode
+    *
+    * @see CommonGLPI::display()
+    *
+    * @param CommonDBTM $item actual item to show
+    * @param array $options
+    * @return void
+    */
+   public function displayExtended(CommonDBTM $item, $options = []): void {
       // if ticket(s) exist(s), show it/them
       $options['_item'] = $item;
       if ($item Instanceof PluginFormcreatorFormAnswer) {
@@ -205,46 +316,58 @@ class PluginFormcreatorIssue extends CommonDBTM {
       }
       unset($options['_item']);
 
+      // Header of the item + link to the list of items
+      $this->setListUrl($item);
+      $this->showNavigationHeader($options);
+
+      if (!$item->canViewItem()) {
+         Html::displayNotFoundError();
+      }
+
       $item->showTabsContent($options);
    }
 
    /**
+    * Display an issue in simplified service catalog mode
+    *
     * @see CommonGLPI::display()
+    *
+    * @param CommonDBTM $item actual item to show
+    * @param array $options
+    * @return void
     */
-   public function displaySimplified($options = []) {
-      global $CFG_GLPI;
-
-      $item = new $options['sub_itemtype'];
-
-      if (isset($options['id'])
-          && !$item->isNewID($options['id'])) {
-         if (!$item->getFromDB($options['id'])) {
-            Html::displayNotFoundError();
-         }
-      }
-
+   public function displaySimplified(CommonDBTM $item, $options = []): void {
       // in case of left tab layout, we couldn't see "right error" message
       if ($item->get_item_to_display_tab) {
-         if (isset($options["id"])
-             && $options["id"]
-             && !$item->can($options["id"], READ)) {
+         if (isset($this->fields['items_id'])
+             && $this->fields['items_id']
+             && !$item->can($this->fields['items_id'], READ)) {
             // This triggers from a profile switch.
             // If we don't have right, redirect instead to central page
             if (isset($_SESSION['_redirected_from_profile_selector'])
                 && $_SESSION['_redirected_from_profile_selector']) {
                unset($_SESSION['_redirected_from_profile_selector']);
-               Html::redirect($CFG_GLPI['root_doc']."/front/central.php");
+               Html::redirect(Central::getFormURL());
             }
 
             html::displayRightError();
          }
       }
 
-      if (!isset($options['id'])) {
+      if (!isset($this->fields['items_id'])) {
          $options['id'] = 0;
+      } else {
+         $options['id'] = $item->getID();
       }
 
-      // Header if the item + link to the list of items
+      $options['_item'] = $item;
+      if ($item Instanceof PluginFormcreatorFormAnswer) {
+         $item = $this->getTicketsForDisplay($options);
+      }
+      unset($options['_item']);
+
+      // Header of the item + link to the list of items
+      $this->setListUrl($item);
       $this->showNavigationHeader($options);
 
       // retrieve associated tickets
@@ -253,10 +376,6 @@ class PluginFormcreatorIssue extends CommonDBTM {
          $item = $this->getTicketsForDisplay($options);
       }
       unset($options['_item']);
-
-      // force recall of ticket in layout
-      $old_layout = $_SESSION['glpilayout'];
-      $_SESSION['glpilayout'] = "lefttab";
 
       if ($item instanceof Ticket) {
          //Tickets without form associated or single ticket for an answer
@@ -268,16 +387,23 @@ class PluginFormcreatorIssue extends CommonDBTM {
             $date2    = strtotime($satisfaction->fields['date_begin']);
             if (($duration == 0)
                 || (strtotime("now") - $date2) <= $duration*DAY_TIMESTAMP) {
-               $satisfaction->showForm($item);
+               $satisfaction->showForm($item->getID());
             } else {
                echo "<p class='center b'>".__('Satisfaction survey expired')."</p>";
             }
          }
 
-         echo "<div class='timeline_box'>";
-         $rand = mt_rand();
-         $item->showTimelineForm($rand);
-         $item->showTimeline($rand);
+         echo "<div class='tab-content p-2 flex-grow-1 card '>";
+         echo '<style>';
+         echo '.itil-right-side { display: none !important }';
+         echo '.itil-right-side { width: 0 !important }';
+         echo '.itil-left-side { width: 100% !important }';
+         echo '#itil-object-container .form-buttons span { display: none !important }';
+         echo '#itil-object-container .form-buttons { flex: inherit; width: auto}';
+         echo "#itil-object-container .timeline-buttons { flex: 1 1 auto }";
+         echo "#itil-object-container button[type='submit'][name='update'] { display: none }";
+         echo '</style>';
+         $item->showForm($item->getID());
          echo "</div>";
       } else {
          // No ticket associated to this issue or multiple tickets
@@ -286,9 +412,46 @@ class PluginFormcreatorIssue extends CommonDBTM {
          $item->showTabsContent($options);
          echo '</div>';
       }
+   }
 
-      // restore layout
-      $_SESSION['glpilayout'] = $old_layout;
+   public function setListUrl(CommonDBTM $item) {
+      global $DB;
+
+      switch ($item::getType()) {
+         case self::getType():
+            $_SESSION['glpilisturl'][self::getType()] = $this->getSearchURL();
+            break;
+
+         case PluginFormcreatorFormAnswer::getType():
+            Session::initNavigateListItems(self::getType());
+            $_SESSION['glpilisturl'][self::getType()] = $this->getSearchURL();
+            break;
+
+         case Ticket::getType():
+            $iterator = $DB->request([
+               'COUNT' => 'count',
+               'FROM' => Item_Ticket::getTable(),
+               'WHERE' => [
+                  'items_id' => new QuerySubQuery([
+                     'SELECT' => 'items_id',
+                     'FROM'   => Item_Ticket::getTable(),
+                     'WHERE'  => [
+                        'itemtype' => PluginFormcreatorFormAnswer::getType(),
+                        'tickets_id' => $item->getID(),
+                     ],
+                  ]),
+               ]
+            ]);
+            $count = 0;
+            if ($iterator->count() == 1) {
+               $count = $iterator->current()['count'];
+            }
+            if ($count > 1) {
+               $_SESSION['glpilisturl'][self::getType()] = $this->getFormURLWithID($this->getID());
+            } else {
+               $_SESSION['glpilisturl'][self::getType()] = $this->getSearchURL();
+            }
+      }
    }
 
    /**
@@ -300,23 +463,37 @@ class PluginFormcreatorIssue extends CommonDBTM {
       global $DB;
 
       $item = $options['_item'];
-      $formanswerId = $options['id'];
       $rows = $DB->request([
          'FROM'  => Item_Ticket::getTable(),
          'WHERE' => [
             'itemtype' => 'PluginFormcreatorFormAnswer',
-            'items_id' => $formanswerId
+            'items_id' => $item->getID() // $item is a PluginFormcreatorFormAnswer
          ],
          'ORDER' => 'tickets_id ASC'
       ]);
       if (count($rows) == 1) {
          // one ticket, replace item
-         $ticket = $rows->next();
+         $ticket = $rows->current();
          $item = new Ticket;
          $item->getFromDB($ticket['tickets_id']);
       } else if (count($rows) > 1) {
-         // multiple tickets, force ticket tab in form anser
-         Session::setActiveTab(PluginFormcreatorFormAnswer::class, 'Ticket$1');
+         if (isset($options['tickets_id'])) {
+            $ticket = Ticket::getById((int) $options['tickets_id']);
+            if ($ticket) {
+               $item = $ticket;
+            }
+         } else {
+            // multiple tickets, ticket specified, then substitute the ticket to the form answer
+            if (isset($options['tickets_id'])) {
+               $ticket = Ticket::getById((int) $options['tickets_id']);
+               if ($ticket) {
+                  $item = $ticket;
+               }
+            } else {
+               // multiple tickets, no specified ticket then force ticket tab in form anser
+               Session::setActiveTab(PluginFormcreatorFormAnswer::class, 'Ticket$1');
+            }
+         }
       }
 
       return $item;
@@ -324,15 +501,22 @@ class PluginFormcreatorIssue extends CommonDBTM {
 
    public function rawSearchOptions() {
       $tab = [];
+      $hide_technician = false;
+      if (!Session::isCron()) {
+         $hide_technician = \Entity::getUsedConfig(
+            'anonymize_support_agents',
+            Session::getActiveEntity()
+         );
+      }
 
       $tab[] = [
          'id'                 => 'common',
-         'name'               => __('Issue', 'formcreator')
+         'name'               => $this->getTypeName(Session::getPluralNumber()),
       ];
 
       $tab[] = [
          'id'                 => '1',
-         'table'              => $this::getTable(),
+         'table'              => self::getTable(),
          'field'              => 'name',
          'name'               => __('Name'),
          'datatype'           => 'itemlink',
@@ -345,7 +529,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '2',
-         'table'              => $this::getTable(),
+         'table'              => self::getTable(),
          'field'              => 'display_id',
          'name'               => __('ID'),
          'datatype'           => 'string',
@@ -354,8 +538,8 @@ class PluginFormcreatorIssue extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '3',
-         'table'              => $this::getTable(),
-         'field'              => 'sub_itemtype',
+         'table'              => self::getTable(),
+         'field'              => 'itemtype',
          'name'               => __('Type'),
          'searchtype'         => [
             '0'                  => 'equals',
@@ -367,7 +551,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '4',
-         'table'              => $this::getTable(),
+         'table'              => self::getTable(),
          'field'              => 'status',
          'name'               => __('Status'),
          'searchtype'         => [
@@ -379,7 +563,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '5',
-         'table'              => $this::getTable(),
+         'table'              => self::getTable(),
          'field'              => 'date_creation',
          'name'               => __('Opening date'),
          'datatype'           => 'datetime',
@@ -388,7 +572,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
 
       $tab[] = [
          'id'                 => '6',
-         'table'              => $this::getTable(),
+         'table'              => self::getTable(),
          'field'              => 'date_mod',
          'name'               => __('Last update'),
          'datatype'           => 'datetime',
@@ -404,7 +588,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
          'massiveaction'      => false
       ];
 
-      $tab[] = [
+      $newtab = [
          'id'                 => '8',
          'table'              => 'glpi_users',
          'field'              => 'name',
@@ -413,29 +597,46 @@ class PluginFormcreatorIssue extends CommonDBTM {
          'datatype'           => 'dropdown',
          'massiveaction'      => false
       ];
+      if (!Session::isCron() // no filter for cron
+          && Session::getCurrentInterface() == 'helpdesk') {
+         $newtab['right']       = 'id';
+      }
+      $tab[] = $newtab;
 
-      $tab[] = [
-         'id'                 => '9',
-         'table'              => 'glpi_users',
-         'field'              => 'name',
-         'linkfield'          => 'users_id_validator',
-         'name'               => __('Form approver', 'formcreator'),
-         'datatype'           => 'dropdown',
-         'massiveaction'      => false
-      ];
+      if (Plugin::isPluginActive(PLUGIN_FORMCREATOR_ADVANCED_VALIDATION)) {
+         $newtab = PluginAdvformIssue::rawSearchOptionFormApprover();
+      } else {
+         $newtab = [
+            'id'                 => '9',
+            'table'              => 'glpi_users',
+            'field'              => 'name',
+            'linkfield'          => 'users_id_validator',
+            'name'               => __('Form approver', 'formcreator'),
+            'datatype'           => 'dropdown',
+            'massiveaction'      => false
+         ];
+
+      }
+      if (!Session::isCron() // no filter for cron
+          && Session::getCurrentInterface() == 'helpdesk') {
+         $newtab['right']       = 'id';
+      }
+      $tab[] = $newtab;
 
       $tab[] = [
          'id'                 => '10',
-         'table'              => $this::getTable(),
+         'table'              => self::getTable(),
          'field'              => 'comment',
          'name'               => __('Comment'),
          'datatype'           => 'text',
+         'htmltext'           => true,
+         'nodisplay'          => true,
          'massiveaction'      => false
       ];
 
-      $tab[] = [
+      $newtab = [
          'id'                 => '11',
-         'table'              => 'glpi_users',
+         'table'              => User::getTable(),
          'field'              => 'name',
          'linkfield'          => 'users_id_validate',
          'name'               => __('Ticket approver', 'formcreator'),
@@ -448,72 +649,119 @@ class PluginFormcreatorIssue extends CommonDBTM {
          'massiveaction'      => false,
          'joinparams'         => [
             'beforejoin'         => [
-               '0'                  => [
-                  'table'              => 'glpi_items_tickets',
-                  'joinparams'         => [
-                     'jointype'           => 'itemtypeonly',
-                     'specific_itemtype'  => PluginFormcreatorFormAnswer::class,
-                     'condition'          => 'AND `REFTABLE`.`original_id` = `NEWTABLE`.`items_id`'
+               'table'              => TicketValidation::getTable(),
+               'joinparams'         => [
+                  'jointype'           => 'child',
+                  'beforejoin'         => [
+                     'table'              => Ticket::getTable(),
+                     'joinparams'         => [
+                        'jointype'        => 'itemtype_item_revert',
+                        'specific_itemtype'  => Ticket::class,
+                     ]
                   ]
-               ],
-               '1'                  => [
-                  'table'              => 'glpi_ticketvalidations'
                ]
-            ]
+            ],
          ]
       ];
+      if (!Session::isCron() // no filter for cron
+          && Session::getCurrentInterface() == 'helpdesk') {
+         $newtab['right']       = 'id';
+      }
+      $tab[] = $newtab;
 
-      $tab[] = [
+      $newtab = [
          'id'                 => '14',
          'table'              => User::getTable(),
          'field'              => 'name',
-         'linkfield'          => 'users_id',
          'name'               => __('Technician'),
          'datatype'           => 'dropdown',
-         'forcegroupby'       => false,
+         'forcegroupby'       => true,
          'massiveaction'      => false,
+         'nodisplay'          => $hide_technician,
+         'nosearch'           => $hide_technician,
+         'right'              => 'interface',
          'joinparams'         => [
             'beforejoin'         => [
                'table'              => Ticket_User::getTable(),
-               'linkfield'          => 'original_id',
                'joinparams'         => [
-                  'jointype'           => 'empty',
+                  'condition'          => "AND NEWTABLE.`type` = '2'", // Assign
+                  'jointype'           => 'child',
+                  'beforejoin'         => [
+                     'table'              => Ticket::getTable(),
+                     'joinparams'         => [
+                        'jointype'           => 'itemtype_item_revert',
+                        'specific_itemtype'  => Ticket::class,
+                     ],
+                  ]
                ]
             ]
          ]
       ];
+      $tab[] = $newtab;
 
-      $tab[] = [
-         'id'                 => '15',
-         'table'              => Group::getTable(),
-         'field'              => 'name',
-         'linkfield'          => 'groups_id',
-         'name'               => __('Technician group'),
-         'datatype'           => 'dropdown',
-         'forcegroupby'       => false,
-         'massiveaction'      => false,
-         'joinparams'         => [
-            'beforejoin'         => [
-               'table'              => Group_Ticket::getTable(),
-               'linkfield'          => 'original_id',
-               'joinparams'         => [
-                  'jointype'           => 'empty',
+      if (!Session::isCron() // no filter for cron
+          && Session::getCurrentInterface() != 'helpdesk') {
+         $tab[] = [
+            'id'                 => '15',
+            'table'              => Group::getTable(),
+            'field'              => 'name',
+            'name'               => __('Technician group'),
+            'datatype'           => 'dropdown',
+            'forcegroupby'       => true,
+            'massiveaction'      => false,
+            'nodisplay'          => $hide_technician,
+            'nosearch'           => $hide_technician,
+            'condition'          => ['is_assign' => 1],
+            'joinparams'         => [
+               'beforejoin'         => [
+                  'table'              => Group_Ticket::getTable(),
+                  'joinparams'         => [
+                     'condition'          => "AND NEWTABLE.`type` = '2'", // Assign
+                     'jointype'           => 'child',
+                     'beforejoin'         => [
+                        'table'              => Ticket::getTable(),
+                        'joinparams'         => [
+                           'jointype'           => 'itemtype_item_revert',
+                           'specific_itemtype'  => Ticket::class,
+                        ],
+                     ]
+                  ]
                ]
             ]
-         ]
-      ];
+         ];
+      }
 
-      $tab[] = [
-         'id'                 => '16',
-         'table'              => 'glpi_groups',
-         'field'              => 'completename',
-         'name'               => __('Form approver group', 'formcreator'),
-         'datatype'           => 'itemlink',
-         'massiveaction'      => false,
-         'linkfield'          => 'groups_id_validator',
-      ];
+      if (Plugin::isPluginActive(PLUGIN_FORMCREATOR_ADVANCED_VALIDATION)) {
+         $tab[] = PluginAdvformIssue::rawSearchOptionFormApproverGroup();
+      } else {
+         $tab[] = [
+            'id'                 => '16',
+            'table'              => 'glpi_groups',
+            'field'              => 'completename',
+            'name'               => __('Form approver group', 'formcreator'),
+            'datatype'           => 'itemlink',
+            'massiveaction'      => false,
+            'linkfield'          => 'groups_id_validator',
+         ];
+      }
+
+      if (Plugin::isPluginActive(PLUGIN_FORMCREATOR_ADVANCED_VALIDATION)) {
+         foreach (PluginAdvformIssue::rawSearchOptions() as $so) {
+            $tab[] = $so;
+         }
+      }
 
       return $tab;
+   }
+
+   public function getForbiddenStandardMassiveAction() {
+      return [
+         'purge',
+         'clone',
+         'update',
+         'add_transfer_list',
+         'amend_comment',
+      ];
    }
 
    public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = []) {
@@ -521,16 +769,16 @@ class PluginFormcreatorIssue extends CommonDBTM {
          $values = [$field => $values];
       }
       switch ($field) {
-         case 'sub_itemtype':
+         case 'itemtype':
             return Dropdown::showFromArray($name,
-                                           [Ticket::class                      => __('Ticket'),
-                                            PluginFormcreatorFormAnswer::class => __('Form answer', 'formcreator')],
+                                           [Ticket::class                      => Ticket::getTypeName(1),
+                                            PluginFormcreatorFormAnswer::class => PluginFormcreatorFormAnswer::getTypeName(1)],
                                            ['display' => false,
                                             'value'   => $values[$field]]);
          case 'status' :
             $ticket_opts = Ticket::getAllStatusArray(true);
-            $ticket_opts[PluginFormcreatorFormAnswer::STATUS_WAITING] = __('Not validated', 'formcreator');
-            $ticket_opts[PluginFormcreatorFormAnswer::STATUS_REFUSED] = __('Refused', 'formcreator');
+            $ticket_opts = $ticket_opts + PluginFormcreatorFormAnswer::getStatuses();
+            unset($ticket_opts[PluginFormcreatorFormAnswer::STATUS_WAITING]);
             return Dropdown::showFromArray($name, $ticket_opts, ['display' => false,
                                                                  'value'   => $values[$field]]);
             break;
@@ -568,27 +816,36 @@ class PluginFormcreatorIssue extends CommonDBTM {
       switch ("$table.$field") {
          case "glpi_plugin_formcreator_issues.name":
             $name = $data[$num][0]['name'];
-            $subItemtype = $data['raw']['sub_itemtype'];
+            $subItemtype = $data['raw']['itemtype'];
+            $content = '';
             switch ($subItemtype) {
                case Ticket::class:
                   $ticket = new Ticket();
-                  $ticket->getFromDB($id);
+                  if (!$ticket->getFromDB($id)) {
+                     trigger_error(sprintf("Ticket ID %s not found", $id), E_USER_WARNING);
+                     break;
+                  }
                   $content = $ticket->fields['content'];
                   break;
 
-               // TODO : need some code refactor to properly provide qtip
-               // case PluginFormcreatorFormAnswer::class:
-               //       $formAnswer = new PluginFormcreatorFormAnswer();
-               //       $formAnswer->getFromDB($id);
-               //       $content = $formAnswer->getFullForm();
-               //       // TODO : need to replace tags before creating the qtip
-               //       break;
-               default:
-                  $content = '';
+               case PluginFormcreatorFormAnswer::class:
+                  $formAnswer = PluginFormcreatorCommon::getFormAnswer();
+                  if (!$formAnswer->getFromDB($id)) {
+                     trigger_error(sprintf("Formanswer ID %s not found", $id), E_USER_WARNING);
+                     break;
+                  }
+                  $content = $formAnswer->parseTags($formAnswer->getFullForm());
+                  break;
             }
-            $link = self::getFormURLWithID($id) . "&sub_itemtype=".$data['raw']['sub_itemtype'];
+            $link = self::getFormURLWithID($data['id']);
+
+            // Show "final" item id in the URL
+            if (Toolbox::isCommonDBTM($subItemtype)) {
+               $link .= "&" . $subItemtype::getForeignKeyField() . "=$id";
+            }
+
             $key = 'id';
-            $tooltip = Html::showToolTip(nl2br(Html::Clean($content)), [
+            $tooltip = Html::showToolTip(nl2br(RichText::getTextFromHtml($content)), [
                'applyto' => $itemtype.$data['raw'][$key],
                'display' => false,
             ]);
@@ -615,15 +872,19 @@ class PluginFormcreatorIssue extends CommonDBTM {
    }
 
    static function getClosedStatusArray() {
-      return Ticket::getClosedStatusArray();
+      return [...Ticket::getClosedStatusArray(), PluginFormcreatorFormAnswer::STATUS_ACCEPTED];
    }
 
    static function getSolvedStatusArray() {
-      return Ticket::getSolvedStatusArray();
+      return [...Ticket::getSolvedStatusArray(), PluginFormcreatorFormAnswer::STATUS_REFUSED];
    }
 
    static function getNewStatusArray() {
-      return [Ticket::INCOMING, PluginFormcreatorFormAnswer::STATUS_WAITING, PluginFormcreatorFormAnswer::STATUS_ACCEPTED, PluginFormcreatorFormAnswer::STATUS_REFUSED];
+      return [Ticket::INCOMING];
+   }
+
+   static function getPendingStatusArray() {
+      return [Ticket::WAITING, PluginFormcreatorFormAnswer::STATUS_WAITING];
    }
 
    static function getProcessStatusArray() {
@@ -642,25 +903,35 @@ class PluginFormcreatorIssue extends CommonDBTM {
       return $all_status;
    }
 
-   static function getProcessingCriteria() {
-      $currentUser = Session::getLoginUserID();
+   static function getAllCriteria() {
+      return ['criteria' => [['field' => 4,
+                              'searchtype' => 'equals',
+                              'value'      => 'all'],
+                           ],
+              'reset'    => 'reset'];
+   }
+
+   static function getNewCriteria() {
+      return ['criteria' => [['field' => 4,
+                              'searchtype' => 'equals',
+                              'value'      => Ticket::INCOMING],
+                           ],
+              'reset'    => 'reset'];
+   }
+
+   static function getAssignedCriteria() {
       return ['criteria' => [['field' => 4,
                               'searchtype' => 'equals',
                               'value'      => 'process'],
-                             ['field'      => 8,
-                             'searchtype'  => 'equals',
-                             'value'       => $currentUser]],
+                           ],
               'reset'    => 'reset'];
    }
 
    static function getWaitingCriteria() {
-      $currentUser = Session::getLoginUserID();
       return ['criteria' => [['field' => 4,
                               'searchtype' => 'equals',
                               'value'      => Ticket::WAITING],
-                              ['field'      => 8,
-                              'searchtype'  => 'equals',
-                              'value'       => $currentUser]],
+                           ],
               'reset'    => 'reset'];
    }
 
@@ -670,123 +941,64 @@ class PluginFormcreatorIssue extends CommonDBTM {
                               'searchtype' => 'equals',
                               'value'      => PluginFormcreatorFormAnswer::STATUS_WAITING,
                               ],
-                             ['link' => 'AND'] + self::getMeAsValidatorCriteria()
                             ],
               'reset'    => 'reset'];
    }
 
    static function getSolvedCriteria() {
-      $currentUser = Session::getLoginUserID();
-      return ['criteria' => [['link'       => 'AND',
-                              'field'      => 8,
-                              'searchtype'  => 'equals',
-                              'value'       => $currentUser,
-                              ],
-                              ['link'       => 'AND',
-                              'criteria' => [[
-                               'link'       => 'AND',
-                               'field' => 4,
-                               'searchtype' => 'equals',
-                               'value'      => 'old', // see Ticket::getAllStatusArray()
-                              ],
-                              ['field' => 4,
-                               'searchtype' => 'equals',
-                               'value'      => PluginFormcreatorFormAnswer::STATUS_REFUSED,
-                               'link'       => 'OR']
-                             ]],
-                             ['link'       => 'OR',
-                             'criteria' => [[
-                              'link'       => 'AND',
-                              'field'      => 9,
+      return ['criteria' => [
+         [
+         'criteria' => [[
+            'link'       => 'OR',
+            'field' => 4,
+            'searchtype' => 'equals',
+            'value'      => Ticket::SOLVED, // see Ticket::getAllStatusArray()
+         ],
+         ]],
+      ],
+      'reset'    => 'reset'];
+   }
+
+   static function getClosedCriteria() {
+      return ['criteria' => [['field' => 4,
                               'searchtype' => 'equals',
-                              'value'      => $currentUser,
-                             ],
-                             ['link'       => 'OR',
-                              'field'      => 16,
-                              'searchtype' => 'equals',
-                              'value'      => 'mygroups',
-                             ],
-                            ]],
-                            ['link'       => 'AND',
-                               'field' => 4,
-                               'searchtype' => 'equals',
-                               'value'      => PluginFormcreatorFormAnswer::STATUS_REFUSED,
-                            ]],
+                              'value'      => Ticket::CLOSED],
+                           ],
               'reset'    => 'reset'];
    }
 
-   public static function getMeAsValidatorCriteria() {
-      $currentUser = Session::getLoginUserID();
-      return ['criteria'   => [[
-         'link'       => 'AND',
-         'field'      => 9,
-         'searchtype' => 'equals',
-         'value'      => $currentUser,
-        ],
-        ['link'       => 'OR',
-         'field'      => 16,
-         'searchtype' => 'equals',
-         'value'      => 'mygroups',
-        ],
-        ['link'       => 'OR',
-         'field'      => 11,
-         'searchtype' => 'equals',
-         'value'      => $currentUser,
-        ]]
-      ];
-   }
-
-   static function getTicketSummary() {
-      $status = [
-         Ticket::INCOMING => 0,
-         Ticket::WAITING => 0,
-         'to_validate' => 0,
-         Ticket::SOLVED => 0
-      ];
-
-      $searchIncoming = Search::getDatas(PluginFormcreatorIssue::class,
-                                         self::getProcessingCriteria());
-      $status[Ticket::INCOMING] = NOT_AVAILABLE;
-      if (isset($searchIncoming['data']['totalcount'])) {
-         $status[Ticket::INCOMING] = $searchIncoming['data']['totalcount'];
-      }
-
-      $searchWaiting = Search::getDatas(PluginFormcreatorIssue::class,
-                                         self::getWaitingCriteria());
-      $status[Ticket::WAITING] = NOT_AVAILABLE;
-      if (isset($searchWaiting['data']['totalcount'])) {
-         $status[Ticket::WAITING] = $searchWaiting['data']['totalcount'];
-      }
-
-      $searchValidate = Search::getDatas(PluginFormcreatorIssue::class,
-                                         self::getValidateCriteria());
-      $status['to_validate'] = NOT_AVAILABLE;
-      if (isset($searchValidate['data']['totalcount'])) {
-         $status['to_validate'] = $searchValidate['data']['totalcount'];
-      }
-
-      $searchSolved = Search::getDatas(PluginFormcreatorIssue::class,
-                                         self::getSolvedCriteria());
-      $status[Ticket::SOLVED] = NOT_AVAILABLE;
-      if (isset($searchSolved['data']['totalcount'])) {
-         $status[Ticket::SOLVED] = $searchSolved['data']['totalcount'];
-      }
-
-      return $status;
+   static function getOldCriteria() {
+      return ['criteria' => [
+         ['link'       => 'AND',
+         'criteria' => [[
+            'link'       => 'AND',
+            'field' => 4,
+            'searchtype' => 'equals',
+            'value'      => 'old', // see Ticket::getAllStatusArray()
+         ],
+         ['field' => 4,
+            'searchtype' => 'equals',
+            'value'      => PluginFormcreatorFormAnswer::STATUS_REFUSED,
+            'link'       => 'OR']
+         ]],
+      ],
+      'reset'    => 'reset'];
    }
 
    /**
     *
     */
    public function prepareInputForAdd($input) {
-      if (!isset($input['original_id']) || !isset($input['sub_itemtype'])) {
+      if (!isset($input['items_id']) || !isset($input['itemtype'])) {
          return false;
       }
 
-      if ($input['sub_itemtype'] == PluginFormcreatorFormAnswer::class) {
-         $input['display_id'] = 'f_' . $input['original_id'];
-      } else if ($input['sub_itemtype'] == 'Ticket') {
-         $input['display_id'] = 't_' . $input['original_id'];
+      $input['users_id_recipient'] = Session::getLoginUserID();
+
+      if ($input['itemtype'] == PluginFormcreatorFormAnswer::class) {
+         $input['display_id'] = 'f_' . $input['items_id'];
+      } else if ($input['itemtype'] == 'Ticket') {
+         $input['display_id'] = 't_' . $input['items_id'];
       } else {
          return false;
       }
@@ -795,18 +1007,154 @@ class PluginFormcreatorIssue extends CommonDBTM {
    }
 
    public function prepareInputForUpdate($input) {
-      if (!isset($input['original_id']) || !isset($input['sub_itemtype'])) {
+      if (!isset($input['items_id']) || !isset($input['itemtype'])) {
          return false;
       }
 
-      if ($input['sub_itemtype'] == PluginFormcreatorFormAnswer::class) {
-         $input['display_id'] = 'f_' . $input['original_id'];
-      } else if ($input['sub_itemtype'] == 'Ticket') {
-         $input['display_id'] = 't_' . $input['original_id'];
+      if ($input['itemtype'] == PluginFormcreatorFormAnswer::class) {
+         $input['display_id'] = 'f_' . $input['items_id'];
+      } else if ($input['itemtype'] == 'Ticket') {
+         $input['display_id'] = 't_' . $input['items_id'];
       } else {
          return false;
       }
 
       return $input;
+   }
+
+   public static function nbIssues(array $params): array {
+      $default_params = [
+         'label'                 => "",
+         'icon'                  => Ticket::getIcon(),
+         'apply_filters'         => [],
+      ];
+      $params = array_merge($default_params, $params);
+
+      switch ($params['status']) {
+         case 'all':
+            $searchCriteria = PluginFormcreatorIssue::getAllCriteria();
+            $params['icon']  = "";
+            break;
+
+         case 'incoming':
+            $searchCriteria = PluginFormcreatorIssue::getNewCriteria();
+            $params['icon']  = Ticket::getIcon();
+            break;
+
+         case 'waiting':
+            $searchCriteria = PluginFormcreatorIssue::getWaitingCriteria();
+            $params['icon']  = "fas fa-pause-circle";
+            break;
+
+         case 'assigned':
+            $searchCriteria = PluginFormcreatorIssue::getAssignedCriteria();
+            $params['icon']  = "fas fa-users";
+            break;
+
+         case 'validate':
+            $params['icon']  = "far fa-eye";
+            $searchCriteria = PluginFormcreatorIssue::getValidateCriteria();
+            break;
+
+         case 'solved':
+            $params['icon']  = "far fa-check-square";
+            $searchCriteria = PluginFormcreatorIssue::getSolvedCriteria();
+            break;
+
+         case 'closed':
+            $params['icon']  = "fas fa-archive";
+            $searchCriteria = PluginFormcreatorIssue::getClosedCriteria();
+            break;
+
+         case 'old':
+            $params['icon']  = "fas fa-archive";
+            $searchCriteria = PluginFormcreatorIssue::getOldCriteria();
+            break;
+      }
+      $searchWaiting = Search::getDatas(
+         PluginFormcreatorIssue::class,
+         $searchCriteria
+      );
+      $count = 0;
+      if (isset($searchWaiting['data']['totalcount'])) {
+         $count = $searchWaiting['data']['totalcount'];
+      }
+
+      $url = self::getSearchURL();
+      $url .= '?' . Toolbox::append_params($searchCriteria);
+      return [
+         'number'     => $count,
+         'url'        => $url,
+         'label'      => $params['label'],
+         'icon'       => $params['icon'],
+         's_criteria' => $searchCriteria,
+         'itemtype'   => 'Ticket',
+      ];
+   }
+
+   public static function getIssuesSummary(array $params = []) {
+      $default_params = [
+         'label'         => "",
+         'icon'          => "",
+         'apply_filters' => [],
+      ];
+      $params = array_merge($default_params, $params);
+
+      $all      = self::nbIssues($params + ['status' => 'all']);
+      $new      = self::nbIssues($params + ['status' => 'incoming']);
+      $waiting  = self::nbIssues($params + ['status' => 'waiting']);
+      $incoming = self::nbIssues($params + ['status' => 'assigned']);
+      $validate = self::nbIssues($params + ['status' => 'validate']);
+      $solved   = self::nbIssues($params + ['status' => 'solved']);
+      $closed   = self::nbIssues($params + ['status' => 'closed']);
+
+      return [
+         'data' => [
+            [
+               'number' => $all['number'],
+               'label'  => __("All", 'formcreator'),
+               'url'    => $all['url'],
+               // 'color'  => '#3bc519',
+            ],
+            [
+               'number' => $new['number'],
+               'label'  => __("New"),
+               'url'    => $new['url'],
+               'color'  => '#3bc519',
+            ],
+            [
+               'number' => $incoming['number'],
+               'label'  => __("Assigned"),
+               'url'    => $incoming['url'],
+               'color'  => '#f1cd29',
+            ],
+            [
+               'number' => $waiting['number'],
+               'label'  => __("Waiting"),
+               'url'    => $waiting['url'],
+               'color'  => '#f1a129',
+            ],
+            [
+               'number' => $validate['number'],
+               'label'  => __("To validate"),
+               'url'    => $validate['url'],
+               'color'  => '#266ae9',
+            ],
+            [
+               'number' => $solved['number'],
+               'label'  => __("Solved"),
+               'url'    => $solved['url'],
+               'color'  => '#edc949',
+            ],
+            [
+               'number' => $closed['number'],
+               'label'  => __("Closed"),
+               'url'    => $closed['url'],
+               'color'  => '#555555',
+            ],
+         ],
+         // 'label' => '$params['label']',
+         'icon'  => $params['icon'],
+      ];
    }
 }

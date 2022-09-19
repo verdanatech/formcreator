@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Formcreator. If not, see <http://www.gnu.org/licenses/>.
  * ---------------------------------------------------------------------
- * @copyright Copyright © 2011 - 2019 Teclib'
+ * @copyright Copyright © 2011 - 2021 Teclib'
  * @license   http://www.gnu.org/licenses/gpl.txt GPLv3+
  * @link      https://github.com/pluginsGLPI/formcreator/
  * @link      https://pluginsglpi.github.io/formcreator/
@@ -30,6 +30,8 @@
  */
 
 use GlpiPlugin\Formcreator\Exception\ImportFailureException;
+use GlpiPlugin\Formcreator\Exception\ExportFailureException;
+use Glpi\Application\View\TemplateRenderer;
 
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
@@ -42,20 +44,35 @@ if (!defined('GLPI_ROOT')) {
  * question B
  */
 class PluginFormcreatorQuestionRegex
-extends PluginFormcreatorQuestionParameter
+extends PluginFormcreatorAbstractQuestionParameter
 {
-
-   protected $domId = 'plugin_formcreator_questionRegex';
+   use PluginFormcreatorTranslatable;
 
    public static function getTypeName($nb = 0) {
       return _n('Question regular expression', 'Question regular expressions', $nb, 'formcreator');
    }
 
+   public function rawSearchOptions() {
+      $tab = parent::rawSearchOptions();
+
+      $tab[] = [
+         'id'                 => '4',
+         'table'              => $this::getTable(),
+         'field'              => 'regex',
+         'name'               => __('Regular expression', 'formcreator'),
+         'datatype'           => 'string',
+         'massiveaction'      => false,
+      ];
+
+      return $tab;
+   }
+
+
    public function getParameterFormSize() {
       return 1;
    }
 
-   public function getParameterForm(PluginFormcreatorForm $form, PluginFormcreatorQuestion $question) {
+   public function getParameterForm(PluginFormcreatorQuestion $question) {
       // get the name of the HTML input field
       $name = '_parameters[' . $this->field->getFieldTypeName() . '][' . $this->fieldName . ']';
 
@@ -70,23 +87,21 @@ extends PluginFormcreatorQuestionParameter
       }
 
       // build HTML code
-      $selector = $this->domId;
-      $out = '';
-      $out.= '<td id="' . $selector . '">' . $this->label . '</td>';
-      $out.= '<td colspan="3"><input type="text" name="'. $name . '[regex]" id="regex" style="width:98%;" value="'.$selected.'" />';
-      $out.= '<em>';
-      $out.= __('Specify the additional validation conditions in the description of the question to help users.', 'formcreator');
-      $out.= '</em></td>';
-
+      $out = TemplateRenderer::getInstance()->render(
+         '@formcreator/questionparameter/regex.html.twig',
+         [
+            'item'   => $this,
+            'label'  => $this->label,
+            'params' => [
+               'name'  => $name,
+            ],
+         ]
+      );
       return $out;
    }
 
    public function post_getEmpty() {
       $this->fields['regex'] = null;
-   }
-
-   public function getJsShowHideSelector() {
-      return "#" . $this->domId;
    }
 
    public function prepareInputForAdd($input) {
@@ -100,9 +115,9 @@ extends PluginFormcreatorQuestionParameter
       return $this->fieldName;
    }
 
-   public function export($remove_uuid = false) {
+   public function export(bool $remove_uuid = false) : array {
       if ($this->isNewItem()) {
-         return false;
+         throw new ExportFailureException(sprintf(__('Cannot export an empty object: %s', 'formcreator'), $this->getTypeName()));
       }
 
       $parameter = $this->fields;
@@ -120,7 +135,7 @@ extends PluginFormcreatorQuestionParameter
       return $parameter;
    }
 
-   public static function import(PluginFormcreatorLinker $linker, $input = [], $containerId = 0) {
+   public static function import(PluginFormcreatorLinker $linker, array $input = [], int $containerId = 0) {
       global $DB;
 
       if (!isset($input['uuid']) && !isset($input['id'])) {
@@ -132,10 +147,7 @@ extends PluginFormcreatorQuestionParameter
 
       $question = new PluginFormcreatorQuestion();
       $question->getFromDB($containerId);
-      $field = PluginFormcreatorFields::getFieldInstance(
-         $question->fields['fieldtype'],
-         $question
-      );
+      $field = $question->getSubField();
 
       $item = $field->getEmptyParameters();
       $item = $item[$input['fieldname']];
@@ -170,12 +182,16 @@ extends PluginFormcreatorQuestionParameter
       }
       if ($itemId === false) {
          $typeName = strtolower(self::getTypeName());
-         throw new ImportFailureException(sprintf(__('failed to add or update the %1$s %2$s', 'formceator'), $typeName, $input['name']));
+         throw new ImportFailureException(sprintf(__('Failed to add or update the %1$s %2$s', 'formceator'), $typeName, $input['name']));
       }
 
       // add the question to the linker
       $linker->addObject($originalId, $item);
 
       return $itemId;
+   }
+
+   public static function countItemsToImport($input) : int {
+      return 1;
    }
 }

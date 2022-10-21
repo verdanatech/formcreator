@@ -206,7 +206,7 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
          'id'                 => '3',
          'table'              => 'glpi_plugin_formcreator_forms',
          'field'              => 'name',
-         'name'               => __('Form', 'formcreator'),
+         'name'               => PluginFormcreatorForm::getTypeName(1),
          'searchtype'         => 'contains',
          'datatype'           => 'string',
          'massiveaction'      => false
@@ -216,7 +216,7 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
          'id'                 => '4',
          'table'              => 'glpi_users',
          'field'              => 'name',
-         'name'               => __('Requester'),
+         'name'               => _n('Requester', 'Requesters', 1),
          'datatype'           => 'itemlink',
          'massiveaction'      => false,
          'linkfield'          => 'requester_id'
@@ -615,7 +615,7 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
 
       //add requester info
       echo '<div class="form-group">';
-      echo '<label for="requester">' . __('Requester', 'formcreator') . '</label>';
+      echo '<label for="requester">' . _n('Requester', 'Requesters', 1) . '</label>';
       echo Dropdown::getDropdownName('glpi_users', $this->fields['requester_id']);
       echo '</div>';
 
@@ -887,6 +887,14 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
       $generatedTargets->buildCompositeRelations();
 
       Session::addMessageAfterRedirect(__('The form has been successfully saved!', 'formcreator'), true, INFO);
+
+      /** @var CommonDBTM $target */
+      foreach ($this->targetList as $target) {
+         // TRANS: %1$s is the name of the target, %2$s is the type of the target, %3$s is the ID of the target in a HTML hyperlink
+         $targetUrl = '<a href="' . $target->getFormURLWithID($target->getID()) . '">' . $target->getID() . '</a>';
+         Session::addMessageAfterRedirect(sprintf(__('Item sucessfully added: %1$s (%2$s: %3$s)', 'formcreator'), $target->getName(), $target->getTypeName(1), $targetUrl), false, INFO);
+      }
+
       unset($CFG_GLPI['plugin_formcreator_disable_hook_create_ticket']);
       return $success;
    }

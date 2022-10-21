@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -33,12 +34,14 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
 }
 
-class PluginFormcreatorKnowbase {
+class PluginFormcreatorKnowbase
+{
 
    /**
     * Show the list of forms to be displayed to the end-user
     */
-   public function showList() {
+   public function showList()
+   {
       echo '<div class="center" id="plugin_formcreator_wizard">';
 
       echo '<div class="plugin_formcreator_card">';
@@ -48,16 +51,18 @@ class PluginFormcreatorKnowbase {
       echo '</div>';
    }
 
-   public function showServiceCatalog() {
+   public function showServiceCatalog()
+   {
       // show wizard
       echo '<div id="plugin_formcreator_wizard" class="card-group">';
       $this->showWizard();
       echo '</div>';
    }
 
-   public function showWizard() {
+   public function showWizard()
+   {
       echo '<div id="plugin_formcreator_kb_categories" class="card">';
-      echo '<div><h2 class="card-title">'._n("Category", "Categories", 2, 'formcreator').'</h2></div>';
+      echo '<div><h2 class="card-title">' . _n("Category", "Categories", 2, 'formcreator') . '</h2></div>';
       echo '<div class="slinky-menu"></div>';
       echo '<div><a href="#" id="wizard_seeall">' . __('See all', 'formcreator') . '</a></div>';
       echo '</div>';
@@ -76,11 +81,12 @@ class PluginFormcreatorKnowbase {
       echo '</div>';
    }
 
-   protected function showSearchBar() {
+   protected function showSearchBar()
+   {
       echo '<form name="plugin_formcreator_search" onsubmit="javascript: return false;" >';
       echo '<input type="text" name="words" id="plugin_formcreator_search_input" required  class="form-control"/>';
       echo '<span id="plugin_formcreator_search_input_bar"></span>';
-      echo '<label for="plugin_formcreator_search_input">'.__('Please, describe your need here', 'formcreator').'</label>';
+      echo '<label for="plugin_formcreator_search_input">' . __('Please, describe your need here', 'formcreator') . '</label>';
       echo '</form>';
    }
 
@@ -92,7 +98,8 @@ class PluginFormcreatorKnowbase {
     *
     * @return array Tree of form categories as nested array
     */
-   public static function getCategoryTree() {
+   public static function getCategoryTree()
+   {
       global $DB;
 
       $cat_table = KnowbaseItemCategory::getTable();
@@ -100,25 +107,25 @@ class PluginFormcreatorKnowbase {
 
       $kbitem_visibility_crit = KnowbaseItem::getVisibilityCriteria(true);
 
+      // This subquery may be obtained from GLPI's KnowbaseItem::getVisibilityCriteria()()
       $items_subquery = new QuerySubQuery(
          array_merge_recursive(
             [
                'SELECT' => ['COUNT DISTINCT' => KnowbaseItem::getTableField('id') . ' as cpt'],
                'FROM'   => KnowbaseItem::getTable(),
-               'LEFT JOIN' => [
+               'INNER JOIN' => [
                   KnowbaseItem_KnowbaseItemCategory::getTable() => [
                      'FKEY' => [
-                           KnowbaseItem::getTable() => 'id',
-                           KnowbaseItem_KnowbaseItemCategory::getTable() => KnowbaseItem::getForeignKeyField(),
-                     ],
-                  ],
-                  KnowbaseItemCategory::getTable() => [
-                     'FKEY' => [
-                        KnowbaseItem_KnowbaseItemCategory::getTable() => KnowbaseItemCategory::getForeignKeyField(),
-                        KnowbaseItemCategory::getTable() => 'id',
+                        KnowbaseItem::getTable() => 'id',
+                        KnowbaseItem_KnowbaseItemCategory::getTable() => KnowbaseItem::getForeignKeyField(),
                      ],
                   ],
                ],
+               'WHERE'  => [
+                  KnowbaseItem_KnowbaseItemCategory::getTableField($cat_fk) => new QueryExpression(
+                     $DB->quoteName(KnowbaseItemCategory::getTableField('id'))
+                  ),
+               ]
             ],
             $kbitem_visibility_crit
          ),
@@ -192,18 +199,22 @@ class PluginFormcreatorKnowbase {
       return $nodes;
    }
 
-   public static function getFaqItems($rootCategory = 0, $keywords = '') {
+   public static function getFaqItems($rootCategory = 0, $keywords = '')
+   {
       global $DB;
 
       $table_cat          = getTableForItemType('KnowbaseItemCategory');
       $selectedCategories = [];
-      $selectedCategories = getSonsOf($table_cat, $rootCategory);
-      $selectedCategories[$rootCategory] = $rootCategory;
+      if ($rootCategory != 0) {
+         $selectedCategories = getSonsOf($table_cat, $rootCategory);
+         $selectedCategories[$rootCategory] = $rootCategory;
+      }
 
       $params = [
          'faq'      => '1',
          'contains' => $keywords
       ];
+      $params['knowbaseitemcategories_id'] = 0;
       if (count($selectedCategories) > 0) {
          $params['knowbaseitemcategories_id'] = $selectedCategories;
       }
@@ -212,17 +223,24 @@ class PluginFormcreatorKnowbase {
       $formList = [];
       $result_faqs = $DB->request($query_faqs);
       foreach ($result_faqs as $faq) {
-         $formList[] = [
+         $faq_object = [
             'id'           => $faq['id'],
             'name'         => $faq['name'],
             'icon'         => '',
             'icon_color'   => '',
             'background_color'   => '',
+            'answer' => '',
             'description'  => '',
             'type'         => 'faq',
             'usage_count'  => $faq['view'],
             'is_default'   => false
          ];
+
+         if (!empty($faq["answer"])) {
+            $faq_object["answer"] = Html::clean($faq["answer"]);
+         }
+
+         $formList[] = $faq_object;
       }
 
       return ['default' => [], 'forms' => $formList];

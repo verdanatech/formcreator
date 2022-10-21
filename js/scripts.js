@@ -1378,7 +1378,7 @@ var plugin_formcreator = new function() {
    };
 
    this.submitUserForm = function () {
-      var form     = document.querySelector('form[data-itemtype]');
+      var form     = document.querySelector('form[role="form"][data-itemtype]');
       var data     = new FormData(form);
       data.append('submit_formcreator', '');
       $.post({
@@ -1392,7 +1392,19 @@ var plugin_formcreator = new function() {
             window.location = data.redirect;
          }
       }).fail(function (xhr, data) {
-         if (xhr.responseText == '' || typeof(xhr.responseJSON.message) == 'undefined') {
+         $(form).find('[type="submit"]')
+            .html(i18n.textdomain('formcreator').__('Send', 'formcreator'))
+            .off('click');
+         $(form).removeAttr('data-submitted');
+
+         if (xhr.responseText == '') {
+            displayAjaxMessageAfterRedirect();
+            return;
+         }
+         if (typeof(xhr.responseJSON) == 'undefined') {
+            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
+         }
+         if (typeof(xhr.responseJSON.message) == 'undefined') {
             displayAjaxMessageAfterRedirect();
             return;
          }

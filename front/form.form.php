@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -29,7 +30,7 @@
  * ---------------------------------------------------------------------
  */
 
-include ("../../../inc/includes.php");
+include("../../../inc/includes.php");
 
 // Check if plugin is activated...
 if (!(new Plugin())->isActivated('formcreator')) {
@@ -43,41 +44,34 @@ if (isset($_POST['add'])) {
    Session::checkRight('entity', UPDATE);
    $newID = $form->add($_POST);
    Html::redirect(FORMCREATOR_ROOTDOC . '/front/form.form.php?id=' . $newID);
-
 } else if (isset($_POST['update'])) {
    // Edit an existing form
    Session::checkRight('entity', UPDATE);
    $form->update($_POST);
    Html::back();
-
 } else if (isset($_POST['delete'])) {
    // Delete a form (is_deleted = true)
    Session::checkRight('entity', UPDATE);
    $form->delete($_POST);
    $form->redirectToList();
-
 } else if (isset($_POST['restore'])) {
    // Restore a deleteted form (is_deleted = false)
    Session::checkRight('entity', UPDATE);
    $form->restore($_POST);
    $form->redirectToList();
-
 } else if (isset($_POST['purge'])) {
    // Delete defenitively a form from DB and all its datas
    Session::checkRight('entity', UPDATE);
    $form->delete($_POST, 1);
    $form->redirectToList();
-
 } else if (isset($_POST['add_target'])) {
    Session::checkRight('entity', UPDATE);
    $form->addTarget($_POST);
    Html::back();
-
 } else if (isset($_POST['delete_target'])) {
    Session::checkRight('entity', UPDATE);
    $form->deleteTarget($_POST);
    Html::redirect(FORMCREATOR_ROOTDOC . '/front/form.form.php?id=' . $_POST['plugin_formcreator_forms_id']);
-
 } else if (isset($_POST['filetype_create'])) {
    $documentType = new DocumentType();
    $canAddType = $documentType->canCreate();
@@ -93,7 +87,6 @@ if (isset($_POST['add'])) {
       $form->enableDocumentType();
    }
    Html::back();
-
 } else if (isset($_GET['import_form'])) {
    // Import form
    Session::checkRight('entity', UPDATE);
@@ -109,7 +102,6 @@ if (isset($_POST['add'])) {
 
    $form->showImportForm();
    Html::footer();
-
 } else if (isset($_POST['import_send'])) {
    Html::header(
       PluginFormcreatorForm::getTypeName(2),
@@ -123,8 +115,14 @@ if (isset($_POST['add'])) {
    Session::checkRight('entity', UPDATE);
    $form->importJson($_REQUEST);
    Html::back();
-
 } else if (isset($_POST['submit_formcreator'])) {
+   foreach ($_POST as $key => $value) {
+      $key = str_replace("formcreator_field_", "", $key);
+      $value = str_replace("\\n", "", $value);
+      $value = str_replace("\\r", "", $value);
+      $_POST['formcreator_field_' . $key] = $value;
+   }
+
    // Save form to target
    if (!$form->getFromDB($_POST['plugin_formcreator_forms_id'])) {
       Html::back();
@@ -169,7 +167,6 @@ if (isset($_POST['add'])) {
    }
    // Form was saved from preview tab, go back to the preview
    Html::back();
-
 } else {
    // Show forms form
    Session::checkRight('entity', UPDATE);

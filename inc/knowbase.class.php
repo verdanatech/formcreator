@@ -84,9 +84,10 @@ class PluginFormcreatorKnowbase
    protected function showSearchBar()
    {
       echo '<form name="plugin_formcreator_search" onsubmit="javascript: return false;" >';
-      echo '<input type="text" name="words" id="plugin_formcreator_search_input" required  class="form-control"/>';
-      echo '<span id="plugin_formcreator_search_input_bar"></span>';
-      echo '<label for="plugin_formcreator_search_input">' . __('Please, describe your need here', 'formcreator') . '</label>';
+      echo '<div class="input-group mb-3">';
+      echo '<input type="text" id="plugin_formcreator_search_input" class="form-control form-control-lg" name="words" placeholder="' . __('Please, describe your need here', 'formcreator') . '" aria-label="' . __('What are you looking for?', 'formcreator') . '" aria-describedby="button-addon2" required>';
+      echo '<span class="btn fa fa-search" id="button-addon2"></span>';
+      echo '</div>';
       echo '</form>';
    }
 

@@ -823,16 +823,6 @@ a.plugin_formcreator_formTile_title {
     left: -9999px
 }
 
-#plugin_formcreator_searchBar:after {
-    width: 16px;
-    height: 16px;
-    content: "";
-    display: inline-block;
-    background-image: url("../pics/search.png");
-    position: absolute;
-    top: 39%;
-    right: 10px
-}
 
 #plugin_formcreator_lastForms .plugin_formcreator_answer {
     margin: 3px;
@@ -1074,7 +1064,7 @@ a.plugin_formcreator_formTile_title {
 
 /* https://github.com/glpi-project/glpi/pull/11524 */
 .formcreator_dashboard_container .dashboard .big-number .label {
-    font-size: 12px !important
+    font-size: 12px !important;
 }
 
 .plugin_formcreator_sort .fa {

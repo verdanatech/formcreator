@@ -405,7 +405,7 @@ function buildTiles(list) {
 
       var description = '';
       if (item.description) {
-         description = '<div class="plugin_formcreator_formTile_description '+ tiles_design +'">'
+         description = '<div class="plugin_formcreator_formTile_description '+ tiles_design +' style="text-align:left;"">'
                         +item.description
                         +'</div>';
       }
@@ -432,32 +432,43 @@ function buildTiles(list) {
       }
 
       if (item.type == 'form') {
-         forms.push(
-            '<div data-itemtype="PluginFormcreatorForm" data-id="' + item.id + '" style="background-color: ' + item.background_color + '" class="plugin_formcreator_formTile '+item.type+' '+tiles_design+' '+default_class+'" title="'+item.description+'">'
-            + '<i class="' + item.icon + '" style="color: ' + item.icon_color+ '"></i>'
-            + '<a href="' + url + '" class="plugin_formcreator_formTile_title">'
-            + item.name
-            + '</a>'
-            + description
-            + '</div>'
-         );
+         var base = `
+         <div class="col-12 col-md-6 col-lg-4">
+            <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.description}" data-bs-html="true">
+               <div class="card-header" style="background-color: ${item.background_color};">
+                  <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
+                  <a href="${url}" class="card-title text-white text-truncate stretched-link">
+                     ${item.name}
+                  </a>
+               </div>
+               <div class="card-body text-start card-body-content mb-2">
+                  ${description}
+               </div>
+            </div>
+         </div>
+         `;
+         forms.push(base);
       } else {
-         faqs.push(
-            '<div style="background-color: ' + item.background_color + '" class="plugin_formcreator_formTile '+item.type+' '+tiles_design+' '+default_class+'" title="'+item.description+'">'
-            + '<i class="fa ' + item.icon + '" style="color: ' + item.icon_color+ '"></i>'
-            + '<a href="' + url + '" class="plugin_formcreator_formTile_title">'
-            + item.name
-            + '</a>'
-            + description
-            + '</div>'
-         );
+         faqs.push(`
+            <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+               <div class="card-header " style="background-color: ${item.background_color};" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.name}" data-bs-html="true">
+                  <span class="fa ${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
+                  <a href="${url}" style="color: #757575" class="card-title text-truncate text-gray stretched-link">
+                     ${item.name}
+                  </a>
+               </div>
+            </div>
+         </div>
+         `);
       }
    });
 
    // concatenate all HTML parts
-   html = '<div id="plugin_formcreator_formlist">'
+   html = '<div id="plugin_formcreator_formlist" class="row row-cols-3 g-3 mb-4">'
    + forms.join("")
-   + '</div><div id="plugin_formcreator_faqlist">'
+   + '</div>'
+   + '<div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">'
    + faqs.join("")
    + '</div>'
 

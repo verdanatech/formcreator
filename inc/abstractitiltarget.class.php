@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -37,10 +38,10 @@ if (!defined('GLPI_ROOT')) {
 }
 
 abstract class PluginFormcreatorAbstractItilTarget extends PluginFormcreatorAbstractTarget implements
-PluginFormcreatorExportableInterface,
-PluginFormcreatorItilTargetInterface,
-PluginFormcreatorConditionnableInterface,
-PluginFormcreatorTranslatableInterface
+   PluginFormcreatorExportableInterface,
+   PluginFormcreatorItilTargetInterface,
+   PluginFormcreatorConditionnableInterface,
+   PluginFormcreatorTranslatableInterface
 {
    /** @var array $requesters requester actors of the target */
    protected $requesters;
@@ -173,7 +174,8 @@ PluginFormcreatorTranslatableInterface
    const SLA_RULE_SPECIFIC = 2;
    const SLA_RULE_FROM_ANWSER = 3;
 
-   public static function getEnumTagType() {
+   public static function getEnumTagType()
+   {
       return [
          self::TAG_TYPE_NONE                   => __('None'),
          self::TAG_TYPE_QUESTIONS              => __('Tags from questions', 'formcreator'),
@@ -183,7 +185,8 @@ PluginFormcreatorTranslatableInterface
       ];
    }
 
-   public static function getEnumDueDateRule() {
+   public static function getEnumDueDateRule()
+   {
       return [
          self::DUE_DATE_RULE_ANSWER => __('equals to the answer to the question', 'formcreator'),
          self::DUE_DATE_RULE_TICKET => __('calculated from the ticket creation date', 'formcreator'),
@@ -191,7 +194,8 @@ PluginFormcreatorTranslatableInterface
       ];
    }
 
-   public static function getEnumSlaRule() {
+   public static function getEnumSlaRule()
+   {
       return [
          self::SLA_RULE_NONE => __('SLA from template or none', 'formcreator'),
          self::SLA_RULE_SPECIFIC => __('Specific SLA', 'formcreator'),
@@ -199,7 +203,8 @@ PluginFormcreatorTranslatableInterface
       ];
    }
 
-   public static function getEnumOlaRule() {
+   public static function getEnumOlaRule()
+   {
       return [
          self::OLA_RULE_NONE => __('OLA from template or none', 'formcreator'),
          self::OLA_RULE_SPECIFIC => __('Specific OLA', 'formcreator'),
@@ -207,7 +212,8 @@ PluginFormcreatorTranslatableInterface
       ];
    }
 
-   public static function getEnumUrgencyRule() {
+   public static function getEnumUrgencyRule()
+   {
       return [
          self::URGENCY_RULE_NONE      => __('Urgency from template or Medium', 'formcreator'),
          self::URGENCY_RULE_SPECIFIC  => __('Specific urgency', 'formcreator'),
@@ -215,7 +221,8 @@ PluginFormcreatorTranslatableInterface
       ];
    }
 
-   public static function getEnumCategoryRule() {
+   public static function getEnumCategoryRule()
+   {
       return [
          self::CATEGORY_RULE_NONE         => __('Category from template or none', 'formcreator'),
          self::CATEGORY_RULE_SPECIFIC     => __('Specific category', 'formcreator'),
@@ -224,7 +231,8 @@ PluginFormcreatorTranslatableInterface
       ];
    }
 
-   public static function getEnumLocationRule() {
+   public static function getEnumLocationRule()
+   {
       return [
          self::LOCATION_RULE_NONE         => __('Location from template or none', 'formcreator'),
          self::LOCATION_RULE_SPECIFIC     => __('Specific location', 'formcreator'),
@@ -233,7 +241,8 @@ PluginFormcreatorTranslatableInterface
       ];
    }
 
-   public static function getEnumValidationRule() {
+   public static function getEnumValidationRule()
+   {
       return [
          self::COMMONITIL_VALIDATION_RULE_NONE                      => __('No validation', 'formcreator'),
          self::COMMONITIL_VALIDATION_RULE_SPECIFIC_USER_OR_GROUP    => __('Specific user or group', 'formcreator'),
@@ -247,7 +256,8 @@ PluginFormcreatorTranslatableInterface
     * @param PluginFormcreatorFormAnswer $formanswer Answers to the form used to populate the target
     * @return array
     */
-   protected function setTargetCategory(array $data, PluginFormcreatorFormAnswer $formanswer) : array {
+   protected function setTargetCategory(array $data, PluginFormcreatorFormAnswer $formanswer): array
+   {
       global $DB;
 
       $category = null;
@@ -326,7 +336,8 @@ PluginFormcreatorTranslatableInterface
       return $data;
    }
 
-   protected function setSLA($data, $formanswer) {
+   protected function setSLA($data, $formanswer)
+   {
       global $DB;
 
       switch ($this->fields['sla_rule']) {
@@ -366,7 +377,8 @@ PluginFormcreatorTranslatableInterface
       return $data;
    }
 
-   protected function setOLA($data, $formanswer) {
+   protected function setOLA($data, $formanswer)
+   {
       global $DB;
 
       switch ($this->fields['ola_rule']) {
@@ -406,7 +418,8 @@ PluginFormcreatorTranslatableInterface
       return $data;
    }
 
-   protected function setTargetUrgency($data, $formanswer) {
+   protected function setTargetUrgency($data, $formanswer)
+   {
       global $DB;
 
       $urgency = null;
@@ -436,7 +449,8 @@ PluginFormcreatorTranslatableInterface
    /**
     * find all actors and prepare data for the ticket being created
     */
-   protected function prepareActors(PluginFormcreatorForm $form, PluginFormcreatorFormAnswer $formanswer) {
+   protected function prepareActors(PluginFormcreatorForm $form, PluginFormcreatorFormAnswer $formanswer)
+   {
       global $DB, $PLUGIN_HOOKS;
 
       $rows = $DB->request([
@@ -453,20 +467,20 @@ PluginFormcreatorTranslatableInterface
          }
 
          switch ($actor['actor_type']) {
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHOR :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHOR:
                $userIds = [$formanswer->fields['requester_id']];
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_VALIDATOR :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_VALIDATOR:
                $userIds = [$_SESSION['glpiID']];
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_PERSON :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_SUPPLIER :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_PERSON:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_SUPPLIER:
                $userIds = [$actor['actor_value']];
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_PERSON :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_GROUP :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_SUPPLIER :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_PERSON:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_GROUP:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_SUPPLIER:
                $answer  = new PluginFormcreatorAnswer();
                $actorValue = $actor['actor_value'];
                $formanswerId = $formanswer->getID();
@@ -502,7 +516,7 @@ PluginFormcreatorTranslatableInterface
                break;
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP_FROM_OBJECT:
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_TECH_GROUP_FROM_OBJECT:
-                  // Get the object from the question
+               // Get the object from the question
                $answer  = new PluginFormcreatorAnswer();
                $actorValue = $actor['actor_value'];
                $formanswerId = $formanswer->getID();
@@ -562,26 +576,26 @@ PluginFormcreatorTranslatableInterface
          $notify = $actor['use_notification'];
 
          switch ($actor['actor_type']) {
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHOR :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_VALIDATOR :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_PERSON :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_PERSON :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHOR:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_VALIDATOR:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_PERSON:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_PERSON:
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_ACTORS:
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHORS_SUPERVISOR:
                foreach ($userIds as $userIdOrEmail) {
                   $this->addActor($actor['actor_role'], $userIdOrEmail, $notify);
                }
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_GROUP :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_GROUP:
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP_FROM_OBJECT:
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_TECH_GROUP_FROM_OBJECT:
                foreach ($userIds as $groupId) {
                   $this->addGroupActor($actor['actor_role'], $groupId);
                }
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_SUPPLIER :
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_SUPPLIER :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_SUPPLIER:
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_SUPPLIER:
                foreach ($userIds as $userId) {
                   $this->addActor(PluginFormcreatorTarget_Actor::ACTOR_ROLE_SUPPLIER, $userId, $notify);
                }
@@ -592,7 +606,7 @@ PluginFormcreatorTranslatableInterface
                      if (!is_a($plugin_target, PluginFormcreatorPluginTargetInterface::class, true)) {
                         continue;
                      }
-                     if ($actor['actor_type']== $plugin_target::getId()) {
+                     if ($actor['actor_type'] == $plugin_target::getId()) {
                         $value = $plugin_target::getActorId($formanswer, $actor['actor_value']);
                         if ($value) {
                            if ($plugin_target::getActorType() == PluginFormcreatorPluginTargetInterface::ACTOR_TYPE_USER) {
@@ -618,7 +632,8 @@ PluginFormcreatorTranslatableInterface
     * @param bool $notify true to enable notification for the actor
     * @return boolean true on success, false on error
     */
-   protected function addActor($role, $user, $notify) {
+   protected function addActor($role, $user, $notify)
+   {
       if (filter_var($user, FILTER_VALIDATE_EMAIL) !== false) {
          $userId = 0;
          $alternativeEmail = $user;
@@ -642,11 +657,11 @@ PluginFormcreatorTranslatableInterface
             $actorType = &$this->observers['_users_id_observer'];
             $actorTypeNotif = &$this->observers['_users_id_observer_notif'];
             break;
-         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_ASSIGNED :
+         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_ASSIGNED:
             $actorType = &$this->assigned['_users_id_assign'];
             $actorTypeNotif = &$this->assigned['_users_id_assign_notif'];
             break;
-         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_SUPPLIER :
+         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_SUPPLIER:
             $actorType = &$this->assignedSuppliers['_suppliers_id_assign'];
             $actorTypeNotif = &$this->assignedSuppliers['_suppliers_id_assign_notif'];
             break;
@@ -683,17 +698,18 @@ PluginFormcreatorTranslatableInterface
     * @param string $group Group ID
     * @return boolean true on sucess, false on error
     */
-   protected function addGroupActor($role, $group) {
+   protected function addGroupActor($role, $group)
+   {
       // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $actorType = null;
       switch ($role) {
          case PluginFormcreatorTarget_Actor::ACTOR_ROLE_REQUESTER:
             $actorType = &$this->requesterGroups['_groups_id_requester'];
             break;
-         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_OBSERVER :
+         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_OBSERVER:
             $actorType = &$this->observerGroups['_groups_id_observer'];
             break;
-         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_ASSIGNED :
+         case PluginFormcreatorTarget_Actor::ACTOR_ROLE_ASSIGNED:
             $actorType = &$this->assignedGroups['_groups_id_assign'];
             break;
          default:
@@ -714,7 +730,8 @@ PluginFormcreatorTranslatableInterface
    /**
     * Attach documents of the answer to the target
     */
-   protected function attachDocument($formAnswerId, $itemtype, $targetID) {
+   protected function attachDocument($formAnswerId, $itemtype, $targetID)
+   {
       global $CFG_GLPI;
 
       $docItem = new Document_Item();
@@ -739,11 +756,13 @@ PluginFormcreatorTranslatableInterface
       }
    }
 
-   public function addAttachedDocument($documentId) {
+   public function addAttachedDocument($documentId)
+   {
       $this->attachedDocuments[$documentId] = true;
    }
 
-   protected function showTemplateSettings() {
+   protected function showTemplateSettings()
+   {
       $templateType = $this->getTemplateItemtypeName();
       $templateFk = $templateType::getForeignKeyField();
 
@@ -756,12 +775,15 @@ PluginFormcreatorTranslatableInterface
       echo '</td>';
    }
 
-   protected  function showDueDateSettings() {
+   protected  function showDueDateSettings()
+   {
       echo '<td width="15%">' . __('Time to resolve') . '</td>';
       echo '<td width="45%">';
 
       // Due date type selection
-      Dropdown::showFromArray('due_date_rule', self::getEnumDueDateRule(),
+      Dropdown::showFromArray(
+         'due_date_rule',
+         self::getEnumDueDateRule(),
          [
             'value'     => $this->fields['due_date_rule'],
             'on_change' => 'plugin_formcreator_formcreatorChangeDueDate(this.value)',
@@ -781,8 +803,10 @@ PluginFormcreatorTranslatableInterface
          $questions_list[$question->getID()] = $question->fields['name'];
       }
       // List questions
-      if ($this->fields['due_date_rule'] != self::DUE_DATE_RULE_ANSWER
-            && $this->fields['due_date_rule'] != self::DUE_DATE_RULE_CALC) {
+      if (
+         $this->fields['due_date_rule'] != self::DUE_DATE_RULE_ANSWER
+         && $this->fields['due_date_rule'] != self::DUE_DATE_RULE_CALC
+      ) {
          echo '<div id="due_date_questions" style="display:none">';
       } else {
          echo '<div id="due_date_questions">';
@@ -798,8 +822,10 @@ PluginFormcreatorTranslatableInterface
       echo '</div>';
 
       // time shift in minutes
-      if ($this->fields['due_date_rule'] != self::DUE_DATE_RULE_TICKET
-            && $this->fields['due_date_rule'] != self::DUE_DATE_RULE_CALC) {
+      if (
+         $this->fields['due_date_rule'] != self::DUE_DATE_RULE_TICKET
+         && $this->fields['due_date_rule'] != self::DUE_DATE_RULE_CALC
+      ) {
          echo '<div id="due_date_time" style="display:none">';
       } else {
          echo '<div id="due_date_time">';
@@ -821,7 +847,8 @@ PluginFormcreatorTranslatableInterface
       echo '</td>';
    }
 
-   protected function showSLASettings() {
+   protected function showSLASettings()
+   {
       $label = __("SLA");
 
       echo '<tr>';
@@ -829,7 +856,9 @@ PluginFormcreatorTranslatableInterface
       echo '<td width="25%">';
 
       // Due date type selection
-      Dropdown::showFromArray("sla_rule", self::getEnumSlaRule(),
+      Dropdown::showFromArray(
+         "sla_rule",
+         self::getEnumSlaRule(),
          [
             'value'     => $this->fields["sla_rule"],
             'on_change' => "plugin_formcreator_formcreatorChangeSla(this.value)",
@@ -894,7 +923,8 @@ PluginFormcreatorTranslatableInterface
       echo '</tr>';
    }
 
-   protected function showOLASettings() {
+   protected function showOLASettings()
+   {
       $label = __("OLA");
 
       echo '<tr>';
@@ -902,7 +932,9 @@ PluginFormcreatorTranslatableInterface
       echo '<td width="25%">';
 
       // Due date type selection
-      Dropdown::showFromArray("ola_rule", self::getEnumOlaRule(),
+      Dropdown::showFromArray(
+         "ola_rule",
+         self::getEnumOlaRule(),
          [
             'value'     => $this->fields["ola_rule"],
             'on_change' => "plugin_formcreator_formcreatorChangeOla(this.value)",
@@ -967,7 +999,8 @@ PluginFormcreatorTranslatableInterface
       echo '</tr>';
    }
 
-   protected function showCategorySettings($rand) {
+   protected function showCategorySettings($rand)
+   {
       echo '<tr>';
       echo '<td width="15%">' . PluginFormcreatorCategory::getTypeName(1) . '</td>';
       echo '<td width="25%">';
@@ -1009,7 +1042,8 @@ PluginFormcreatorTranslatableInterface
       echo '</tr>';
    }
 
-   protected function showUrgencySettings($rand) {
+   protected function showUrgencySettings($rand)
+   {
       echo '<tr>';
       echo '<td width="15%">' . __('Urgency') . '</td>';
       echo '<td width="45%">';
@@ -1046,7 +1080,8 @@ PluginFormcreatorTranslatableInterface
       echo '</tr>';
    }
 
-   protected function showPluginTagsSettings($rand) {
+   protected function showPluginTagsSettings($rand)
+   {
       global $DB;
 
       $plugin = new Plugin();
@@ -1142,7 +1177,7 @@ SCRIPT;
             ]
          ]);
          $values = [];
-         foreach ($result AS $id => $data) {
+         foreach ($result as $id => $data) {
             $values[$id] = $data['name'];
          }
 
@@ -1158,7 +1193,8 @@ SCRIPT;
       }
    }
 
-   protected function showActorsSettings() {
+   protected function showActorsSettings()
+   {
       global $DB;
 
       // Get available questions for actors lists
@@ -1184,9 +1220,9 @@ SCRIPT;
       }
 
       echo '<table class="tab_cadre_fixe" '
-      . ' data-itemtype="' . $this->getType() . '"'
-      . ' data-id="' . $this->getID() . '"'
-      . '>';
+         . ' data-itemtype="' . $this->getType() . '"'
+         . ' data-id="' . $this->getID() . '"'
+         . '>';
 
       echo '<tr><th class="center" colspan="3">' . __('Actors', 'formcreator') . '</th></tr>';
 
@@ -1215,7 +1251,8 @@ SCRIPT;
       echo '</table>';
    }
 
-   protected function showLocationSettings($rand) {
+   protected function showLocationSettings($rand)
+   {
       global $DB;
 
       echo '<tr>';
@@ -1282,7 +1319,8 @@ SCRIPT;
       echo '</tr>';
    }
 
-   protected function showValidationSettings($rand) {
+   protected function showValidationSettings($rand)
+   {
       echo '<tr>';
 
       // Setting label
@@ -1342,7 +1380,7 @@ SCRIPT;
             'OR' => [
                'fieldtype' => 'actor',
                'AND' => [
-                  'fieldtype' => 'glpiselect',
+                  'fieldtype' => ['glpiselect', 'ldapselect'],
                   'itemtype'  => 'User',
                ]
             ]
@@ -1377,7 +1415,8 @@ SCRIPT;
     * @param PluginFormcreatorFormAnswer $formanswer    Answers previously saved
     * @return array updated data of the target object
     */
-   protected function setTargetDueDate($data, PluginFormcreatorFormAnswer $formanswer) {
+   protected function setTargetDueDate($data, PluginFormcreatorFormAnswer $formanswer)
+   {
       global $DB;
 
       $answer  = new PluginFormcreatorAnswer();
@@ -1530,7 +1569,8 @@ SCRIPT;
       return $data;
    }
 
-   public function prepareInputForAdd($input) {
+   public function prepareInputForAdd($input)
+   {
       $input = parent::prepareInputForAdd($input);
       if ($input === false || (is_array($input) && count($input) < 1)) {
          return false;
@@ -1552,15 +1592,18 @@ SCRIPT;
       return $input;
    }
 
-   public function prepareInputForUpdate($input) {
+   public function prepareInputForUpdate($input)
+   {
       $input = parent::prepareInputForUpdate($input);
       if ($input === false || (is_array($input) && count($input) < 1)) {
          return [];
       }
 
       if (!$this->skipChecks) {
-         if (isset($input['name'])
-            && empty($input['name'])) {
+         if (
+            isset($input['name'])
+            && empty($input['name'])
+         ) {
             Session::addMessageAfterRedirect(__('The name cannot be empty!', 'formcreator'), false, ERROR);
             return [];
          }
@@ -1578,13 +1621,13 @@ SCRIPT;
          if (Plugin::isPluginActive('tag')) {
             if (isset($input['_tag_questions'])) {
                $input['tag_questions'] = (!empty($input['_tag_questions']))
-                                          ? implode(',', $input['_tag_questions'])
-                                          : '';
+                  ? implode(',', $input['_tag_questions'])
+                  : '';
             }
             if (isset($input['_tag_specifics'])) {
                $input['tag_specifics'] = (!empty($input['_tag_specifics']))
-                                       ? implode(',', $input['_tag_specifics'])
-                                       : '';
+                  ? implode(',', $input['_tag_specifics'])
+                  : '';
             }
          }
       }
@@ -1620,7 +1663,8 @@ SCRIPT;
       return $input;
    }
 
-   public function post_addItem() {
+   public function post_addItem()
+   {
       parent::post_addItem();
       if ($this->skipCreateActors) {
          return;
@@ -1644,14 +1688,16 @@ SCRIPT;
       ]);
    }
 
-   protected function getDeleteImage() {
+   protected function getDeleteImage()
+   {
       $link = '<a onclick="plugin_formcreator.deleteActor(this)">';
       $link .= '<i style="color: #000" class="fas fa-trash-alt" alt="' . __('Delete') . '" title="' . __('Delete') . '"></i>';
       $link .= '</a>';
       return $link;
    }
 
-   public function pre_purgeItem() {
+   public function pre_purgeItem()
+   {
       // delete actors related to this instance
       $targetItemActor = new PluginFormcreatorTarget_Actor();
       if (!$targetItemActor->deleteByCriteria(['itemtype' => $this->getType(), 'items_id' => $this->getID()])) {
@@ -1669,7 +1715,8 @@ SCRIPT;
     * @param int $targetId ID of the generated target
     * @return void
     */
-   protected function saveTags(PluginFormcreatorFormanswer $formanswer, $targetId) {
+   protected function saveTags(PluginFormcreatorFormanswer $formanswer, $targetId)
+   {
       global $DB;
 
       // Add tag if presents
@@ -1685,7 +1732,8 @@ SCRIPT;
       if (($this->fields['tag_type'] == self::TAG_TYPE_QUESTIONS
             || $this->fields['tag_type'] == self::TAG_TYPE_QUESTIONS_AND_SPECIFIC
             || $this->fields['tag_type'] == self::TAG_TYPE_QUESTIONS_OR_SPECIFIC)
-            && (!empty($this->fields['tag_questions']))) {
+         && (!empty($this->fields['tag_questions']))
+      ) {
          $formAnswerFk = PluginFormcreatorFormAnswer::getForeignKeyField();
          $questionFk = PluginFormcreatorQuestion::getForeignKeyField();
          $result = $DB->request([
@@ -1712,10 +1760,12 @@ SCRIPT;
       }
 
       // Add specific tags
-      if ($this->fields['tag_type'] == self::TAG_TYPE_SPECIFICS
-                  || $this->fields['tag_type'] == self::TAG_TYPE_QUESTIONS_AND_SPECIFIC
-                  || ($this->fields['tag_type'] == self::TAG_TYPE_QUESTIONS_OR_SPECIFIC && empty($tags))
-                  && (!empty($this->fields['tag_specifics']))) {
+      if (
+         $this->fields['tag_type'] == self::TAG_TYPE_SPECIFICS
+         || $this->fields['tag_type'] == self::TAG_TYPE_QUESTIONS_AND_SPECIFIC
+         || ($this->fields['tag_type'] == self::TAG_TYPE_QUESTIONS_OR_SPECIFIC && empty($tags))
+         && (!empty($this->fields['tag_specifics']))
+      ) {
 
          $tags = array_merge($tags, explode(',', $this->fields['tag_specifics']));
       }
@@ -1738,7 +1788,8 @@ SCRIPT;
     * @param int $type see CommonITILActor constants
     * @return void
     */
-   protected function showActorSettingsHeader($type) {
+   protected function showActorSettingsHeader($type)
+   {
       switch ($type) { // Values from CommonITILObject::getSearchOptionsActors()
          case CommonITILActor::REQUESTER:
             $label =  _n('Requester', 'Requesters', 1);
@@ -1765,9 +1816,9 @@ SCRIPT;
 
       echo '<th width="33%">';
       echo $label . ' &nbsp;';
-      echo '<i class="fas fa-plus-circle" title="' . __('Add', 'formcreator'). '" alt="' . __('Add', 'formcreator'). '" onclick="' . $displayJSFunction . '" class="pointer"
+      echo '<i class="fas fa-plus-circle" title="' . __('Add', 'formcreator') . '" alt="' . __('Add', 'formcreator') . '" onclick="' . $displayJSFunction . '" class="pointer"
          id="' . $buttonAdd . '"></i>';
-      echo '<i class="fas fa-minus-circle" title="' . __('Cancel', 'formcreator'). '" alt="' . __('Cancel', 'formcreator'). '" onclick="' . $hideJSFunction . '" class="pointer"
+      echo '<i class="fas fa-minus-circle" title="' . __('Cancel', 'formcreator') . '" alt="' . __('Cancel', 'formcreator') . '" onclick="' . $hideJSFunction . '" class="pointer"
          id="' . $buttonCancel . '" style="display:none"></i>';
       echo '</th>';
    }
@@ -1779,7 +1830,8 @@ SCRIPT;
     * @param array $actors actors to show
     * @return void
     */
-   protected function showActorSettingsForType($actorType, array $actors) {
+   protected function showActorSettingsForType($actorType, array $actors)
+   {
       global $DB, $PLUGIN_HOOKS;
 
       $itemActor = new PluginFormcreatorTarget_Actor();
@@ -1808,13 +1860,14 @@ SCRIPT;
 
       echo '<td valign="top">';
       echo '<form name="form_target"'
-      . ' id="form_add_' . $type . '"'
-      . ' style="display:none"'
-      . 'action="javascript:;"'
-      . '">';
+         . ' id="form_add_' . $type . '"'
+         . ' style="display:none"'
+         . 'action="javascript:;"'
+         . '">';
       Dropdown::showFromArray(
          'actor_type',
-         $dropdownItems, [
+         $dropdownItems,
+         [
             'on_change' => $changeActorJSFunction,
          ]
       );
@@ -1959,7 +2012,7 @@ SCRIPT;
       echo '</div>';
 
       echo '<div style="display:none" data-actor-type="' . $type . "_" . PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_ACTORS . '">';
-       // find already used items
+      // find already used items
       $request = $DB->request([
          'FROM'  => PluginFormcreatorTarget_Actor::getTable(),
          'WHERE' => [
@@ -2077,64 +2130,64 @@ SCRIPT;
       foreach ($actors[$actorRole] as $id => $values) {
          echo '<div data-itemtype="PluginFormcreatorTarget_Actor" data-id="' . $id . '">';
          switch ($values['actor_type']) {
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHOR :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHOR:
                echo $img_user . ' <b>' . __('Form author', 'formcreator') . '</b>';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_VALIDATOR :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_VALIDATOR:
                echo $img_user . ' <b>' . __('Form validator', 'formcreator') . '</b>';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_PERSON :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_PERSON:
                $user = new User();
                $user->getFromDB($values['actor_value']);
                echo $img_user . ' <b>' . __('User') . ' </b> "' . $user->getName() . '"';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_PERSON :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_PERSON:
                $question = new PluginFormcreatorQuestion();
                $question->getFromDB($values['actor_value']);
                echo $img_user . ' <b>' . __('Person from the question', 'formcreator')
-               . '</b> "' . $question->getName() . '"';
+                  . '</b> "' . $question->getName() . '"';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP:
                $group = new Group();
                $group->getFromDB($values['actor_value']);
                echo $img_group . ' <b>' . __('Group') . ' </b> "' . $group->getName() . '"';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_GROUP :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_GROUP:
                $question = new PluginFormcreatorQuestion();
                $question->getFromDB($values['actor_value']);
                echo $img_group . ' <b>' . __('Group from the question', 'formcreator')
-               . '</b> "' . $question->getName() . '"';
+                  . '</b> "' . $question->getName() . '"';
                break;
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_GROUP_FROM_OBJECT:
                $question = new PluginFormcreatorQuestion();
                $question->getFromDB($values['actor_value']);
                echo $img_group . ' <b>' . __('Group from the object', 'formcreator')
-               . '</b> "' . $question->getName() . '"';
+                  . '</b> "' . $question->getName() . '"';
                break;
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_TECH_GROUP_FROM_OBJECT:
                $question = new PluginFormcreatorQuestion();
                $question->getFromDB($values['actor_value']);
                echo $img_group . ' <b>' . __('Tech group from the object', 'formcreator')
-               . '</b> "' . $question->getName() . '"';
+                  . '</b> "' . $question->getName() . '"';
                break;
             case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_ACTORS:
                $question = new PluginFormcreatorQuestion();
                $question->getFromDB($values['actor_value']);
                echo $img_user . ' <b>' . __('Actors from the question', 'formcreator')
-               . '</b> "' . $question->getName() . '"';
+                  . '</b> "' . $question->getName() . '"';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_SUPPLIER :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_SUPPLIER:
                $supplier = new Supplier();
                $supplier->getFromDB($values['actor_value']);
                echo $img_supplier . ' <b>' . __('Supplier') . ' </b> "' . $supplier->getName() . '"';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_SUPPLIER :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_QUESTION_SUPPLIER:
                $question = new PluginFormcreatorQuestion();
                $question->getFromDB($values['actor_value']);
                echo $img_supplier . ' <b>' . __('Supplier from the question', 'formcreator')
-               . '</b> "' . $question->getName() . '"';
+                  . '</b> "' . $question->getName() . '"';
                break;
-            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHORS_SUPERVISOR :
+            case PluginFormcreatorTarget_Actor::ACTOR_TYPE_AUTHORS_SUPERVISOR:
                echo $img_user . ' <b>' . __('Form author\'s supervisor', 'formcreator') . '</b>';
                break;
             default:
@@ -2160,7 +2213,8 @@ SCRIPT;
       echo '</td>';
    }
 
-   protected function initializeActors() {
+   protected function initializeActors()
+   {
       // Prepare actors structures for creation of the ticket
       $this->requesters = [
          '_users_id_requester'         => [],
@@ -2211,7 +2265,8 @@ SCRIPT;
     * @param array $data
     * @return array
     */
-   public function cleanActors(array $data): array {
+   public function cleanActors(array $data): array
+   {
       $actorTypes = [
          '_users_id_requester',
          '_users_id_observer',
@@ -2268,7 +2323,8 @@ SCRIPT;
     * @param PluginFormcreatorFormAnswer $formanswer
     * @return array
     */
-   public function getDefaultData(PluginFormcreatorFormAnswer $formanswer): array {
+   public function getDefaultData(PluginFormcreatorFormAnswer $formanswer): array
+   {
       $this->initializeActors();
 
       $targetItemtype = $this->getTargetItemtypeName();
@@ -2320,12 +2376,13 @@ SCRIPT;
       return $data;
    }
 
-   protected function prepareUploadsFromTextarea(array $data, PluginFormcreatorFormAnswer $formanswer): array {
+   protected function prepareUploadsFromTextarea(array $data, PluginFormcreatorFormAnswer $formanswer): array
+   {
       $saved_documents = $formanswer->getFileProperties();
 
       if ($saved_documents) {
          foreach ($formanswer->getForm()->getFields() as $questionId => $field) {
-            if (!($field instanceOf TextareaField)) {
+            if (!($field instanceof TextareaField)) {
                continue;
             }
             if (!isset($saved_documents["_content"][$questionId])) {
@@ -2343,7 +2400,7 @@ SCRIPT;
          }
       } else {
          foreach ($formanswer->getForm()->getFields() as $questionId => $field) {
-            if (!($field instanceOf TextareaField)) {
+            if (!($field instanceof TextareaField)) {
                continue;
             }
             $data["_content"] = array_merge($data["_content"], $formanswer->input["_formcreator_field_" . $questionId]);
@@ -2367,7 +2424,8 @@ SCRIPT;
     * @param array $data
     * @return array input $data updated with (fake) file uploads
     */
-   protected function prepareUploadedFiles(array $data): array {
+   protected function prepareUploadedFiles(array $data): array
+   {
       $data['_filename'] = [];
       $data['_prefix_filename'] = [];
       $data['_tag_filename'] = [];
@@ -2420,7 +2478,8 @@ SCRIPT;
       return $data;
    }
 
-   public static function getTargetType(): int {
+   public static function getTargetType(): int
+   {
       return self::TARGET_TYPE_OBJECT;
    }
 
@@ -2430,7 +2489,8 @@ SCRIPT;
     * @param PluginFormcreatorFormAnswer $formAnswer
     * @return array
     */
-   public static function findForFormAnswer(PluginFormcreatorFormAnswer $formAnswer): array {
+   public static function findForFormAnswer(PluginFormcreatorFormAnswer $formAnswer): array
+   {
       global $DB;
 
       $targets = [];
@@ -2465,23 +2525,28 @@ SCRIPT;
       return $targets;
    }
 
-   public static function getUserImage() {
+   public static function getUserImage()
+   {
       return '<i class="fas fa-user" alt="' . __('User') . '" title="' . __('User') . '" width="20"></i>';
    }
 
-   public static function getGroupImage() {
+   public static function getGroupImage()
+   {
       return  '<i class="fas fa-users" alt="' . __('Group') . '" title="' . __('Group') . '" width="20"></i>';
    }
 
-   public static function getSupplierImage() {
+   public static function getSupplierImage()
+   {
       return '<i class="fas fa-suitcase" alt="' . __('Supplier') . '" title="' . __('Supplier') . '" width="20"></i>';
    }
 
-   public static function getMailImage() {
+   public static function getMailImage()
+   {
       return '<i class="fas fa-envelope pointer"  title="' . __('Email followup') . ' ' . __('Yes') . '" width="20"></i>';
    }
 
-   public static function getNoMailImage() {
+   public static function getNoMailImage()
+   {
       return '<i class="fas fa-envelope pointer" title="' . __('Email followup') . ' ' . __('No') . '" width="20"></i>';
    }
 }

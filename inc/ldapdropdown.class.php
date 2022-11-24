@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -37,30 +38,35 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginFormcreatorLdapDropdown extends CommonGLPI
 {
-   public static function getTable() {
-       return '';
+   public static function getTable()
+   {
+      return '';
    }
 
-   public function getForeignKeyField() {
-       return '';
+   public function getForeignKeyField()
+   {
+      return '';
    }
 
-   public function isField() {
-       return false;
+   public function isField()
+   {
+      return false;
    }
 
-   public static function dropdown($options = []) {
-       $options['display'] = $options['display'] ?? false;
-       $options['url'] = Plugin::getWebDir('formcreator') . '/ajax/getldapvalues.php';
+   public static function dropdown($options = [])
+   {
+      $options['display'] = $options['display'] ?? false;
+      $options['url'] = Plugin::getWebDir('formcreator') . '/ajax/getldapvalues.php';
 
-       $out = Dropdown::show(self::class, $options);
+      $out = Dropdown::show(self::class, $options);
       if (!$options['display']) {
-          return $out;
+         return $out;
       }
-       echo $out;
+      echo $out;
    }
 
-   public static function getDropdownValue($post, $json = true) {
+   public static function getDropdownValue($post, $json = true)
+   {
       // Count real items returned
       $count = 0;
 
@@ -98,6 +104,9 @@ class PluginFormcreatorLdapDropdown extends CommonGLPI
       if (!$config_ldap->getFromDB($ldap_values['ldap_auth'])) {
          return [];
       }
+
+      $config_ldap->fields['condition'] = str_replace("#38;", "", $config_ldap->fields['condition']);
+      $config_ldap->fields['group_condition'] = str_replace("#38;", "", $config_ldap->fields['condition']);
 
       set_error_handler([self::class, 'ldapErrorHandler'], E_WARNING);
 
@@ -160,8 +169,8 @@ class PluginFormcreatorLdapDropdown extends CommonGLPI
                }
 
                $tab_values[] = [
-                'id'   => $attr[$attribute[0]][0],
-                'text' => $attr[$attribute[0]][0],
+                  'id'   => $attr[$attribute[0]][0],
+                  'text' => $attr[$attribute[0]][0],
                ];
                $count++;
                if ($count >= $post['page_limit']) {
@@ -177,7 +186,7 @@ class PluginFormcreatorLdapDropdown extends CommonGLPI
       restore_error_handler();
 
       $tab_values = Sanitizer::unsanitize($tab_values);
-      usort($tab_values, function($a, $b) {
+      usort($tab_values, function ($a, $b) {
          return strnatcmp($a['text'], $b['text']);
       });
       $ret['results'] = $tab_values;
@@ -186,7 +195,8 @@ class PluginFormcreatorLdapDropdown extends CommonGLPI
       return ($json === true) ? json_encode($ret) : $ret;
    }
 
-   public static function ldapErrorHandler($errno, $errstr, $errfile, $errline) {
+   public static function ldapErrorHandler($errno, $errstr, $errfile, $errline)
+   {
       if (0 === error_reporting()) {
          return false;
       }

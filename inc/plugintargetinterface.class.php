@@ -29,34 +29,19 @@
  * ---------------------------------------------------------------------
  */
 
-include ('../../../inc/includes.php');
-
-Session::checkLoginUser();
-
-// Check if plugin is activated...
-if (!(new Plugin())->isActivated('formcreator')) {
-   Html::displayNotFoundError();
+if (!defined('GLPI_ROOT')) {
+   die("Sorry. You can't access this file directly");
 }
 
-if (Session::getCurrentInterface() == 'helpdesk') {
-   if (plugin_formcreator_replaceHelpdesk()) {
-      Html::redirect('issue.php');
-   } else {
-      Html::helpHeader(
-         __('Form list', 'formcreator'),
-         'seek_assistance',
-         PluginFormcreatorForm::class
-      );
-   }
-} else {
-   Html::header(__('Form list', 'formcreator'));
-}
+interface PluginFormcreatorPluginTargetInterface
+{
+   const ACTOR_TYPE_USER = 1;
+   const ACTOR_TYPE_GROUP = 2;
 
-$form = PluginFormcreatorCommon::getForm();
-$form->showList();
-
-if (Session::getCurrentInterface() == "helpdesk") {
-   Html::helpFooter();
-} else {
-   Html::footer();
+   public static function getId(): int;
+   public static function getLabel(): string;
+   public static function getForm(PluginFormcreatorForm $form): string;
+   public static function getDisplayedValue($value): string;
+   public static function getActorType(): int;
+   public static function getActorId(PluginFormcreatorFormAnswer $formanswer, int $value): int;
 }

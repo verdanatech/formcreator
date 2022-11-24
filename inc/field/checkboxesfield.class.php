@@ -187,7 +187,6 @@ class CheckboxesField extends PluginFormcreatorAbstractField
          return true;
       }
 
-      $value = Toolbox::stripslashes_deep($value);
       foreach ($value as $item) {
          if (trim($item) == '') {
             return false;
@@ -264,7 +263,7 @@ class CheckboxesField extends PluginFormcreatorAbstractField
       }
 
       if ($richText) {
-         $value = '<p>' . implode('</p><p>', $value) . '</p>';
+         $value = implode('<br />', $value);
       } else {
          $value = implode(', ', $value);
       }

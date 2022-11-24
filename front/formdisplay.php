@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -31,7 +30,7 @@
  */
 
 global $CFG_GLPI, $DB;
-include('../../../inc/includes.php');
+include ('../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!(new Plugin())->isActivated('formcreator')) {
@@ -40,15 +39,13 @@ if (!(new Plugin())->isActivated('formcreator')) {
 
 PluginFormcreatorCommon::header();
 
-if (
-   isset($_REQUEST['id'])
-   && is_numeric($_REQUEST['id'])
-) {
+if (isset($_REQUEST['id'])
+   && is_numeric($_REQUEST['id'])) {
 
    $criteria = [
       'id'        => (int) $_REQUEST['id'],
       'is_active' => '1',
-      'is_deleted' => '0',
+      'is_deleted'=> '0',
    ];
    $form = PluginFormcreatorCommon::getForm();
    if (!$form->getFromDBByCrit($criteria)) {
@@ -75,8 +72,8 @@ if (
          $_SESSION['glpiactiveentities'] = [$form->fields['entities_id']];
          $subentities = getSonsOf('glpi_entities', $form->fields['entities_id']);
          $_SESSION['glpiactiveentities_string'] = (!empty($subentities))
-            ? "'" . implode("', '", $subentities) . "'"
-            : "'" . $form->fields['entities_id'] . "'";
+                                                ? "'" . implode("', '", $subentities) . "'"
+                                                : "'" . $form->fields['entities_id'] . "'";
          $_SESSION['glpilanguage'] = $form->getBestLanguage();
       }
    }
@@ -91,7 +88,7 @@ if (
    }
 } else if (isset($_GET['answer_saved'])) {
    $message = __("The form has been successfully saved!");
-   Html::displayTitle($CFG_GLPI['root_doc'] . "/pics/ok.png", $message, $message);
+   Html::displayTitle($CFG_GLPI['root_doc']."/pics/ok.png", $message, $message);
 }
 
 PluginFormcreatorCommon::footer();

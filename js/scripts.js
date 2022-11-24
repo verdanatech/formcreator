@@ -405,7 +405,7 @@ function buildTiles(list) {
 
       var description = '';
       if (item.description) {
-         description = '<div class="plugin_formcreator_formTile_description '+ tiles_design +' style="text-align:left;"">'
+         description = '<div class="plugin_formcreator_formTile_description '+ tiles_design +'">'
                         +item.description
                         +'</div>';
       }
@@ -432,43 +432,32 @@ function buildTiles(list) {
       }
 
       if (item.type == 'form') {
-         var base = `
-         <div class="col-12 col-md-6 col-lg-4">
-            <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.description}" data-bs-html="true">
-               <div class="card-header" style="background-color: ${item.background_color};">
-                  <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
-                  <a href="${url}" class="card-title text-white text-truncate stretched-link">
-                     ${item.name}
-                  </a>
-               </div>
-               <div class="card-body text-start card-body-content mb-2">
-                  ${description}
-               </div>
-            </div>
-         </div>
-         `;
-         forms.push(base);
+         forms.push(
+            '<div data-itemtype="PluginFormcreatorForm" data-id="' + item.id + '" style="background-color: ' + item.background_color + '" class="plugin_formcreator_formTile '+item.type+' '+tiles_design+' '+default_class+'" title="'+item.description+'">'
+            + '<i class="' + item.icon + '" style="color: ' + item.icon_color+ '"></i>'
+            + '<a href="' + url + '" class="plugin_formcreator_formTile_title">'
+            + item.name
+            + '</a>'
+            + description
+            + '</div>'
+         );
       } else {
-         faqs.push(`
-            <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100">
-               <div class="card-header " style="background-color: ${item.background_color};" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.name}" data-bs-html="true">
-                  <span class="fa ${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
-                  <a href="${url}" style="color: #757575" class="card-title text-truncate text-gray stretched-link">
-                     ${item.name}
-                  </a>
-               </div>
-            </div>
-         </div>
-         `);
+         faqs.push(
+            '<div style="background-color: ' + item.background_color + '" class="plugin_formcreator_formTile '+item.type+' '+tiles_design+' '+default_class+'" title="'+item.description+'">'
+            + '<i class="fa ' + item.icon + '" style="color: ' + item.icon_color+ '"></i>'
+            + '<a href="' + url + '" class="plugin_formcreator_formTile_title">'
+            + item.name
+            + '</a>'
+            + description
+            + '</div>'
+         );
       }
    });
 
    // concatenate all HTML parts
-   html = '<div id="plugin_formcreator_formlist" class="row row-cols-3 g-3 mb-4">'
+   html = '<div id="plugin_formcreator_formlist">'
    + forms.join("")
-   + '</div>'
-   + '<div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">'
+   + '</div><div id="plugin_formcreator_faqlist">'
    + faqs.join("")
    + '</div>'
 
@@ -694,6 +683,7 @@ var plugin_formcreator = new function() {
       if (typeof(id) === 'undefined') {
          return;
       }
+      var that = this;
       if (confirm(i18n.textdomain('formcreator').__('Are you sure you want to delete this question?', 'formcreator'))) {
          jQuery.ajax({
          url: formcreatorRootDoc + '/ajax/question_delete.php',
@@ -708,6 +698,7 @@ var plugin_formcreator = new function() {
             var gridstack = container.gridstack;
             var row = $(item).attr('data-gs-y');
             gridstack.removeWidget(item);
+            that.resetTabs();
          });
       }
    };
@@ -834,16 +825,19 @@ var plugin_formcreator = new function() {
    };
 
    this.showFields = function (form) {
+      var data = form.serializeArray();
+      data = this.serializeForAjax(form);
+
       $.ajax({
          url: formcreatorRootDoc + '/ajax/showfields.php',
          type: "POST",
-         data: form.serializeArray()
+         dataType: 'json',
+         data: data
       }).done(function(response){
          try {
-            var itemToShow = JSON.parse(response);
-            var questionToShow = itemToShow['PluginFormcreatorQuestion'];
-            var sectionToShow = itemToShow['PluginFormcreatorSection'];
-            var submitButtonToShow = itemToShow['PluginFormcreatorForm'];
+            var questionToShow = response['PluginFormcreatorQuestion'];
+            var sectionToShow = response['PluginFormcreatorSection'];
+            var submitButtonToShow = response['PluginFormcreatorForm'];
          } catch (e) {
             // Do nothing for now
          }
@@ -1228,28 +1222,8 @@ var plugin_formcreator = new function() {
    }
 
    this.changeActor = function(type, value) {
-      $('#block_' + type + '_user').hide();
-      $('#block_' + type + '_question_user').hide();
-      $('#block_' + type + '_group').hide();
-      $('#block_' + type + '_question_group').hide();
-      $('#block_' + type + '_group_from_object').hide();
-      $('#block_' + type + '_tech_group_from_object').hide();
-      $('#block_' + type + '_question_actors').hide();
-      $('#block_' + type + '_supplier').hide();
-      $('#block_' + type + '_question_supplier').hide();
-
-      // The numbers match PluginFormcreatorTarget_Actor::ACTOR_TYPE_* constants
-      switch (value) {
-         case '3' : $('#block_' + type + '_user').show();                   break;
-         case '4' : $('#block_' + type + '_question_user').show();          break;
-         case '5' : $('#block_' + type + '_group').show();                  break;
-         case '6' : $('#block_' + type + '_question_group').show();         break;
-         case '9' : $('#block_' + type + '_question_actors').show();        break;
-         case '7' : $('#block_' + type + '_supplier').show();               break;
-         case '8' : $('#block_' + type + '_question_supplier').show();      break;
-         case '10': $('#block_' + type + '_group_from_object').show();      break;
-         case '11': $('#block_' + type + '_tech_group_from_object').show(); break;
-      }
+      $('div[data-actor-type^=' + type + ']').hide();
+      $('div[data-actor-type=' + type + '_' + value + ']').show();
    }
 
    this.updateWizardFormsView = function (item) {
@@ -1299,31 +1273,6 @@ var plugin_formcreator = new function() {
             });
          }
       );
-   }
-
-   this.changeActor = function(type, value) {
-      $('#block_' + type + '_user').hide();
-      $('#block_' + type + '_question_user').hide();
-      $('#block_' + type + '_group').hide();
-      $('#block_' + type + '_question_group').hide();
-      $('#block_' + type + '_group_from_object').hide();
-      $('#block_' + type + '_tech_group_from_object').hide();
-      $('#block_' + type + '_question_actors').hide();
-      $('#block_' + type + '_supplier').hide();
-      $('#block_' + type + '_question_supplier').hide();
-
-      // The numbers match PluginFormcreatorTarget_Actor::ACTOR_TYPE_* constants
-      switch (value) {
-         case '3' : $('#block_' + type + '_user').show();                   break;
-         case '4' : $('#block_' + type + '_question_user').show();          break;
-         case '5' : $('#block_' + type + '_group').show();                  break;
-         case '6' : $('#block_' + type + '_question_group').show();         break;
-         case '9' : $('#block_' + type + '_question_actors').show();        break;
-         case '7' : $('#block_' + type + '_supplier').show();               break;
-         case '8' : $('#block_' + type + '_question_supplier').show();      break;
-         case '10': $('#block_' + type + '_group_from_object').show();      break;
-         case '11': $('#block_' + type + '_tech_group_from_object').show(); break;
-      }
    }
 
    this.deleteActor = function (item) {
@@ -1439,6 +1388,18 @@ var plugin_formcreator = new function() {
 
       return true;
    };
+
+   /**
+    * Serialize a form without its csrf token
+    * @param {*} form
+    * @returns
+    */
+   this.serializeForAjax = function (form) {
+      var serialized = form.serializeArray()
+      return serialized.filter( function( item ) {
+         return item.name != '_glpi_csrf_token';
+      });
+   }
 }
 
 // === TARGETS ===
@@ -1682,11 +1643,8 @@ function pluginFormcreatorInitializeCheckboxes(fieldName, rand) {
  * Initialize a date field
  */
 function pluginFormcreatorInitializeDate(fieldName, rand) {
-   var field = $('[name="_' + fieldName + '"]');
+   var field = $('[name="' + fieldName + '"]');
    field.on("change", function() {
-      plugin_formcreator.showFields($(field[0].form));
-   });
-   $('#resetdate' + rand).on("click", function() {
       plugin_formcreator.showFields($(field[0].form));
    });
 }

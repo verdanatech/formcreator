@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -34,19 +33,16 @@ use Glpi\Plugin\Hooks;
 
 global $CFG_GLPI;
 // Version of the plugin (major.minor.bugfix)
-define('PLUGIN_FORMCREATOR_VERSION', '2.13.2');
-
-define('PLUGIN_NAME_FORMCREATOR', 'formcreator');
-
+define('PLUGIN_FORMCREATOR_VERSION', '2.13.3');
 // Schema version of this version (major.minor only)
 define('PLUGIN_FORMCREATOR_SCHEMA_VERSION', '2.13');
 // is or is not an official release of the plugin
 define('PLUGIN_FORMCREATOR_IS_OFFICIAL_RELEASE', true);
 
 // Minimal GLPI version, inclusive
-define('PLUGIN_FORMCREATOR_GLPI_MIN_VERSION', '10.0');
+define ('PLUGIN_FORMCREATOR_GLPI_MIN_VERSION', '10.0');
 // Maximum GLPI version, exclusive (ignored if PLUGIN_FORMCREATOR_IS_OFFICIAL_RELEASE == false)
-define('PLUGIN_FORMCREATOR_GLPI_MAX_VERSION', '10.1');
+define ('PLUGIN_FORMCREATOR_GLPI_MAX_VERSION', '10.1');
 
 define('FORMCREATOR_ROOTDOC', Plugin::getWebDir('formcreator'));
 
@@ -58,8 +54,7 @@ define('PLUGIN_FORMCREATOR_ADVANCED_VALIDATION', 'advform');
  *
  * @return Array [name, version, author, homepage, license, minGlpiVersion]
  */
-function plugin_version_formcreator()
-{
+function plugin_version_formcreator() {
    plugin_formcreator_savePreviousVersion();
 
    $glpiVersion = rtrim(GLPI_VERSION, '-dev');
@@ -93,14 +88,11 @@ function plugin_version_formcreator()
  *
  * @return boolean
  */
-function plugin_formcreator_check_prerequisites()
-{
+function plugin_formcreator_check_prerequisites() {
    $prerequisitesSuccess = true;
 
-   if (
-      version_compare(GLPI_VERSION, PLUGIN_FORMCREATOR_GLPI_MIN_VERSION, 'lt')
-      || PLUGIN_FORMCREATOR_IS_OFFICIAL_RELEASE && version_compare(GLPI_VERSION, PLUGIN_FORMCREATOR_GLPI_MAX_VERSION, 'ge')
-   ) {
+   if (version_compare(GLPI_VERSION, PLUGIN_FORMCREATOR_GLPI_MIN_VERSION, 'lt')
+       || PLUGIN_FORMCREATOR_IS_OFFICIAL_RELEASE && version_compare(GLPI_VERSION, PLUGIN_FORMCREATOR_GLPI_MAX_VERSION, 'ge')) {
       echo "This plugin requires GLPI >= " . PLUGIN_FORMCREATOR_GLPI_MIN_VERSION . " and GLPI < " . PLUGIN_FORMCREATOR_GLPI_MAX_VERSION . "<br>";
       $prerequisitesSuccess = false;
    }
@@ -124,16 +116,14 @@ function plugin_formcreator_check_prerequisites()
  * @param string $verbose Set true to show all messages (false by default)
  * @return boolean
  */
-function plugin_formcreator_check_config($verbose = false)
-{
+function plugin_formcreator_check_config($verbose = false) {
    return true;
 }
 
 /**
  * Initialize all classes and generic variables of the plugin
  */
-function plugin_init_formcreator()
-{
+function plugin_init_formcreator() {
    global $CFG_GLPI;
 
    plugin_formcreator_permanent_hook();
@@ -173,7 +163,6 @@ function plugin_init_formcreator()
       }
    }
 
-   // Html::requireJs('gridstack');
    $CFG_GLPI['javascript']['admin'][strtolower(PluginFormcreatorForm::class)] = ['gridstack'];
    $CFG_GLPI['javascript']['helpdesk'][strtolower(PluginFormcreatorFormlist::class)] = ['gridstack'];
    $CFG_GLPI['javascript']['helpdesk'][strtolower(PluginFormcreatorIssue::class)] = ['photoswipe'];
@@ -184,8 +173,7 @@ function plugin_init_formcreator()
  *
  * @return boolean|integer
  */
-function plugin_formcreator_replaceHelpdesk()
-{
+function plugin_formcreator_replaceHelpdesk() {
    if (!isset($_SESSION['glpiactive_entity'])) {
       return false;
    }
@@ -206,8 +194,7 @@ function plugin_formcreator_replaceHelpdesk()
 /**
  * Generate unique id for form based on server name, glpi directory and basetime
  **/
-function plugin_formcreator_getUuid()
-{
+function plugin_formcreator_getUuid() {
    //encode uname -a, ex Linux localhost 2.4.21-0.13mdk #1 Fri Mar 14 15:08:06 EST 2003 i686
    $serverSubSha1 = substr(sha1(php_uname('a')), 0, 8);
    // encode script current dir, ex : /var/www/glpi_X
@@ -225,16 +212,13 @@ function plugin_formcreator_getUuid()
  *
  * @return true if succeed else false
  */
-function plugin_formcreator_getFromDBByField(CommonDBTM $item, $field = '', $value = '')
-{
+function plugin_formcreator_getFromDBByField(CommonDBTM $item, $field = '', $value = '') {
    global $DB;
 
    // != 0 because 0 is consider as empty
-   if (
-      !$item instanceof Entity
-      && (strlen($value) == 0
-         || $value === 0)
-   ) {
+   if (!$item instanceof Entity
+       && (strlen($value) == 0
+           || $value === 0)) {
       return false;
    }
 
@@ -255,11 +239,10 @@ function plugin_formcreator_getFromDBByField(CommonDBTM $item, $field = '', $val
  * Autoloader
  * @param string $classname
  */
-function plugin_formcreator_autoload($classname)
-{
+function plugin_formcreator_autoload($classname) {
    if (strpos($classname, 'PluginFormcreator') === 0) {
       // useful only for installer GLPi autoloader already handles inc/ folder
-      $filename = __DIR__ . '/inc/' . strtolower(str_replace('PluginFormcreator', '', $classname)) . '.class.php';
+      $filename = __DIR__ . '/inc/' . strtolower(str_replace('PluginFormcreator', '', $classname)). '.class.php';
       if (is_readable($filename) && is_file($filename)) {
          include_once($filename);
          return true;
@@ -271,8 +254,7 @@ function plugin_formcreator_autoload($classname)
  * Show the last SQL error, logs its backtrace and dies
  * @param Migration $migration
  */
-function plugin_formcreator_upgrade_error(Migration $migration)
-{
+function plugin_formcreator_upgrade_error(Migration $migration) {
    global $DB;
 
    $error = $DB->error();
@@ -285,8 +267,7 @@ function plugin_formcreator_upgrade_error(Migration $migration)
  *
  * @return void
  */
-function plugin_formcreator_permanent_hook(): void
-{
+function plugin_formcreator_permanent_hook(): void {
    global $PLUGIN_HOOKS;
 
    // Set the plugin CSRF compliance (required since GLPI 0.84)
@@ -331,8 +312,7 @@ function plugin_formcreator_permanent_hook(): void
  *
  * @return void
  */
-function plugin_formcreator_hook(): void
-{
+function plugin_formcreator_hook(): void {
    global $PLUGIN_HOOKS, $CFG_GLPI;
 
    // Add specific CSS
@@ -347,33 +327,41 @@ function plugin_formcreator_hook(): void
 
    // Load JS and CSS files if we are on a page which need them
    if (isset($_SERVER['REQUEST_URI'])) {
-      if (
-         strpos($_SERVER['REQUEST_URI'], 'formcreator') !== false
+      if (strpos($_SERVER['REQUEST_URI'], 'formcreator') !== false
          || strpos($_SERVER['REQUEST_URI'], 'central.php') !== false
          || isset($_SESSION['glpiactiveprofile']) &&
-         Session::getCurrentInterface() == 'helpdesk'
-      ) {
+            Session::getCurrentInterface() == 'helpdesk') {
 
          // Add specific JavaScript
          $PLUGIN_HOOKS['add_javascript']['formcreator'][] = 'js/scripts.js';
       }
 
       if (isset($_SESSION['glpiactiveentities_string'])) {
-         if (
-            strpos($_SERVER['REQUEST_URI'], 'helpdesk') !== false
-            || strpos($_SERVER['REQUEST_URI'], 'central.php') !== false
-            || strpos($_SERVER['REQUEST_URI'], 'formcreator/front/formlist.php') !== false
-            || strpos($_SERVER['REQUEST_URI'], 'formcreator/front/knowbaseitem.php') !== false
-            || strpos($_SERVER['REQUEST_URI'], 'formcreator/front/wizard.php') !== false
-         ) {
+         if (strpos($_SERVER['REQUEST_URI'], 'helpdesk') !== false
+               || strpos($_SERVER['REQUEST_URI'], 'central.php') !== false
+               || strpos($_SERVER['REQUEST_URI'], 'formcreator/front/formlist.php') !== false
+               || strpos($_SERVER['REQUEST_URI'], 'formcreator/front/wizard.php') !== false) {
             $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['formcreator'][] = 'lib/jquery-slinky/dist/slinky.min.js';
-            $CFG_GLPI['javascript']['self-service']['none'] = [
+            $CFG_GLPI['javascript']['seek_assistance'][PluginFormcreatorForm::class] = [
                'dashboard',
                'gridstack'
             ];
          }
          if (strpos($_SERVER['REQUEST_URI'], 'issue.php') !== false) {
-            $CFG_GLPI['javascript']['self-service']['none'] = [
+            $CFG_GLPI['javascript']['my_assistance_requests'][PluginFormcreatorIssue::class] = [
+               'dashboard',
+               'gridstack'
+            ];
+         }
+         if (strpos($_SERVER['REQUEST_URI'], 'formdisplay.php') !== false) {
+            $CFG_GLPI['javascript']['seek_assistance'][PluginFormcreatorForm::class] = [
+               'dashboard',
+               'gridstack'
+            ];
+         }
+         if (strpos($_SERVER['REQUEST_URI'], 'knowbaseitem.php') !== false) {
+            $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['formcreator'][] = 'lib/jquery-slinky/dist/slinky.min.js';
+            $CFG_GLPI['javascript']['faq'][PluginFormcreatorForm::class] = [
                'dashboard',
                'gridstack'
             ];
@@ -388,6 +376,7 @@ function plugin_formcreator_hook(): void
    }
 
    $PLUGIN_HOOKS['menu_toadd']['formcreator']['helpdesk'] = PluginFormcreatorFormlist::class;
+   $PLUGIN_HOOKS['menu_toadd']['formcreator']['my_assistance_requests'] = PluginFormcreatorIssue::class;
 
    // Massive Action definition
    $PLUGIN_HOOKS['use_massive_action']['formcreator'] = 1;
@@ -403,11 +392,9 @@ function plugin_formcreator_hook(): void
    }
 }
 
-function plugin_formcreator_registerClasses()
-{
+function plugin_formcreator_registerClasses() {
    // Load menu entries if user is logged in and if he has access to at least one form
    if (Session::getLoginUserID() !== false) {
-
       Plugin::registerClass(PluginFormcreatorEntityconfig::class, ['addtabon' => Entity::class]);
    }
    Plugin::registerClass(PluginFormcreatorForm::class, ['addtabon' => Central::class]);
@@ -423,8 +410,7 @@ function plugin_formcreator_registerClasses()
    Plugin::registerClass(PluginFormcreatorEntityconfig::class, ['addtabon' => Entity::class]);
 }
 
-function plugin_formcreator_redirect()
-{
+function plugin_formcreator_redirect() {
    global $CFG_GLPI;
 
    if (!isset($_SERVER['REQUEST_URI']) || !isset($_SESSION['glpiactiveentities_string'])) {
@@ -435,13 +421,11 @@ function plugin_formcreator_redirect()
    if (strpos($_SERVER['REQUEST_URI'], "front/helpdesk.public.php") !== false) {
       if (!isset($_REQUEST['newprofile']) && !isset($_REQUEST['active_entity'])) {
          // Not changing profile or active entity
-         if (
-            Session::getCurrentInterface() !== false
-            && isset($_SESSION['glpiactive_entity'])
-         ) {
+         if (Session::getCurrentInterface() !== false
+               && isset($_SESSION['glpiactive_entity'])) {
             // Interface and active entity are set in session
             if (plugin_formcreator_replaceHelpdesk()) {
-               Html::redirect(FORMCREATOR_ROOTDOC . "/front/wizard.php");
+               Html::redirect(FORMCREATOR_ROOTDOC."/front/wizard.php");
             }
          }
       }
@@ -531,8 +515,7 @@ function plugin_formcreator_redirect()
    }
 }
 
-function plugin_formcreator_options()
-{
+function plugin_formcreator_options() {
    return [
       Plugin::OPTION_AUTOINSTALL_DISABLED => true,
    ];
@@ -543,8 +526,7 @@ function plugin_formcreator_options()
  *
  * @return string|null
  */
-function plugin_formcreator_getSchemaPath(string $version = null): ?string
-{
+function plugin_formcreator_getSchemaPath(string $version = null): ?string {
    if ($version === null) {
       $version = PLUGIN_FORMCREATOR_VERSION;
    }
@@ -566,8 +548,7 @@ function plugin_formcreator_getSchemaPath(string $version = null): ?string
  *
  * @return void
  */
-function plugin_formcreator_savePreviousVersion(): void
-{
+function plugin_formcreator_savePreviousVersion(): void {
    $plugin = new Plugin();
    $plugin->getFromDBbyDir('formcreator');
    $oldVersion = $plugin->fields['version'] ?? null;

@@ -669,7 +669,6 @@ class PluginFormcreatorForm extends CommonDBTM implements
 
       echo "<style>
       .card-body-content {line-height: 20px; max-height: 100px;-webkit-line-clamp: 4; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;}
-      #plugin_formcreator_header img{width: 100% !important;}
       </style>";
 
       echo '<div id="plugin_formcreator_wizard_categories" class="card">';
@@ -684,7 +683,7 @@ class PluginFormcreatorForm extends CommonDBTM implements
       echo '<div class="card-body">';
 
       if (PluginFormcreatorEntityconfig::getUsedConfig('is_header_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_HEADER_VISIBLE) {
-         echo '<div id="plugin_formcreator_header" class="m-0 w-100">';
+         echo '<div id="plugin_formcreator_header">';
          $this->showHeader();
          echo '</div>';
       }

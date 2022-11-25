@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -33,12 +34,14 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
 }
 
-class PluginFormcreatorKnowbase {
+class PluginFormcreatorKnowbase
+{
 
    /**
     * Show the list of forms to be displayed to the end-user
     */
-   public function showList() {
+   public function showList()
+   {
       echo '<div class="center" id="plugin_formcreator_wizard">';
 
       echo '<div class="plugin_formcreator_card">';
@@ -48,16 +51,18 @@ class PluginFormcreatorKnowbase {
       echo '</div>';
    }
 
-   public function showServiceCatalog() {
+   public function showServiceCatalog()
+   {
       // show wizard
       echo '<div id="plugin_formcreator_wizard" class="card-group">';
       $this->showWizard();
       echo '</div>';
    }
 
-   public function showWizard() {
+   public function showWizard()
+   {
       echo '<div id="plugin_formcreator_kb_categories" class="card">';
-      echo '<div><h2 class="card-title">'._n("Category", "Categories", 2, 'formcreator').'</h2></div>';
+      echo '<div><h2 class="card-title">' . _n("Category", "Categories", 2, 'formcreator') . '</h2></div>';
       echo '<div class="slinky-menu"></div>';
       echo '<div><a href="#" id="wizard_seeall">' . __('See all', 'formcreator') . '</a></div>';
       echo '</div>';
@@ -76,11 +81,13 @@ class PluginFormcreatorKnowbase {
       echo '</div>';
    }
 
-   protected function showSearchBar() {
+   protected function showSearchBar()
+   {
       echo '<form name="plugin_formcreator_search" onsubmit="javascript: return false;" >';
-      echo '<input type="text" name="words" id="plugin_formcreator_search_input" required  class="form-control"/>';
-      echo '<span id="plugin_formcreator_search_input_bar"></span>';
-      echo '<label for="plugin_formcreator_search_input">'.__('Please, describe your need here', 'formcreator').'</label>';
+      echo '<div class="input-group mb-3">';
+      echo '<input type="text" id="plugin_formcreator_search_input" class="form-control form-control-lg" name="words" placeholder="' . __('Please, describe your need here', 'formcreator') . '" aria-label="' . __('What are you looking for?', 'formcreator') . '" aria-describedby="button-addon2" required>';
+      echo '<span class="btn fa fa-search" id="button-addon2"></span>';
+      echo '</div>';
       echo '</form>';
    }
 
@@ -92,7 +99,8 @@ class PluginFormcreatorKnowbase {
     *
     * @return array Tree of form categories as nested array
     */
-   public static function getCategoryTree() {
+   public static function getCategoryTree()
+   {
       global $DB;
 
       $cat_table = KnowbaseItemCategory::getTable();
@@ -109,14 +117,14 @@ class PluginFormcreatorKnowbase {
                'INNER JOIN' => [
                   KnowbaseItem_KnowbaseItemCategory::getTable() => [
                      'FKEY' => [
-                           KnowbaseItem::getTable() => 'id',
-                           KnowbaseItem_KnowbaseItemCategory::getTable() => KnowbaseItem::getForeignKeyField(),
+                        KnowbaseItem::getTable() => 'id',
+                        KnowbaseItem_KnowbaseItemCategory::getTable() => KnowbaseItem::getForeignKeyField(),
                      ],
                   ],
                ],
                'WHERE'  => [
                   KnowbaseItem_KnowbaseItemCategory::getTableField($cat_fk) => new QueryExpression(
-                      $DB->quoteName(KnowbaseItemCategory::getTableField('id'))
+                     $DB->quoteName(KnowbaseItemCategory::getTableField('id'))
                   ),
                ]
             ],
@@ -192,7 +200,8 @@ class PluginFormcreatorKnowbase {
       return $nodes;
    }
 
-   public static function getFaqItems($rootCategory = 0, $keywords = '') {
+   public static function getFaqItems($rootCategory = 0, $keywords = '')
+   {
       global $DB;
 
       $table_cat          = getTableForItemType('KnowbaseItemCategory');

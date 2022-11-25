@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -29,7 +30,10 @@
  * ---------------------------------------------------------------------
  */
 
-include ('../../../inc/includes.php');
+
+use Xylemical\Expressions\Value;
+
+include('../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!Plugin::isPluginActive('formcreator')) {
@@ -55,6 +59,18 @@ if (!isset($_SESSION['glpiname'])) {
 
 // Save form
 $formAnswer = PluginFormcreatorCommon::getFormAnswer();
+
+foreach ($_POST as $key => $value) {
+   $key = str_replace("formcreator_field_", "", $key);
+   $questions = PluginFormcreatorQuestion::getQuestionsById($key);
+   if (!empty($questions)) {
+      if (!is_numeric($value)) {
+         $_POST['formcreator_field_' . $key] = User::getIdByName($value);
+         $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
+      }
+   }
+}
+
 if ($formAnswer->add($_POST) === false) {
    http_response_code(400);
    if ($_SESSION['glpiname'] == 'formcreator_temp_user') {
@@ -78,7 +94,8 @@ if ($_SESSION['glpiname'] == 'formcreator_temp_user') {
    echo json_encode(
       [
          'redirect' => 'formdisplay.php?answer_saved',
-      ], JSON_FORCE_OBJECT
+      ],
+      JSON_FORCE_OBJECT
    );
    die();
 }
@@ -92,21 +109,24 @@ if ($_SESSION['glpibackcreated']) {
          echo json_encode(
             [
                'redirect' => $target->getFormURLWithID($target->getID()),
-            ], JSON_FORCE_OBJECT
+            ],
+            JSON_FORCE_OBJECT
          );
          die();
       }
       echo json_encode(
          [
             'redirect' => $formAnswer->getFormURLWithID($formAnswer->getID()),
-         ], JSON_FORCE_OBJECT
+         ],
+         JSON_FORCE_OBJECT
       );
       die();
    }
    echo json_encode(
       [
          'redirect' => (new PluginFormcreatorForm())->getFormURLWithID($formAnswer->fields['plugin_formcreator_forms_id']),
-      ], JSON_FORCE_OBJECT
+      ],
+      JSON_FORCE_OBJECT
    );
    die();
 }
@@ -116,7 +136,8 @@ if (plugin_formcreator_replaceHelpdesk()) {
    echo json_encode(
       [
          'redirect' => PluginFormcreatorIssue::getSearchURL(),
-      ], JSON_FORCE_OBJECT
+      ],
+      JSON_FORCE_OBJECT
    );
    die();
 }
@@ -125,7 +146,8 @@ if (strpos($_SERVER['HTTP_REFERER'], 'formdisplay.php') !== false) {
    echo json_encode(
       [
          'redirect' => 'formlist.php',
-      ], JSON_FORCE_OBJECT
+      ],
+      JSON_FORCE_OBJECT
    );
    die();
 }

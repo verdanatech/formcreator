@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -29,7 +30,7 @@
  * ---------------------------------------------------------------------
  */
 
-include ('../../../inc/includes.php');
+include('../../../inc/includes.php');
 Session::checkRight('entity', UPDATE);
 
 if (!isset($_REQUEST['id'])) {
@@ -50,6 +51,10 @@ if (!$question->canUpdate()) {
    http_response_code(403);
    Session::addMessageAfterRedirect(__('You don\'t have right for this action', 'formcreator'), false, ERROR);
    exit;
+}
+
+if ($_REQUEST['fieldtype'] == 'ldapselect' && $_REQUEST['ldap_attribute'] == 4) {
+   $_REQUEST['itemtype'] = "User";
 }
 
 $success = $question->update($_REQUEST);

@@ -66,6 +66,7 @@ foreach ($_POST as $key => $value) {
    if (!empty($questions)) {
       if (!is_numeric($value)) {
          $_POST['formcreator_field_' . $key] = User::getIdByName($value);
+         $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
       }
    }
 }

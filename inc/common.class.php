@@ -817,6 +817,28 @@ JAVASCRIPT;
          'title'   => __('My requests for assistance', 'formcreator'),
          'icon'    => 'fa-fw ti ti-list',
       ];
+      if($_SESSION['glpilanguage'] =='zh_TW'){
+   $newMenu['seek_assistance'] = [
+         'default' => Plugin::getWebDir('formcreator', false) . '/front/wizard.php',
+         'title'   => __(' 服务'),
+         'icon'    => 'fa-fw ti ti-headset',
+      ];
+      $newMenu['my_assistance_requests'] = [
+         'default' => PluginFormcreatorIssue::getSearchURL(false),
+         'title'   => __('我的请求'),
+         'icon'    => 'fa-fw ti ti-list',
+         'content' => [
+            PluginFormcreatorIssue::class => [
+               'title' => __('My requests for assistance', 'formcreator'),
+               'icon'  => 'fa-fw ti ti-list',
+               'links'   => [
+                  'lists' => '',
+               ],
+            ],
+         ],
+      ];
+}
+
 
       if (
          PluginFormcreatorEntityConfig::getUsedConfig('is_kb_separated', Session::getActiveEntity()) == PluginFormcreatorEntityConfig::CONFIG_KB_DISTINCT

@@ -437,7 +437,7 @@ function buildTiles(list) {
             <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.description}" data-bs-html="true">
                <div class="card-header" style="background-color: ${item.background_color};">
                   <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
-                  <a href="${url}" class="card-title text-white text-truncate stretched-link">
+                  <a href="${url}" class="card-title text-white stretched-link">
                      ${item.name}
                   </a>
                </div>

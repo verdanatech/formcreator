@@ -1147,7 +1147,7 @@ SCRIPT;
                'fieldtype' => ['tag'],
             ],
             '_tag_questions',
-            $this->fields['tag_questions'],
+            explode(',', $this->fields['tag_questions']),
             [
                'multiple' => true,
             ]

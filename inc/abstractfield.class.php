@@ -55,11 +55,13 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     *
     * @param array $question PluginFormcreatorQuestion instance
     */
-   public function __construct(PluginFormcreatorQuestion $question) {
+   public function __construct(PluginFormcreatorQuestion $question)
+   {
       $this->question = $question;
    }
 
-   public function setFormAnswer(PluginFormcreatorFormAnswer $form_answer): void {
+   public function setFormAnswer(PluginFormcreatorFormAnswer $form_answer): void
+   {
       $this->form_answer = $form_answer;
       if ($this->hasInput($this->form_answer->getAnswers())) {
          // Parse an HTML input
@@ -70,12 +72,14 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
       }
    }
 
-   public function prepareQuestionInputForSave($input) {
+   public function prepareQuestionInputForSave($input)
+   {
       $this->value = $input['default_values'];
       return $input;
    }
 
-   public function getRawValue() {
+   public function getRawValue()
+   {
       return $this->value;
    }
 
@@ -84,7 +88,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     * @param string  $domain  Translation domain of the form
     * @param boolean $canEdit is the field editable ?
     */
-   public function show(string $domain, bool $canEdit = true): string {
+   public function show(string $domain, bool $canEdit = true): string
+   {
       $html = '';
 
       if ($this->isEditableField() && !empty($this->question->fields['description'])) {
@@ -124,10 +129,11 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
          $label .= '</label>';
       }
 
-      return $label.$html;
+      return $label . $html;
    }
 
-   public function getRenderedHtml($domain, $canEdit = true): string {
+   public function getRenderedHtml($domain, $canEdit = true): string
+   {
       if (!$canEdit) {
          return $this->value;
       }
@@ -154,7 +160,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     *
     * @return string
     */
-   public function getLabel() {
+   public function getLabel()
+   {
       return $this->question->fields['name'];
    }
 
@@ -162,7 +169,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     * Gets the available values for the field
     * @return array available values
     */
-   public function getAvailableValues() {
+   public function getAvailableValues()
+   {
       $values = json_decode($this->question->fields['values']);
       $tab_values = [];
       foreach ($values as $value) {
@@ -174,7 +182,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
       return $tab_values;
    }
 
-   public function isRequired(): bool {
+   public function isRequired(): bool
+   {
       return ($this->question->fields['required'] != '0');
    }
 
@@ -183,7 +192,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     * @param string $value a value or default value
     * @return string
     */
-   protected function trimValue($value) {
+   protected function trimValue($value)
+   {
       global $DB;
 
       $value = explode('\r\n', $value);
@@ -202,7 +212,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
       return $DB->escape(json_encode($value, JSON_UNESCAPED_UNICODE));
    }
 
-   public function getFieldTypeName(): string {
+   public function getFieldTypeName(): string
+   {
       $classname = explode('\\', get_called_class());
       $classname = array_pop($classname);
       $matches = null;
@@ -211,7 +222,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
       return strtolower($matches[1]);
    }
 
-   public function getEmptyParameters(): array {
+   public function getEmptyParameters(): array
+   {
       return [];
    }
 
@@ -220,7 +232,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     *
     * @return PluginFormcreatorAbstractQuestionParameter[]
     */
-   public final function getParameters(): array {
+   public final function getParameters(): array
+   {
       $parameters = $this->getEmptyParameters();
       foreach ($parameters as $fieldname => $parameter) {
          $parameter->getFromDBByCrit([
@@ -235,7 +248,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
       return $parameters;
    }
 
-   public final function addParameters(PluginFormcreatorQuestion $question, array $input) {
+   public final function addParameters(PluginFormcreatorQuestion $question, array $input)
+   {
       $fieldTypeName = $this->getFieldTypeName();
       if (!isset($input['_parameters'][$fieldTypeName])) {
          return;
@@ -247,7 +261,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
       }
    }
 
-   public final function updateParameters(PluginFormcreatorQuestion $question, array $input) {
+   public final function updateParameters(PluginFormcreatorQuestion $question, array $input)
+   {
       $fieldTypeName = $this->getFieldTypeName();
       if (!isset($input['_parameters'][$fieldTypeName])) {
          return;
@@ -270,7 +285,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
       }
    }
 
-   public final function deleteParameters(PluginFormcreatorQuestion $question): bool {
+   public final function deleteParameters(PluginFormcreatorQuestion $question): bool
+   {
       foreach ($this->getEmptyParameters() as $parameter) {
          if (!$parameter->deleteByCriteria(['plugin_formcreator_questions_id' => $question->getID()])) {
             // Don't make  this error fatal, but log it anyway
@@ -285,7 +301,8 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     *
     * @return string
     */
-   protected function getParametersHtmlForDesign() {
+   protected function getParametersHtmlForDesign()
+   {
       $parameters = $this->getParameters();
       if (count($parameters) == 0) {
          return '';
@@ -304,11 +321,13 @@ abstract class PluginFormcreatorAbstractField implements PluginFormcreatorFieldI
     *
     * @return PluginFormcreatorQuestion
     */
-   public function getQuestion() {
+   public function getQuestion()
+   {
       return $this->question;
    }
 
-   public function getTranslatableStrings(array $options = []) : array {
+   public function getTranslatableStrings(array $options = []): array
+   {
       $strings = [
          'itemlink' => [],
          'string'   => [],

@@ -1327,6 +1327,11 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
             $value =  getUserName($value);
          }
 
+         if($question->fields['fieldtype'] == "textarea"){
+            $value = Sanitizer::unsanitize($value);
+            $value = Html::cleanPostForTextArea($value);
+         }
+
          // $content = str_replace('##question_' . $questionId . '##', Sanitizer::sanitize($name), $content);
          $content = str_replace('##question_' . $questionId . '##', $name, $content);
          if ($question->fields['fieldtype'] === 'file') {

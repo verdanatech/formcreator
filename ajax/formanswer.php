@@ -62,7 +62,7 @@ $formAnswer = PluginFormcreatorCommon::getFormAnswer();
 foreach ($_POST as $key => $value) {
    $key = str_replace("formcreator_field_", "", $key);
    $questions = PluginFormcreatorQuestion::getQuestionsById($key);
-   if (!empty($questions)) {
+   if (isset($questions)) {
       if (!is_numeric($value)) {
          $_POST['formcreator_field_' . $key] = User::getIdByName($value);
          $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];

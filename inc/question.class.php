@@ -980,29 +980,6 @@ PluginFormcreatorTranslatableInterface
       return $questions;
    }
 
-   public static function getQuestionsById($id)
-   {
-      global $DB;
-
-      $question = [];
-      $rows = $DB->request([
-         'SELECT' => ['id'],
-         'FROM'   => self::getTable(),
-         'WHERE'  => [
-            'id' => $id,
-            'itemtype' => 'User',
-            'fieldtype' => 'ldapselect'
-         ],
-         'ORDER'  => ['row ASC', 'col ASC']
-      ]);
-      foreach ($rows as $row) {
-         $question = new self();
-         $question->getFromDB($row['id']);
-      }
-
-      return $question;
-   }
-   
    /**
     * get questions of a form grouped by section name and filtered by criteria
     *

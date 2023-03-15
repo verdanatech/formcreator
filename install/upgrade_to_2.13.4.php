@@ -28,33 +28,34 @@
  * @link      http://plugins.glpi-project.org/#/plugin/formcreator
  * ---------------------------------------------------------------------
  */
+class PluginFormcreatorUpgradeTo2_13_4 {
+   /** @var Migration */
+   protected $migration;
 
-include ('../../../inc/includes.php');
-Session::checkRight('entity', UPDATE);
+   public function isResyncIssuesRequired() {
+      return false;
+   }
 
-if (!isset($_REQUEST['id'])) {
-   Session::addMessageAfterRedirect(__('Bad request', 'formcreator'), false, ERROR);
-   http_response_code(400);
-   exit();
+   /**
+    * @param Migration $migration
+    */
+   public function upgrade(Migration $migration) {
+      $this->migration = $migration;
+      $this->updateConditions();
+      $this->addServiceCatalogHopepage();
+   }
+
+   public function addServiceCatalogHopepage() {
+      $table = 'glpi_plugin_formcreator_entityconfigs';
+      $this->migration->addField($table, 'service_catalog_home', 'integer', [
+         'value' => -2,
+         'after' => 'header',
+         'update' => '0',
+         'condition' => 'WHERE `entities_id` = 0'
+      ]);
+   }
+
+   public function updateConditions() {
+      $this->migration->changeField('glpi_plugin_formcreator_conditions', 'show_value', 'show_value', 'mediumtext');
+   }
 }
-$questionId = (int) $_REQUEST['id'];
-
-$question = new PluginFormcreatorQuestion();
-if (!$question->getFromDB($questionId)) {
-   http_response_code(404);
-   Session::addMessageAfterRedirect(__('Question not found', 'formcreator'), false, ERROR);
-   exit;
-}
-
-if (!$question->canUpdate()) {
-   http_response_code(403);
-   Session::addMessageAfterRedirect(__('You don\'t have right for this action', 'formcreator'), false, ERROR);
-   exit;
-}
-
-$success = $question->update($_REQUEST);
-if (!$success) {
-   http_response_code(500);
-   exit();
-}
-echo json_encode(['name' => $question->fields['name']], JSON_UNESCAPED_UNICODE);

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -30,14 +29,14 @@
  * ---------------------------------------------------------------------
  */
 
-include('../../../inc/includes.php');
+include ('../../../inc/includes.php');
 
 // Check if plugin is activated...
 if (!(new Plugin())->isActivated('formcreator')) {
    Html::displayNotFoundError();
 }
 
-if (!plugin_formcreator_replaceHelpdesk()) {
+if (! plugin_formcreator_replaceHelpdesk()) {
    Html::redirect(FORMCREATOR_ROOTDOC . '/front/formlist.php');
 }
 

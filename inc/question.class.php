@@ -1030,7 +1030,7 @@ class PluginFormcreatorQuestion extends CommonDBChild implements
    public static function getQuestionsById($id)
    {
       global $DB;
-      $questions = "";
+      $question = "";
       $rows = $DB->request([
          'SELECT' => ['id'],
          'FROM'   => self::getTable(),

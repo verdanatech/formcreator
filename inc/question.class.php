@@ -1031,7 +1031,7 @@ class PluginFormcreatorQuestion extends CommonDBChild implements
    {
       global $DB;
 
-      $questions = [];
+      $question = [];
       $rows = $DB->request([
          'SELECT' => ['id'],
          'FROM'   => self::getTable(),

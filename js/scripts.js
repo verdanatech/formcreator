@@ -1354,6 +1354,7 @@ var plugin_formcreator = new function() {
       var form     = document.querySelector('form[role="form"][data-itemtype]');
       var data     = new FormData(form);
       data.append('submit_formcreator', '');
+      $(form).find('[type="submit"]').attr('disabled','disabled');
       $.post({
          url: formcreatorRootDoc + '/ajax/formanswer.php',
          processData: false,
@@ -1365,6 +1366,7 @@ var plugin_formcreator = new function() {
             window.location = data.redirect;
          }
       }).fail(function (xhr, data) {
+         $(form).find('[type="submit"]').removeAttr("disabled");
          $(form).find('[type="submit"]')
             .html(i18n.textdomain('formcreator').__('Send', 'formcreator'))
             .off('click');
@@ -1374,12 +1376,12 @@ var plugin_formcreator = new function() {
             displayAjaxMessageAfterRedirect();
             return;
          }
-         if (typeof(xhr.responseJSON) == 'undefined') {
-            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
-         }
-         if (typeof(xhr.responseJSON.message) == 'undefined') {
+         if ((data) == 'error') {
             displayAjaxMessageAfterRedirect();
             return;
+         }
+          if (typeof(xhr.responseJSON) == 'undefined') {
+            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
          }
          var display_container = ($('#messages_after_redirect').length  == 0);
          var html = xhr.responseJSON.message;

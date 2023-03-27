@@ -1340,6 +1340,16 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
                }
             }
          }
+
+         if ($question->fields['fieldtype'] == "ldapselect" && $question->fields['itemtype'] == "User") {
+            $value =  getUserName($value);
+         }
+
+         if($question->fields['fieldtype'] == "textarea"){
+            $value = Sanitizer::unsanitize($value);
+            $value = Html::cleanPostForTextArea($value);
+         }
+         
          // $content = str_replace('##answer_' . $questionId . '##', Sanitizer::sanitize($value ?? ''), $content);
          $content = str_replace('##answer_' . $questionId . '##', $value ?? '', $content);
 

@@ -433,6 +433,8 @@ function buildTiles(list) {
       }
 
       if (item.type == 'form') {
+
+         if(item.description){
          var base = `
          <div class="col-12 col-md-6 col-lg-4">
             <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.description}" data-bs-html="true">
@@ -449,6 +451,22 @@ function buildTiles(list) {
          </div>
          `;
          forms.push(base);
+      }else{
+            var base = `
+            <div class="col-12 col-md-6 col-lg-4">
+            <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100">
+               <div class="card-header" style="background-color: ${item.background_color};">
+                  <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
+                  <a href="${url}" class="card-title text-white stretched-link">
+                     ${item.name}
+                  </a>
+               </div>
+               <div class="card-body text-start card-body-content mb-2">
+                  ${description}
+               </div>
+            </div>
+         </div>`;
+         }
       } else {
          faqs.push(`
             <div class="col-12 col-md-6 col-lg-4">

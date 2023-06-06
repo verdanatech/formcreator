@@ -468,7 +468,7 @@ function buildTiles(list) {
    // concatenate all HTML parts
    html = '<div id="plugin_formcreator_formlist" class="row row-cols-3 g-3 mb-4">'
    + forms.join("")
-   + '</div><div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">>'
+   + '</div><div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">'
    + faqs.join("")
    + '</div>'
 
@@ -1367,6 +1367,7 @@ var plugin_formcreator = new function() {
       var form     = document.querySelector('form[role="form"][data-itemtype]');
       var data     = new FormData(form);
       data.append('add', '');
+      $(form).find('[type="submit"]').attr('disabled','disabled');
       $.post({
          url: formcreatorRootDoc + '/ajax/formanswer.php',
          processData: false,
@@ -1378,6 +1379,7 @@ var plugin_formcreator = new function() {
             window.location = data.redirect;
          }
       }).fail(function (xhr, data) {
+         $(form).find('[type="submit"]').removeAttr("disabled");
          $(form).find('[type="submit"]')
             .html(i18n.textdomain('formcreator').__('Send', 'formcreator'))
             .off('click');

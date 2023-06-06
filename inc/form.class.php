@@ -647,6 +647,9 @@ PluginFormcreatorTranslatableInterface
    }
 
    public function showServiceCatalog() : void {
+      echo "<style>
+      .card-body-content {line-height: 20px; max-height: 100px;-webkit-line-clamp: 4; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;}
+      </style>";
       echo '<div id="plugin_formcreator_wizard" class="card-group">';
       $this->showWizard();
       echo '</div>';
@@ -670,30 +673,30 @@ PluginFormcreatorTranslatableInterface
          echo '</div>';
       }
       if (PluginFormcreatorEntityconfig::getUsedConfig('is_search_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_SEARCH_VISIBLE) {
-         echo '<div id="plugin_formcreator_searchBar">';
+         echo '<div id="plugin_formcreator_searchBar" class="p-2 m-0 col-12 col-xl-9">';
          $this->showSearchBar();
          echo '</div>';
       }
       $sort_settings = PluginFormcreatorEntityConfig::getEnumSort();
-      echo '<div class="plugin_formcreator_sort">';
-      echo '<span class="radios">';
+      echo '<div class="my-3 plugin_formcreator_sort col-12 col-xl-3">';
+      echo '<span class="radios form-check me-3">';
       $sort_order = PluginFormcreatorEntityconfig::getUsedConfig('sort_order', Session::getActiveEntity());
       $selected = $sort_order == PluginFormcreatorEntityconfig::CONFIG_SORT_POPULARITY ? 'checked="checked"' : '';
-      echo '<input type="radio" class="-check-input" id="plugin_formcreator_mostPopular" name="sort" value="mostPopularSort" '.$selected.' onclick="showTiles(tiles)"/>';
+      echo '<input type="radio" class="form-check-input" id="plugin_formcreator_mostPopular" name="sort" value="mostPopularSort" '.$selected.' onclick="showTiles(tiles)"/>';
       echo '<label for="plugin_formcreator_mostPopular">';
       echo '<a title="' . $sort_settings[PluginFormcreatorEntityConfig::CONFIG_SORT_POPULARITY] . '">&nbsp;<i class="fa fa-star" aria-hidden="true"></i></a>';
       echo '</label>';
       echo '</span>';
       echo '&nbsp;';
-      echo '<span class="radios">';
+      echo '<span class="radios form-check me-3">';
       $selected = $sort_order == PluginFormcreatorEntityconfig::CONFIG_SORT_ALPHABETICAL ? 'checked="checked"' : '';
-      echo '<input type="radio" class="-check-input" id="plugin_formcreator_alphabetic" name="sort" value="alphabeticSort" '.$selected.' onclick="showTiles(tiles)"/>';
+      echo '<input type="radio" class="form-check-input" id="plugin_formcreator_alphabetic" name="sort" value="alphabeticSort" '.$selected.' onclick="showTiles(tiles)"/>';
       echo '<label for="plugin_formcreator_alphabetic">';
-      echo '<a title="' . $sort_settings[PluginFormcreatorEntityConfig::CONFIG_SORT_ALPHABETICAL] . '">&nbsp;<i class="fa fa-arrow-down-a-z"></i></a>';
+      echo '<a title="' . $sort_settings[PluginFormcreatorEntityConfig::CONFIG_SORT_ALPHABETICAL] . '">&nbsp;<i class="fs-3 fa fa-arrow-down-a-z"></i></a>';
       echo '</label>';
       echo '</span>';
       echo '</div>';
-      echo '<div id="plugin_formcreator_wizard_forms">';
+      echo '<div id="plugin_formcreator_wizard_forms" class="m-0 col-12">';
       echo '</div>';
       echo '</div>';
       echo '</div>';
@@ -895,9 +898,10 @@ PluginFormcreatorTranslatableInterface
 
    protected function showSearchBar() : void {
       echo '<form name="plugin_formcreator_search" onsubmit="javascript: return false;" >';
-      echo '<input type="text" name="words" id="plugin_formcreator_search_input" required class="form-control" />';
-      echo '<span id="plugin_formcreator_search_input_bar"></span>';
-      echo '<label for="plugin_formcreator_search_input">'.__('What are you looking for?', 'formcreator').'</label>';
+      echo '<div class="input-group mb-3">';
+      echo '<input type="text" class="form-control form-control-lg" name="words" placeholder="' . __('What are you looking for?', 'formcreator') . '" aria-label="' . __('What are you looking for?', 'formcreator') . '" aria-describedby="button-addon2" required>';
+      echo '<span class="btn fa fa-search" id="button-addon2"></span>';
+      echo '</div>';
       echo '</form>';
    }
 

@@ -1414,10 +1414,6 @@ var plugin_formcreator = new function () {
             return;
          }
 
-         if (typeof (xhr.responseJSON) == 'undefined') {
-            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
-         }
-
          var display_container = ($('#messages_after_redirect').length == 0);
          var html = xhr.responseJSON.message;
          if (display_container) {

@@ -1414,6 +1414,10 @@ var plugin_formcreator = new function () {
             return;
          }
 
+         if (xhr.status == 200 && xhr.statusText == 'OK') {
+            window.location = "formlist.php"
+         }
+
          if (typeof (xhr.responseJSON) == 'undefined') {
             alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
          }

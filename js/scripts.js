@@ -1404,7 +1404,7 @@ var plugin_formcreator = new function () {
             .html(i18n.textdomain('formcreator').__('Send', 'formcreator'))
             .off('click');
          $(form).removeAttr('data-submitted');
-
+         console.log(xhr, data);
          if (xhr.responseText == '') {
             displayAjaxMessageAfterRedirect();
             return;
@@ -1412,6 +1412,10 @@ var plugin_formcreator = new function () {
          if ((data) == 'error') {
             displayAjaxMessageAfterRedirect();
             return;
+         }
+
+         if (typeof (xhr.responseJSON) == 'undefined') {
+            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
          }
 
          var display_container = ($('#messages_after_redirect').length == 0);

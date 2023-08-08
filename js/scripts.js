@@ -1416,12 +1416,12 @@ var plugin_formcreator = new function () {
 
          if (xhr.status == 200 && xhr.statusText == 'OK') {
             window.location = "formlist.php"
-         }
+         } else {
 
-         if (typeof (xhr.responseJSON) == 'undefined') {
-            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
+            if (typeof (xhr.responseJSON) == 'undefined') {
+               alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
+            }
          }
-
          var display_container = ($('#messages_after_redirect').length == 0);
          var html = xhr.responseJSON.message;
          if (display_container) {

@@ -1413,7 +1413,7 @@ var plugin_formcreator = new function () {
             displayAjaxMessageAfterRedirect();
             return;
          }
-
+         console.log(xhr);
          if (xhr.status == 200 && xhr.statusText == 'OK') {
             window.location = "formlist.php"
          } else {

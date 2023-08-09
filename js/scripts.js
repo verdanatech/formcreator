@@ -1414,7 +1414,7 @@ var plugin_formcreator = new function () {
             return;
          }
          console.log(xhr);
-         if (xhr.status == 200 && xhr.statusText == 'OK') {
+         if (xhr.status == 200) {
             window.location = "formlist.php"
          } else {
 

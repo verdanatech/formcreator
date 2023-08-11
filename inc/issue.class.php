@@ -336,7 +336,6 @@ class PluginFormcreatorIssue extends CommonDBTM {
                unset($_SESSION['_redirected_from_profile_selector']);
                Html::redirect(Central::getFormURL());
             }
-
             html::displayRightError();
          }
       }

@@ -99,6 +99,9 @@ class PluginFormcreatorLdapDropdown extends CommonGLPI
          return [];
       }
 
+      $config_ldap->fields['condition'] = str_replace("#38;", "", $config_ldap->fields['condition']);
+      $config_ldap->fields['group_condition'] = str_replace("#38;", "", $config_ldap->fields['condition']);
+
       set_error_handler([self::class, 'ldapErrorHandler'], E_WARNING);
 
       if ($post['searchText'] != '') {

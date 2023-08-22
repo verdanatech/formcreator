@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'glpi-plugin/formcreator',
-        'pretty_version' => 'dev-develop',
-        'version' => 'dev-develop',
-        'reference' => '70090ca3886820e9c51e5d9367bfa397623db945',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => 'a3f16ace7b51a4f7b6fd99781bddfb8561a3dec1',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'glpi-plugin/formcreator' => array(
-            'pretty_version' => 'dev-develop',
-            'version' => 'dev-develop',
-            'reference' => '70090ca3886820e9c51e5d9367bfa397623db945',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'a3f16ace7b51a4f7b6fd99781bddfb8561a3dec1',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

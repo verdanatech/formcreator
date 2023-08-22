@@ -55,7 +55,7 @@ if (!isset($_SESSION['glpiname'])) {
 
 // Save form
 $backup_debug = $_SESSION['glpi_use_mode'];
-$_SESSION['glpi_use_mode'] = \Session::NORMAL_MODE;
+$_SESSION['glpi_use_mode'] = Session::NORMAL_MODE;
 $formAnswer = PluginFormcreatorCommon::getFormAnswer();
 foreach ($_POST as $key => $value) {
    $key = str_replace("formcreator_field_", "", $key);
@@ -67,6 +67,7 @@ foreach ($_POST as $key => $value) {
       }
    }
 }
+
 if ($formAnswer->add($_POST) === false) {
    http_response_code(400);
    if ($_SESSION['glpiname'] == 'formcreator_temp_user') {

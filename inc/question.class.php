@@ -1302,4 +1302,31 @@ PluginFormcreatorTranslatableInterface
          ],
       ] + $options);
    }
+
+   public static function getQuestionsById($id)
+   {
+      global $DB;
+      $questions = "";
+      $rows = $DB->request([
+         'SELECT' => ['id'],
+         'FROM'   => self::getTable(),
+         'WHERE'  => [
+            'id' => $id,
+            'itemtype' => 'User',
+            'fieldtype' => 'ldapselect'
+         ],
+         'ORDER'  => ['row ASC', 'col ASC']
+      ]);
+
+
+      foreach ($rows as $row) {
+         if (!isset($row['id'])) {
+            return false;
+         }
+         $question = new self();
+         $question->getFromDB($row['id']);
+      }
+
+      return $question;
+   }
 }

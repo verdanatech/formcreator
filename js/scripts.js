@@ -1404,7 +1404,10 @@ var plugin_formcreator = new function() {
             return;
          }
          if (xhr.status == 200) {
-            window.location = data.redirect
+            if (typeof(data.redirect) == 'string') {
+               window.location = data.redirect;
+            }
+            window.location = "issue.php";
          } else {
 
             if (typeof(xhr.responseJSON) == 'undefined') {

@@ -1407,7 +1407,7 @@ var plugin_formcreator = new function() {
             if (typeof(data.redirect) == 'string') {
                window.location = data.redirect;
             }
-            window.location = "issue.php";
+            window.location = "formlist.php";
          } else {
 
             if (typeof(xhr.responseJSON) == 'undefined') {

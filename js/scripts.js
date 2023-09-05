@@ -1404,9 +1404,6 @@ var plugin_formcreator = new function() {
             return;
          }
          if (xhr.status == 200) {
-            if (typeof(data.redirect) == 'string') {
-               window.location = data.redirect;
-            }
             window.location = "formlist.php";
          } else {
 

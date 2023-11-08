@@ -61,8 +61,13 @@ foreach ($_POST as $key => $value) {
    $key = str_replace("formcreator_field_", "", $key);
    $questions = PluginFormcreatorQuestion::getQuestionsById($key);
    if (isset($questions)) {
+      if (!is_numeric($value)) {
          $_POST['formcreator_field_' . $key] = User::getIdByName($value);
          $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
+      }else{
+            $_POST['formcreator_field_' . $key] = User::getUsersIdByEmails($value);
+            $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
+         }
    }
 }
 

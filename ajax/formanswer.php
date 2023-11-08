@@ -59,7 +59,8 @@ $backup_debug = $_SESSION['glpi_use_mode'];
 $_SESSION['glpi_use_mode'] = Session::NORMAL_MODE;
 $formAnswer = PluginFormcreatorCommon::getFormAnswer();
 foreach ($_POST as $key => $value) {
-   $key = str_replace("formcreator_field_", "", $key);
+      echo "<script>console.log($_POST)</script>";
+      $key = str_replace("formcreator_field_", "", $key);
    $questions = PluginFormcreatorQuestion::getQuestionsById($key);
    if (isset($questions)) {
       echo "<script>console.log($value)</script>";

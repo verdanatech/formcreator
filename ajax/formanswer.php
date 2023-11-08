@@ -65,7 +65,7 @@ foreach ($_POST as $key => $value) {
          $_POST['formcreator_field_' . $key] = User::getIdByName($value);
          $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
       }else{
-            $_POST['formcreator_field_' . $key] = User::getUsersIdByEmails($value);
+            $_POST['formcreator_field_' . $key] = current(User::getUsersIdByEmails($value));
             $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
          }
    }

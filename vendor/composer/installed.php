@@ -3,7 +3,7 @@
         'name' => 'glpi-plugin/formcreator',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'a3f16ace7b51a4f7b6fd99781bddfb8561a3dec1',
+        'reference' => '63d89aaf2765548e6fd8bc48464166c35ed2fc32',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'glpi-plugin/formcreator' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'a3f16ace7b51a4f7b6fd99781bddfb8561a3dec1',
+            'reference' => '63d89aaf2765548e6fd8bc48464166c35ed2fc32',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

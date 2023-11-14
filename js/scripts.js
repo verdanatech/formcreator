@@ -1403,8 +1403,13 @@ var plugin_formcreator = new function() {
             displayAjaxMessageAfterRedirect();
             return;
          }
-         if (typeof(xhr.responseJSON) == 'undefined') {
-            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
+         if (xhr.status == 200) {
+            window.location = "formlist.php";
+         } else {
+
+            if (typeof(xhr.responseJSON) == 'undefined') {
+               alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
+            }
          }
          if (typeof(xhr.responseJSON.message) == 'undefined') {
             displayAjaxMessageAfterRedirect();

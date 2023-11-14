@@ -40,6 +40,10 @@ if (!$question->canCreate()) {
     exit;
 }
 
+if ($_REQUEST['fieldtype'] == 'ldapselect' && $_REQUEST['ldap_attribute'] == 4) {
+    $_REQUEST['itemtype'] = "User";
+}
+
 if (!$question->add($_REQUEST)) {
     http_response_code(500);
     Session::addMessageAfterRedirect(__('Could not add the question', 'formcreator'), false, ERROR);

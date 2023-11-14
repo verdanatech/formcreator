@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ---------------------------------------------------------------------
  * Formcreator is a plugin which allows creation of custom forms of
@@ -39,10 +40,10 @@ if (!defined('GLPI_ROOT')) {
 }
 
 class PluginFormcreatorQuestion extends CommonDBChild implements
-PluginFormcreatorExportableInterface,
-PluginFormcreatorDuplicatableInterface,
-PluginFormcreatorConditionnableInterface,
-PluginFormcreatorTranslatableInterface
+   PluginFormcreatorExportableInterface,
+   PluginFormcreatorDuplicatableInterface,
+   PluginFormcreatorConditionnableInterface,
+   PluginFormcreatorTranslatableInterface
 {
    use PluginFormcreatorConditionnableTrait;
    use PluginFormcreatorExportableTrait;
@@ -56,7 +57,8 @@ PluginFormcreatorTranslatableInterface
 
    private $skipChecks = false;
 
-   public static function getEnumShowRule() : array {
+   public static function getEnumShowRule(): array
+   {
       return PluginFormcreatorCondition::getEnumShowRule();
    }
 
@@ -66,18 +68,28 @@ PluginFormcreatorTranslatableInterface
     * @param number $nb Number of item(s)
     * @return string Itemtype name
     */
-   public static function getTypeName($nb = 0) {
+   public static function getTypeName($nb = 0)
+   {
       return _n('Question', 'Questions', $nb, 'formcreator');
    }
 
-   public static function getIcon() {
+   public static function getIcon()
+   {
       return 'fas fa-edit';
    }
 
-   function addMessageOnAddAction() {}
-   function addMessageOnUpdateAction() {}
-   function addMessageOnDeleteAction() {}
-   function addMessageOnPurgeAction() {}
+   function addMessageOnAddAction()
+   {
+   }
+   function addMessageOnUpdateAction()
+   {
+   }
+   function addMessageOnDeleteAction()
+   {
+   }
+   function addMessageOnPurgeAction()
+   {
+   }
 
    /**
     * Return the name of the tab for item including forms like the config page
@@ -87,7 +99,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return String                   Name to be displayed
     */
-   public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+   {
       global $DB;
 
       if ($item instanceof PluginFormcreatorForm) {
@@ -130,7 +143,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return null                     Nothing, just display the list
     */
-   public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+   {
       if ($item instanceof PluginFormcreatorForm) {
          static::showForForm($item, $withtemplate);
       }
@@ -142,11 +156,13 @@ PluginFormcreatorTranslatableInterface
     * (while editing conditions, list of questions is empty + SQL error)
     * @see bug on GLPI #6488, might be related
     */
-   function isEntityAssign() {
+   function isEntityAssign()
+   {
       return false;
    }
 
-   public function rawSearchOptions() {
+   public function rawSearchOptions()
+   {
       $tab = parent::rawSearchOptions();
 
       $tab[] = [
@@ -171,13 +187,15 @@ PluginFormcreatorTranslatableInterface
       return $tab;
    }
 
-   public function getForbiddenStandardMassiveAction() {
+   public function getForbiddenStandardMassiveAction()
+   {
       return [
          'update', 'clone', 'add_note',
       ];
    }
 
-   public static function showForForm(CommonDBTM $item, $withtemplate = '') {
+   public static function showForForm(CommonDBTM $item, $withtemplate = '')
+   {
       $options = [
          'candel'      => false,
          'formoptions' => sprintf('data-itemtype="%s" data-id="%s"', $item::getType(), $item->getID()),
@@ -191,7 +209,8 @@ PluginFormcreatorTranslatableInterface
       return true;
    }
 
-   public function getDesignLabel(): string {
+   public function getDesignLabel(): string
+   {
       $questionId = $this->getID();
       $nb = (new DBUtils())->countElementsInTable(PluginFormcreatorCondition::getTable(), [
          'itemtype' => PluginFormcreatorQuestion::getType(),
@@ -200,7 +219,7 @@ PluginFormcreatorTranslatableInterface
       $sectionId = $this->fields[PluginFormcreatorSection::getForeignKeyField()];
       $onclick = 'plugin_formcreator.showQuestionForm(' . $sectionId . ', ' . $questionId . ');';
       $html = '<a href="javascript:' . $onclick . '" data-field="name">';
-      $html .= "<sup class='plugin_formcreator_conditions_count' title='" . __('Count of conditions', 'formcreator') ."'>$nb</sup>";
+      $html .= "<sup class='plugin_formcreator_conditions_count' title='" . __('Count of conditions', 'formcreator') . "'>$nb</sup>";
       $html .= empty($this->fields['name']) ? '(' . $questionId . ')' : $this->fields['name'];
       $html .= '</a>';
 
@@ -212,7 +231,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return string
     */
-   public function getDesignHtml() : string {
+   public function getDesignHtml(): string
+   {
       if ($this->isNewItem()) {
          return '';
       }
@@ -226,9 +246,9 @@ PluginFormcreatorTranslatableInterface
       $field = new $fieldType($this);
 
       $html .= '<div class="grid-stack-item"'
-      . ' data-itemtype="' . self::class . '"'
-      . ' data-id="'.$questionId.'"'
-      . '>';
+         . ' data-itemtype="' . self::class . '"'
+         . ' data-id="' . $questionId . '"'
+         . '>';
 
       $html .= '<div class="grid-stack-item-content">';
 
@@ -253,7 +273,7 @@ PluginFormcreatorTranslatableInterface
       $html .= "<span class='form_control pointer'>";
       if ($fieldType::canRequire()) {
          $required = ($this->fields['required'] == '0') ? 'far fa-circle' : 'far fa-check-circle';
-         $html .= '<i class="' . $required .'"
+         $html .= '<i class="' . $required . '"
                   onclick="plugin_formcreator.toggleRequired(this)"></i> ';
       }
       $html .= "</span>";
@@ -274,7 +294,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return string
     */
-   public function getRenderedHtml($domain, $canEdit = true, ?PluginFormcreatorFormAnswer $form_answer = null, $isVisible = true): string {
+   public function getRenderedHtml($domain, $canEdit = true, ?PluginFormcreatorFormAnswer $form_answer = null, $isVisible = true): string
+   {
       if ($this->isNewItem()) {
          return '';
       }
@@ -310,7 +331,8 @@ PluginFormcreatorTranslatableInterface
     * @param  array $input Datas used to add the item
     * @return array        The modified $input array
     */
-   private function checkBeforeSave($input) : array {
+   private function checkBeforeSave($input): array
+   {
       // Control fields values :
       // - name is required
       if (isset($input['name'])) {
@@ -321,15 +343,19 @@ PluginFormcreatorTranslatableInterface
       }
 
       // - field type is required
-      if (isset($input['fieldtype'])
-          && empty($input['fieldtype'])) {
+      if (
+         isset($input['fieldtype'])
+         && empty($input['fieldtype'])
+      ) {
          Session::addMessageAfterRedirect(__('The field type is required', 'formcreator'), false, ERROR);
          return [];
       }
 
       // - section is required
-      if (isset($input['plugin_formcreator_sections_id'])
-          && empty($input['plugin_formcreator_sections_id'])) {
+      if (
+         isset($input['plugin_formcreator_sections_id'])
+         && empty($input['plugin_formcreator_sections_id'])
+      ) {
          Session::addMessageAfterRedirect(__('The section is required', 'formcreator'), false, ERROR);
          return [];
       }
@@ -345,7 +371,7 @@ PluginFormcreatorTranslatableInterface
                __('Field type %1$s is not available for question %2$s.', 'formcreator'),
                $input['fieldtype'],
                $input['name']
-               ),
+            ),
             false,
             ERROR
          );
@@ -401,7 +427,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return array the modified $input array
     */
-   public function prepareInputForAdd($input) {
+   public function prepareInputForAdd($input)
+   {
       if (!$this->skipChecks) {
          $input = $this->checkBeforeSave($input);
 
@@ -433,8 +460,10 @@ PluginFormcreatorTranslatableInterface
       }
 
       // generate a unique id
-      if (!isset($input['uuid'])
-          || empty($input['uuid'])) {
+      if (
+         !isset($input['uuid'])
+         || empty($input['uuid'])
+      ) {
          $input['uuid'] = plugin_formcreator_getUuid();
       }
 
@@ -449,7 +478,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @array return the modified $input array
     */
-   public function prepareInputForUpdate($input) {
+   public function prepareInputForUpdate($input)
+   {
       // global $DB;
 
       if (!$this->skipChecks) {
@@ -469,8 +499,10 @@ PluginFormcreatorTranslatableInterface
       }
 
       // generate a unique id
-      if (!isset($input['uuid'])
-          || empty($input['uuid'])) {
+      if (
+         !isset($input['uuid'])
+         || empty($input['uuid'])
+      ) {
          if (!isset($this->fields['uuid']) && $this->fields['uuid'] != $input['uuid']) {
             $input['uuid'] = plugin_formcreator_getUuid();
          }
@@ -484,7 +516,8 @@ PluginFormcreatorTranslatableInterface
     * @param array $input
     * @return bool false on error
     */
-   public function change($input): bool {
+   public function change($input): bool
+   {
       $x = $this->fields['col'];
       $y = $this->fields['row'];
       $width = $this->fields['width'];
@@ -506,7 +539,8 @@ PluginFormcreatorTranslatableInterface
             return false;
          }
          $maxRow = 1 + PluginFormcreatorCommon::getMax(
-            $this, [
+            $this,
+            [
                $sectionFk => $this->fields[$sectionFk]
             ],
             'row'
@@ -567,7 +601,8 @@ PluginFormcreatorTranslatableInterface
     * @param bool $isRequired
     * @return bool true if success, false otherwise
     */
-   public function setRequired($isRequired): bool {
+   public function setRequired($isRequired): bool
+   {
       $this->skipChecks = true;
       $success = $this->update([
          'id'           => $this->getID(),
@@ -582,7 +617,8 @@ PluginFormcreatorTranslatableInterface
     * Adds or updates parameters of the question
     * @param array $input parameters
     */
-   public function updateParameters($input) {
+   public function updateParameters($input)
+   {
       // The question instance has a field type
       if (!isset($this->fields['fieldtype'])) {
          return;
@@ -598,7 +634,8 @@ PluginFormcreatorTranslatableInterface
       $this->field->updateParameters($this, $input);
    }
 
-   public function pre_deleteItem() {
+   public function pre_deleteItem()
+   {
       $success = (new PluginFormcreatorCondition())->deleteByCriteria([
          'itemtype' => self::class,
          'items_id' => $this->getID(),
@@ -611,7 +648,8 @@ PluginFormcreatorTranslatableInterface
       return $this->field->deleteParameters($this);
    }
 
-   public function post_addItem() {
+   public function post_addItem()
+   {
       $this->input = $this->addFiles(
          $this->input,
          [
@@ -638,7 +676,8 @@ PluginFormcreatorTranslatableInterface
       }
    }
 
-   public function post_updateItem($history = 1) {
+   public function post_updateItem($history = 1)
+   {
       $this->input = $this->addFiles(
          $this->input,
          [
@@ -671,7 +710,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return void
     */
-   public function post_purgeItem() {
+   public function post_purgeItem()
+   {
       global $DB;
 
       $table = self::getTable();
@@ -691,8 +731,8 @@ PluginFormcreatorTranslatableInterface
                'row' => new QueryExpression('`row` - 1')
             ],
             [
-              'row' => ['>', $row],
-              $sectionFk => $this->fields[$sectionFk]
+               'row' => ['>', $row],
+               $sectionFk => $this->fields[$sectionFk]
             ]
          );
       }
@@ -724,7 +764,8 @@ PluginFormcreatorTranslatableInterface
       );
    }
 
-   public function showForm($ID, $options = []) {
+   public function showForm($ID, $options = [])
+   {
       $options['candel'] = false;
       $options['target'] = "javascript:;";
       $options['formoptions'] = sprintf('onsubmit="plugin_formcreator.submitQuestion(this)" data-itemtype="%s" data-id="%s"', self::getType(), $this->getID());
@@ -750,13 +791,15 @@ PluginFormcreatorTranslatableInterface
     * @param array $options
     * @return void
     */
-   public static function dropdownQuestionType(string $name, array $options): void {
+   public static function dropdownQuestionType(string $name, array $options): void
+   {
       $fieldtypes = PluginFormcreatorFields::getNames();
       $options['on_change'] = "plugin_formcreator.changeQuestionType(this)";
       Dropdown::showFromArray($name, $fieldtypes, $options);
    }
 
-   public function duplicate(array $options = []) {
+   public function duplicate(array $options = [])
+   {
       $linker = new PluginFormcreatorLinker($options);
 
       $sectionFk = PluginFormcreatorSection::getForeignKeyField();
@@ -797,7 +840,8 @@ PluginFormcreatorTranslatableInterface
       return $newQuestionId;
    }
 
-   public static function import(PluginFormcreatorLinker $linker, array $input = [], int $containerId = 0) {
+   public static function import(PluginFormcreatorLinker $linker, array $input = [], int $containerId = 0)
+   {
       global $DB;
 
       if (!isset($input['uuid']) && !isset($input['id'])) {
@@ -883,7 +927,8 @@ PluginFormcreatorTranslatableInterface
       return $itemId;
    }
 
-   public static function countItemsToImport(array $input) : int {
+   public static function countItemsToImport(array $input): int
+   {
       // TODO: need improvement to handle parameters
       $subItems = [
          '_conditions' => PluginFormcreatorCondition::class,
@@ -892,7 +937,8 @@ PluginFormcreatorTranslatableInterface
       return 1 + self::countChildren($input, $subItems);
    }
 
-   public function export(bool $remove_uuid = false) : array {
+   public function export(bool $remove_uuid = false): array
+   {
       if ($this->isNewItem()) {
          throw new ExportFailureException(sprintf(__('Cannot export an empty object: %s', 'formcreator'), $this->getTypeName()));
       }
@@ -934,7 +980,8 @@ PluginFormcreatorTranslatableInterface
     * @param array $crit array for the WHERE clause
     * @return PluginFormcreatorQuestion[]
     */
-   public static function getQuestionsFromForm($formId, $crit = []) {
+   public static function getQuestionsFromForm($formId, $crit = [])
+   {
       global $DB;
 
       $table_question = PluginFormcreatorQuestion::getTable();
@@ -979,7 +1026,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return PluginFormcreatorQuestion[]
     */
-   public static function getQuestionsFromSection($sectionId) {
+   public static function getQuestionsFromSection($sectionId)
+   {
       global $DB;
 
       $questions = [];
@@ -992,9 +1040,9 @@ PluginFormcreatorTranslatableInterface
          'ORDER'  => ['row ASC', 'col ASC']
       ]);
       foreach ($rows as $row) {
-            $question = new self();
-            $question->getFromDB($row['id']);
-            $questions[$row['id']] = $question;
+         $question = new self();
+         $question->getFromDB($row['id']);
+         $questions[$row['id']] = $question;
       }
 
       return $questions;
@@ -1007,7 +1055,8 @@ PluginFormcreatorTranslatableInterface
     * @param array $crit additional slection criterias criterias
     * @return array 1st level is the section name, 2nd level is id and name of the question
     */
-   public static function getQuestionsFromFormBySection($form, $crit = []) {
+   public static function getQuestionsFromFormBySection($form, $crit = [])
+   {
       global $DB;
 
       if ($form->isNewItem()) {
@@ -1067,7 +1116,8 @@ PluginFormcreatorTranslatableInterface
     * @param array $options
     * @return string|int HTML output or random id
     */
-   public static function dropdownForForm($form, $crit, $name, $value = null, $options = []) {
+   public static function dropdownForForm($form, $crit, $name, $value = null, $options = [])
+   {
       if (isset($crit['used']) && count($crit['used']) == 0) {
          unset($crit['used']);
       }
@@ -1095,7 +1145,8 @@ PluginFormcreatorTranslatableInterface
     * @param int|array $id      a single id or an array of ids
     * @return array
     */
-   public static function getQuestionDataById($table, $id) {
+   public static function getQuestionDataById($table, $id)
+   {
       global $DB;
 
       $validTargets = [
@@ -1121,7 +1172,8 @@ PluginFormcreatorTranslatableInterface
     *
     * @return bool true on sucess, false otherwise
     */
-   private function loadField($fieldType): bool {
+   private function loadField($fieldType): bool
+   {
       if (!$this->field === null) {
          return false;
       }
@@ -1132,7 +1184,8 @@ PluginFormcreatorTranslatableInterface
       return true;
    }
 
-   public function deleteObsoleteItems(CommonDBTM $container, array $exclude) : bool {
+   public function deleteObsoleteItems(CommonDBTM $container, array $exclude): bool
+   {
       $keepCriteria = [
          self::$items_id => $container->getID(),
       ];
@@ -1146,7 +1199,8 @@ PluginFormcreatorTranslatableInterface
     * Get the field object representing the question
     * @return PluginFormcreatorFieldInterface|null
     */
-   public function getSubField(): ?PluginFormcreatorFieldInterface {
+   public function getSubField(): ?PluginFormcreatorFieldInterface
+   {
       if ($this->isNewItem()) {
          return null;
       }
@@ -1161,7 +1215,8 @@ PluginFormcreatorTranslatableInterface
       return $this->field;
    }
 
-   public function getTranslatableStrings(array $options = []) : array {
+   public function getTranslatableStrings(array $options = []): array
+   {
       $strings = [
          'itemlink' => [],
          'string'   => [],
@@ -1197,7 +1252,8 @@ PluginFormcreatorTranslatableInterface
     * @param array $options
     * @return void
     */
-   public static function dropdownDropdownSubType(string $name, array $options = []): void {
+   public static function dropdownDropdownSubType(string $name, array $options = []): void
+   {
       $optgroup = Dropdown::getStandardDropdownItemTypes();
       $optgroup[__('Service levels')] = [
          SLA::getType() => __("SLA", "formcreator"),
@@ -1216,7 +1272,8 @@ PluginFormcreatorTranslatableInterface
       ] + $options);
    }
 
-   public static function dropdownObjectSubType(string $name, array $options = []): void {
+   public static function dropdownObjectSubType(string $name, array $options = []): void
+   {
       $plural = Session::getPluralNumber();
 
       $optgroup = [
@@ -1301,5 +1358,32 @@ PluginFormcreatorTranslatableInterface
             'data-itemtype' => $itemtype
          ],
       ] + $options);
+   }
+
+   public static function getQuestionsById($id)
+   {
+      global $DB;
+      $questions = "";
+      $rows = $DB->request([
+         'SELECT' => ['id'],
+         'FROM'   => self::getTable(),
+         'WHERE'  => [
+            'id' => $id,
+            'itemtype' => 'User',
+            'fieldtype' => 'ldapselect'
+         ],
+         'ORDER'  => ['row ASC', 'col ASC']
+      ]);
+
+
+      foreach ($rows as $row) {
+         if (!isset($row['id'])) {
+            return false;
+         }
+         $question = new self();
+         $question->getFromDB($row['id']);
+      }
+
+      return $question;
    }
 }

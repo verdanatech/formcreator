@@ -140,7 +140,6 @@ class PluginFormcreatorFields
       /** @var CommonDBTM $item */
       $itemtype = get_class($item);
       $itemId = $item->getID();
-
       if (!isset(self::$visibility[$itemtype]) || !array_key_exists($itemId, self::$visibility[$itemtype])) {
          self::$visibility[$itemtype][$itemId] = null;
       } else if (self::$visibility[$itemtype][$itemId] !== null) {
@@ -157,12 +156,13 @@ class PluginFormcreatorFields
          // Check if item has a condtionnable visibility parent
          if ($item instanceof CommonDBChild) {
             $interfaces = class_implements($item::$itemtype);
+
             if (in_array(PluginFormcreatorConditionnableInterface::class, $interfaces)) {
                if ($parent = $item->getItem(true, false)) {
                   $parentItemtype = $parent->getType();
                   $parentId = $parent->getID();
                   if ($parent->getType() == PluginFormcreatorForm::class) {
-                     // the condition for form is only for its submit button. A form is always visible
+                     // the condition for form is only for its submit button. A form is always visible]
                      self::$visibility[$parentItemtype][$parentId] = true;
                      return self::$visibility[$parentItemtype][$parentId];
                   }
@@ -366,6 +366,7 @@ class PluginFormcreatorFields
     * @return array
     */
    public static function updateVisibility($input) {
+     
       $form = PluginFormcreatorCommon::getForm();
       $form->getFromDB((int) $input['plugin_formcreator_forms_id']);
       $fields = $form->getFields();
@@ -374,10 +375,10 @@ class PluginFormcreatorFields
       }
       // Get the visibility for the submit button of the form
       $submitShow = PluginFormcreatorFields::isVisible($form, $fields);
-
       // Get the visibility result of questions
       $questionToShow = [];
       foreach ($fields as $id => $field) {
+         
          $questionToShow[$id] = PluginFormcreatorFields::isVisible($field->getQuestion(), $fields);
       }
 

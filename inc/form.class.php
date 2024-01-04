@@ -692,7 +692,7 @@ PluginFormcreatorTranslatableInterface
       $selected = $sort_order == PluginFormcreatorEntityconfig::CONFIG_SORT_ALPHABETICAL ? 'checked="checked"' : '';
       echo '<input type="radio" class="form-check-input" id="plugin_formcreator_alphabetic" name="sort" value="alphabeticSort" '.$selected.' onclick="showTiles(tiles)"/>';
       echo '<label for="plugin_formcreator_alphabetic">';
-      echo '<a title="' . $sort_settings[PluginFormcreatorEntityConfig::CONFIG_SORT_ALPHABETICAL] . '">&nbsp;<i class="fa fa-arrow-down-a-z"></i></a>';
+      echo '<a title="' . $sort_settings[PluginFormcreatorEntityConfig::CONFIG_SORT_ALPHABETICAL] . '">&nbsp;<i class="fs-3 fa fa-arrow-down-a-z"></i></a>';
       echo '</label>';
       echo '</span>';
       echo '</div>';

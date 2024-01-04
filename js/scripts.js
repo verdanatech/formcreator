@@ -434,6 +434,7 @@ function buildTiles(list) {
 
       if (item.type == 'form') {
          var base = `
+<<<<<<< HEAD
             <div class="col-12 col-md-6 col-lg-4">
             <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100">
                <div class="card-header" style="background-color: ${item.background_color};">
@@ -449,6 +450,8 @@ function buildTiles(list) {
          </div>`;
          if(item.description){
          var base = `
+=======
+>>>>>>> a29d283 (:sparkles: Add styling verdanadesk)
          <div class="col-12 col-md-6 col-lg-4">
             <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.description}" data-bs-html="true">
                <div class="card-header" style="background-color: ${item.background_color};">
@@ -462,11 +465,18 @@ function buildTiles(list) {
                </div>
             </div>
          </div>
+<<<<<<< HEAD
       `;
          }
          forms.push(base);
       } else {
             faqs.push(`
+=======
+         `;
+         forms.push(base);
+      } else {
+         faqs.push(`
+>>>>>>> a29d283 (:sparkles: Add styling verdanadesk)
             <div class="col-12 col-md-6 col-lg-4">
             <div class="card h-100">
                <div class="card-header " style="background-color: ${item.background_color};" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.name}" data-bs-html="true">
@@ -484,7 +494,11 @@ function buildTiles(list) {
    // concatenate all HTML parts
    html = '<div id="plugin_formcreator_formlist" class="row row-cols-3 g-3 mb-4">'
    + forms.join("")
+<<<<<<< HEAD
    + '</div><div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">'
+=======
+   + '</div><div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">>'
+>>>>>>> a29d283 (:sparkles: Add styling verdanadesk)
    + faqs.join("")
    + '</div>'
 

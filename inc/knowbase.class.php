@@ -219,6 +219,7 @@ class PluginFormcreatorKnowbase {
 
       $formList = [];
       $result_faqs = $DB->request($query_faqs);
+
       foreach ($result_faqs as $faq) {
          $formList[] = [
             'id'           => $faq['id'],

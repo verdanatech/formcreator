@@ -2255,6 +2255,10 @@ SCRIPT;
             }
          }
       }
+    
+      if (isset($data['_users_id_assign']) && $data['_users_id_assign'] == 0) {
+         unset($data['_users_id_assign']);
+      }
 
       if (isset($data['_groups_id_requester']) && $data['_groups_id_requester'] == 0) {
          unset($data['_groups_id_requester']);

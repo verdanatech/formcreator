@@ -176,8 +176,8 @@ class RequestTypeField extends SelectField
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("en_GB");
-      $_SESSION['glpilanguage'] = "en_GB";
+      // $TRANSLATE->setLocale("en_GB");
+      // $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;
@@ -192,8 +192,8 @@ class RequestTypeField extends SelectField
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("en_GB");
-      $_SESSION['glpilanguage'] = "en_GB";
+      // $TRANSLATE->setLocale("en_GB");
+      // $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;
@@ -208,8 +208,8 @@ class RequestTypeField extends SelectField
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("en_GB");
-      $_SESSION['glpilanguage'] = "en_GB";
+      // $TRANSLATE->setLocale("en_GB");
+      // $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;
@@ -224,8 +224,8 @@ class RequestTypeField extends SelectField
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("en_GB");
-      $_SESSION['glpilanguage'] = "en_GB";
+      // $TRANSLATE->setLocale("en_GB");
+      // $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;

@@ -61,8 +61,8 @@ foreach ($_POST as $key => $value) {
    $key = str_replace("formcreator_field_", "", $key);
    $questions = PluginFormcreatorQuestion::getQuestionsById($key);
    if (isset($questions)) {
-         $_POST['formcreator_field_' . $key] = User::getIdByName($value);
-         $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
+      $_POST['formcreator_field_' . $key] = current(User::getUsersIdByEmails($value));
+      $_POST['formcreator_field_' . $key] = (string)$_POST['formcreator_field_' . $key];
    }
 }
 if ($formAnswer->add($_POST) === false) {

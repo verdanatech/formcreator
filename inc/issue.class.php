@@ -1130,7 +1130,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
    }
 
    static function getPendingStatusArray() {
-      return [Ticket::WAITING, PluginFormcreatorFormAnswer::STATUS_WAITING,PluginFormcreatorFormAnswer::STATUS_ACCEPTED];
+      return [Ticket::WAITING, PluginFormcreatorFormAnswer::STATUS_WAITING];
    }
 
    static function getProcessStatusArray() {
@@ -1182,12 +1182,20 @@ class PluginFormcreatorIssue extends CommonDBTM {
    }
 
    static function getValidateCriteria() {
-      return ['criteria' => [['link'       => 'AND',
-                              'field' => 4,
-                              'searchtype' => 'equals',
-                              'value'      => PluginFormcreatorFormAnswer::STATUS_WAITING,
-                              ],
-                            ],
+      return      ['criteria' => [
+         ['link'       => 'AND',
+         'criteria' => [[
+            'link'       => 'AND',
+            'field' => 4,
+            'searchtype' => 'equals',
+            'value'      => PluginFormcreatorFormAnswer::STATUS_WAITING
+         ],
+         ['field' => 4,
+            'searchtype' => 'equals',
+            'value'      => PluginFormcreatorFormAnswer::STATUS_ACCEPTED,
+            'link'       => 'OR']
+         ]],
+      ],
               'reset'    => 'reset'];
    }
 

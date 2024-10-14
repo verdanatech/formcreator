@@ -526,6 +526,10 @@ class PluginFormcreatorIssue extends CommonDBTM {
          'field'              => 'name',
          'name'               => __('Name'),
          'datatype'           => 'itemlink',
+         'searchtype'         => [
+            '0'                  => 'contains',
+            '1'                  => 'not contains',
+         ],
          'massiveaction'      => false,
          'additionalfields'   => [
             '0'                  => 'display_id'
@@ -727,6 +731,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
          'field'              => 'name',
          'name'               => __('Technician'),
          'datatype'           => 'dropdown',
+         'forcegroupby'       => true,
          'massiveaction'      => false,
          'nodisplay'          => $hide_technician,
          'nosearch'           => $hide_technician,
@@ -1118,7 +1123,7 @@ class PluginFormcreatorIssue extends CommonDBTM {
    }
 
    static function getClosedStatusArray() {
-      return [...Ticket::getClosedStatusArray(), PluginFormcreatorFormAnswer::STATUS_ACCEPTED];
+      return [...Ticket::getClosedStatusArray() ];
    }
 
    static function getSolvedStatusArray() {
@@ -1182,12 +1187,20 @@ class PluginFormcreatorIssue extends CommonDBTM {
    }
 
    static function getValidateCriteria() {
-      return ['criteria' => [['link'       => 'AND',
-                              'field' => 4,
-                              'searchtype' => 'equals',
-                              'value'      => PluginFormcreatorFormAnswer::STATUS_WAITING,
-                              ],
-                            ],
+      return      ['criteria' => [
+         ['link'       => 'AND',
+         'criteria' => [[
+            'link'       => 'AND',
+            'field' => 4,
+            'searchtype' => 'equals',
+            'value'      => PluginFormcreatorFormAnswer::STATUS_WAITING
+         ],
+         ['field' => 4,
+            'searchtype' => 'equals',
+            'value'      => PluginFormcreatorFormAnswer::STATUS_ACCEPTED,
+            'link'       => 'OR']
+         ]],
+      ],
               'reset'    => 'reset'];
    }
 

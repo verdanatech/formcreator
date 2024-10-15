@@ -54,10 +54,10 @@ class PluginFormcreatorForm_Qrcode extends CommonDBRelation
       echo json_encode($item);
 
       $json_data = [
-         "url" => "verdanadeskapp://formcreator/{$item->fields['id']}/answer",
+         "url" => "verdanadeskapp://greencat/formcreator/{$item->fields['id']}/answer",
       ];
 
-      $generator = new QRCode("verdanadeskapp://formcreator/{$item->fields['id']}/answer", []);
+      $generator = new QRCode("verdanadeskapp://greencat/formcreator/{$item->fields['id']}/answer", []);
 
       ob_start();
       $generator->output_image();

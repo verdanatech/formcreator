@@ -374,11 +374,12 @@ class PluginFormcreatorFields
       }
       // Get the visibility for the submit button of the form
       $submitShow = PluginFormcreatorFields::isVisible($form, $fields);
-
       // Get the visibility result of questions
       $questionToShow = [];
       foreach ($fields as $id => $field) {
+
          $questionToShow[$id] = PluginFormcreatorFields::isVisible($field->getQuestion(), $fields);
+    
       }
 
       // Get the visibility result of sections

@@ -538,7 +538,6 @@ class PluginFormcreatorTargetTicket extends PluginFormcreatorAbstractItilTarget
             $input['type_question'] = Ticket::INCIDENT_TYPE;
          }
       }
-      var_dump("Aqui");exit;
 
       if (!isset($input['source_rule'])) {
          $input['source_rule'] = self::REQUESTSOURCE_FORMCREATOR;

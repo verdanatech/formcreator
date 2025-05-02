@@ -176,24 +176,23 @@ class RequestTypeField extends SelectField
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("pt_BR");
-      $_SESSION['glpilanguage'] = "pt_BR";
+      $TRANSLATE->setLocale("en_GB");
+      $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;
-
       if (!isset($available[$this->value])) {
          return false;
       }
-      return strcasecmp($available[$this->value], $value) === 0;
+      return strcasecmp(__($available[$this->value]), $value) === 0;
    }
 
    public function notEquals($value): bool {
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("pt_BR");
-      $_SESSION['glpilanguage'] = "pt_BR";
+      $TRANSLATE->setLocale("en_GB");
+      $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;
@@ -208,8 +207,8 @@ class RequestTypeField extends SelectField
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("pt_BR");
-      $_SESSION['glpilanguage'] = "pt_BR";
+      $TRANSLATE->setLocale("en_GB");
+      $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;
@@ -217,15 +216,15 @@ class RequestTypeField extends SelectField
       if (!isset($available[$this->value])) {
          return false;
       }
-      return strcasecmp($available[$this->value], $value) > 0;
+      return strcasecmp(__($available[$this->value]), $value) > 0;
    }
 
    public function lessThan($value): bool {
       global $TRANSLATE;
 
       $oldLocale = $TRANSLATE->getLocale();
-      $TRANSLATE->setLocale("pt_BR");
-      $_SESSION['glpilanguage'] = "pt_BR";
+      $TRANSLATE->setLocale("en_GB");
+      $_SESSION['glpilanguage'] = "en_GB";
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;

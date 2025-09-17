@@ -780,8 +780,11 @@ PluginFormcreatorTranslatableInterface
 
       // Find forms accessible by the current user
       $keywords = trim($keywords);
+
       if (!empty($keywords)) {
+
          $keywordsWithWilcards = $DB->escape(PluginFormcreatorCommon::prepareBooleanKeywords($keywords));
+         
          $formList['WHERE']['AND'][] = [
             'OR' => [
                new QueryExpression("MATCH($table_form.`name`, $table_form.`description`)
@@ -790,10 +793,11 @@ PluginFormcreatorTranslatableInterface
                   AGAINST('$keywordsWithWilcards' IN BOOLEAN MODE)"),
             ]
          ];
+      echo json_encode( $keywordsWithWilcards);exit;
+
       }
 
       $result_forms = $DB->request($formList);
-
       $formList = [];
       foreach ($result_forms as $form) {
          // load thanguage for the form, if any

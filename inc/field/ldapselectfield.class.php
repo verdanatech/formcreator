@@ -109,7 +109,7 @@ class LdapselectField extends SelectField
 
    public function isValid(): bool {
       // If the field is required it can't be empty
-      if ($this->isRequired() && $this->value == '0') {
+      if ($this->isRequired() && ($this->value == '0' || $this->value == '')) {
          Session::addMessageAfterRedirect(
             __('A required field is empty:', 'formcreator') . ' ' . $this->getTtranslatedLabel(),
             false,

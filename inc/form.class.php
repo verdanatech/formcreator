@@ -793,7 +793,6 @@ PluginFormcreatorTranslatableInterface
                   AGAINST('$keywordsWithWilcards' IN BOOLEAN MODE)"),
             ]
          ];
-      echo json_encode( $keywordsWithWilcards);exit;
 
       }
 

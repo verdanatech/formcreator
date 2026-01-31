@@ -6,9 +6,4 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Xylemical\\Expressions\\' => array($vendorDir . '/xylemical/php-expressions/src'),
-    'Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
-    'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
-    'Laminas\\EventManager\\' => array($vendorDir . '/laminas/laminas-eventmanager/src'),
-    'Gregwar\\' => array($vendorDir . '/gregwar/captcha/src/Gregwar'),
 );

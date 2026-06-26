@@ -54,10 +54,6 @@ if (!$question->canUpdate()) {
    exit;
 }
 
-if ($_REQUEST['fieldtype'] == 'ldapselect' && $_REQUEST['ldap_attribute'] == 4) {
-   $_REQUEST['itemtype'] = "User";
-}
-
 $success = $question->update($_REQUEST);
 if (!$success) {
    http_response_code(500);

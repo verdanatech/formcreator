@@ -75,9 +75,9 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
 
    public static function getStatuses() {
       return [
-         self::STATUS_WAITING  => __('Waiting', 'formcreator'),
-         self::STATUS_REFUSED  => __('Refused', 'formcreator'),
-         self::STATUS_ACCEPTED => __('Accepted', 'formcreator'),
+         self::STATUS_WAITING  => __('To validate', 'formcreator'),
+         self::STATUS_REFUSED  => __('Validation Refused', 'formcreator'),
+         self::STATUS_ACCEPTED => __('Validation Accepted', 'formcreator'),
       ];
    }
 
@@ -120,11 +120,6 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
 
       if ($currentUser == $this->fields['requester_id']) {
          return true;
-      }
-
-      if ($this->canUserValidator($this->fields['id'])) {
-         return true;
-
       }
 
       if ($currentUser == $this->fields['users_id_validator']) {
@@ -1359,10 +1354,6 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
             $value = $this->questionFields[$questionId]->getValueForTargetText($domain, $richText);
          }
 
-         if ($question->fields['fieldtype'] == "ldapselect" && $question->fields['itemtype'] == "User") {
-            $value =  getUserName($value);
-         }
-
          // $content = str_replace('##question_' . $questionId . '##', Sanitizer::sanitize($name), $content);
          $content = str_replace('##question_' . $questionId . '##', $name, $content);
          if ($question->fields['fieldtype'] === 'file') {
@@ -2014,10 +2005,13 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
             continue;
          }
          $ticketStatus = PluginFormcreatorCommon::getTicketStatusForIssue($generatedTarget);
-         if ($ticketStatus >= PluginFormcreatorFormAnswer::STATUS_WAITING) {
-            // Ignore tickets refused or pending for validation
-            // getTicketStatusForIssue() does not returns STATUS_ACCEPTED
+         if ($ticketStatus > PluginFormcreatorFormAnswer::STATUS_WAITING) {
             continue;
+         }
+
+         // force pending approval status to be seen from to_validate dashboard
+         if ($ticketStatus == PluginFormcreatorFormAnswer::STATUS_WAITING) {
+            return PluginFormcreatorFormAnswer::STATUS_WAITING;
          }
 
          if ($ticketStatus == CommonITILObject::WAITING) {
@@ -2155,37 +2149,5 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
             ]
          ])
       ]);
-   }
-
-   public function canUserValidator($formAnswer)
-   {
-      $response = "";
-      $currentUser = Session::getLoginUserID();
-      global $DB;
-      $query = $DB->query("SELECT 
-      DISTINCT t.id
-  FROM
-      glpi_tickets AS t
-          LEFT JOIN
-      glpi_items_tickets AS it ON (t.id = it.tickets_id)
-          LEFT JOIN
-      glpi_plugin_formcreator_formanswers AS fa ON (it.items_id = fa.id)
-          LEFT JOIN
-      glpi_plugin_formcreator_issues AS fi ON (fi.items_id = fa.id)
-          LEFT JOIN
-      glpi_ticketvalidations AS tv ON (tv.tickets_id = t.id)
-  WHERE
-      t.is_deleted = 0
-      AND tv.users_id_validate =  {$currentUser}
-      AND it.itemtype ='PluginFormcreatorFormAnswer'
-      AND fa.id ={$formAnswer};");
-
-      if ($query->num_rows == 0) {
-         return false;
-      }
-
-      $response = $DB->fetchAssoc($query);
-
-      return $response;
    }
 }

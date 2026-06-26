@@ -63,7 +63,6 @@ switch ($_REQUEST['action']) {
       die();
 }
 
-
 if (!$success) {
    http_response_code(500);
 }

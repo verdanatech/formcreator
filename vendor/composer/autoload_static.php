@@ -12,43 +12,43 @@ class ComposerStaticInit8180e065b1922f6620fe49d1732f6152
     );
 
     public static $prefixLengthsPsr4 = array (
-        'X' => 
+        'X' =>
         array (
             'Xylemical\\Expressions\\' => 22,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Component\\Finder\\' => 25,
         ),
-        'L' => 
+        'L' =>
         array (
             'Laminas\\EventManager\\' => 21,
         ),
-        'G' => 
+        'G' =>
         array (
             'Gregwar\\' => 8,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Xylemical\\Expressions\\' => 
+        'Xylemical\\Expressions\\' =>
         array (
             0 => __DIR__ . '/..' . '/xylemical/php-expressions/src',
         ),
-        'Symfony\\Polyfill\\Php80\\' => 
+        'Symfony\\Polyfill\\Php80\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
         ),
-        'Symfony\\Component\\Finder\\' => 
+        'Symfony\\Component\\Finder\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
         ),
-        'Laminas\\EventManager\\' => 
+        'Laminas\\EventManager\\' =>
         array (
             0 => __DIR__ . '/..' . '/laminas/laminas-eventmanager/src',
         ),
-        'Gregwar\\' => 
+        'Gregwar\\' =>
         array (
             0 => __DIR__ . '/..' . '/gregwar/captcha/src/Gregwar',
         ),

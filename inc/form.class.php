@@ -129,6 +129,15 @@ PluginFormcreatorTranslatableInterface
       $menu['links'][$validation_image] = PluginFormcreatorFormAnswer::getSearchURL(false).'?criteria[0][link]=AND&criteria[0][field]=8&criteria[0][searchtype]=equals&criteria[0][value]=' . PluginFormcreatorFormAnswer::STATUS_WAITING;
       $menu['links'][$import_image]     = PluginFormcreatorForm::getFormURL(false)."?import_form=1";
       $menu['links'][$requests_image]   = PluginFormcreatorIssue::getSearchURL(false);
+
+      $menu['options']['answer'] = [
+         'title' => PluginFormcreatorFormAnswer::getTypeName(Session::getPluralNumber()),
+         'page'  => PluginFormcreatorFormAnswer::getSearchURL(false),
+         'icon'  => PluginFormcreatorFormAnswer::getIcon(),
+         'links' => [
+            'search' => PluginFormcreatorFormAnswer::getSearchURL(false),
+         ],
+      ];
       return $menu;
    }
 
@@ -628,7 +637,6 @@ PluginFormcreatorTranslatableInterface
       $this->addStandardTab(PluginFormcreatorFormAccessType::class, $ong, $options);
       $this->addStandardTab(self::class, $ong, $options);
       $this->addStandardTab(PluginFormcreatorFormAnswer::class, $ong, $options);
-      $this->addStandardTab(PluginFormcreatorForm_Qrcode::class, $ong, $options);
       $this->addStandardTab(PluginFormcreatorForm_Language::class, $ong, $options);
       $this->addStandardTab(Document_Item::class, $ong, $options);
       $this->addStandardTab(Log::class, $ong, $options);
@@ -648,9 +656,6 @@ PluginFormcreatorTranslatableInterface
    }
 
    public function showServiceCatalog() : void {
-      echo "<style>
-      .card-body-content {line-height: 20px; max-height: 100px;-webkit-line-clamp: 4; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;}
-      </style>";
       echo '<div id="plugin_formcreator_wizard" class="card-group">';
       $this->showWizard();
       echo '</div>';
@@ -674,30 +679,30 @@ PluginFormcreatorTranslatableInterface
          echo '</div>';
       }
       if (PluginFormcreatorEntityconfig::getUsedConfig('is_search_visible', Session::getActiveEntity()) == PluginFormcreatorEntityconfig::CONFIG_SEARCH_VISIBLE) {
-         echo '<div id="plugin_formcreator_searchBar" class="p-2 m-0 col-12 col-xl-9">';
+         echo '<div id="plugin_formcreator_searchBar">';
          $this->showSearchBar();
          echo '</div>';
       }
       $sort_settings = PluginFormcreatorEntityConfig::getEnumSort();
-      echo '<div class="my-3 plugin_formcreator_sort col-12 col-xl-3">';
-      echo '<span class="radios form-check me-3">';
+      echo '<div class="plugin_formcreator_sort">';
+      echo '<span class="radios">';
       $sort_order = PluginFormcreatorEntityconfig::getUsedConfig('sort_order', Session::getActiveEntity());
       $selected = $sort_order == PluginFormcreatorEntityconfig::CONFIG_SORT_POPULARITY ? 'checked="checked"' : '';
-      echo '<input type="radio" class="form-check-input" id="plugin_formcreator_mostPopular" name="sort" value="mostPopularSort" '.$selected.' onclick="showTiles(tiles)"/>';
+      echo '<input type="radio" class="-check-input" id="plugin_formcreator_mostPopular" name="sort" value="mostPopularSort" '.$selected.' onclick="showTiles(tiles)"/>';
       echo '<label for="plugin_formcreator_mostPopular">';
       echo '<a title="' . $sort_settings[PluginFormcreatorEntityConfig::CONFIG_SORT_POPULARITY] . '">&nbsp;<i class="fa fa-star" aria-hidden="true"></i></a>';
       echo '</label>';
       echo '</span>';
       echo '&nbsp;';
-      echo '<span class="radios form-check me-3">';
+      echo '<span class="radios">';
       $selected = $sort_order == PluginFormcreatorEntityconfig::CONFIG_SORT_ALPHABETICAL ? 'checked="checked"' : '';
-      echo '<input type="radio" class="form-check-input" id="plugin_formcreator_alphabetic" name="sort" value="alphabeticSort" '.$selected.' onclick="showTiles(tiles)"/>';
+      echo '<input type="radio" class="-check-input" id="plugin_formcreator_alphabetic" name="sort" value="alphabeticSort" '.$selected.' onclick="showTiles(tiles)"/>';
       echo '<label for="plugin_formcreator_alphabetic">';
       echo '<a title="' . $sort_settings[PluginFormcreatorEntityConfig::CONFIG_SORT_ALPHABETICAL] . '">&nbsp;<i class="fa fa-arrow-down-a-z"></i></a>';
       echo '</label>';
       echo '</span>';
       echo '</div>';
-      echo '<div id="plugin_formcreator_wizard_forms" class="m-0 col-12">';
+      echo '<div id="plugin_formcreator_wizard_forms">';
       echo '</div>';
       echo '</div>';
       echo '</div>';
@@ -780,11 +785,8 @@ PluginFormcreatorTranslatableInterface
 
       // Find forms accessible by the current user
       $keywords = trim($keywords);
-
       if (!empty($keywords)) {
-
          $keywordsWithWilcards = $DB->escape(PluginFormcreatorCommon::prepareBooleanKeywords($keywords));
-         
          $formList['WHERE']['AND'][] = [
             'OR' => [
                new QueryExpression("MATCH($table_form.`name`, $table_form.`description`)
@@ -793,10 +795,10 @@ PluginFormcreatorTranslatableInterface
                   AGAINST('$keywordsWithWilcards' IN BOOLEAN MODE)"),
             ]
          ];
-
       }
 
       $result_forms = $DB->request($formList);
+
       $formList = [];
       foreach ($result_forms as $form) {
          // load thanguage for the form, if any
@@ -807,11 +809,11 @@ PluginFormcreatorTranslatableInterface
          }
          $formList[] = [
             'id'               => $form['id'],
-            'name'             => __($form['name'], $domain),
-            'icon'             => $form['icon'],
-            'icon_color'       => $form['icon_color'],
-            'background_color' => $form['background_color'],
-            'description'      => __($form['description'], $domain),
+            'name'             => htmlspecialchars(__($form['name'], $domain)),
+            'icon'             => htmlspecialchars($form['icon']),
+            'icon_color'       => htmlspecialchars($form['icon_color']),
+            'background_color' => htmlspecialchars($form['background_color']),
+            'description'      => htmlspecialchars(__($form['description'], $domain) ?? ''),
             'type'             => 'form',
             'usage_count'      => $form['usage_count'],
             'is_default'       => $form['is_default'] ? "true" : "false",
@@ -880,11 +882,11 @@ PluginFormcreatorTranslatableInterface
          foreach ($result_forms as $form) {
             $formList[] = [
                'id'               => $form['id'],
-               'name'             => $form['name'],
-               'icon'             => $form['icon'],
-               'icon_color'       => $form['icon_color'],
-               'background_color' => $form['background_color'],
-               'description'      => $form['description'],
+               'name'             => htmlspecialchars($form['name']),
+               'icon'             => htmlspecialchars($form['icon']),
+               'icon_color'       => htmlspecialchars($form['icon_color']),
+               'background_color' => htmlspecialchars($form['background_color']),
+               'description'      => htmlspecialchars($form['description'] ?? ''),
                'type'             => 'form',
                'usage_count'      => $form['usage_count'],
                'is_default'       => true,
@@ -902,10 +904,9 @@ PluginFormcreatorTranslatableInterface
 
    protected function showSearchBar() : void {
       echo '<form name="plugin_formcreator_search" onsubmit="javascript: return false;" >';
-      echo '<div class="input-group mb-3">';
-      echo '<input type="text" class="form-control form-control-lg" name="words" placeholder="' . __('What are you looking for?', 'formcreator') . '" aria-label="' . __('What are you looking for?', 'formcreator') . '" aria-describedby="button-addon2" required>';
-      echo '<span class="btn fa fa-search" id="button-addon2"></span>';
-      echo '</div>';
+      echo '<input type="text" name="words" id="plugin_formcreator_search_input" required class="form-control" />';
+      echo '<span id="plugin_formcreator_search_input_bar"></span>';
+      echo '<label for="plugin_formcreator_search_input">'.__('What are you looking for?', 'formcreator').'</label>';
       echo '</form>';
    }
 

@@ -29,7 +29,7 @@
  * ---------------------------------------------------------------------
  */
 
-include("../../../inc/includes.php");
+include ("../../../inc/includes.php");
 
 Session::redirectIfNotLoggedIn();
 
@@ -66,7 +66,6 @@ if (isset($_POST['update'])) {
 }
 // Show target ticket form
 $formanswer->getFromDB((int) $_GET['id']);
-
 if (!$formanswer->checkEntity()) {
    Html::displayRightError();
 }

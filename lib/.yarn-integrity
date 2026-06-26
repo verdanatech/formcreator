@@ -1,5 +1,5 @@
 {
-  "systemParams": "linux-x64-115",
+  "systemParams": "linux-x64-108",
   "modulesFolders": [
     "lib"
   ],
@@ -10,8 +10,7 @@
   "topLevelPatterns": [
     "conventional-changelog-cli@^2.0",
     "jquery-slinky@^4.1",
-    "standard-version@^9.0",
-    "yarn@^1.22.22"
+    "standard-version@^9.0"
   ],
   "lockfileEntries": {
     "@babel/code-frame@^7.0.0": "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.16.7.tgz#44416b6bd7624b998f5b1af5d470856c40138789",
@@ -220,7 +219,6 @@
     "yargs-parser@^20.2.3": "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-20.2.9.tgz#2eb7dc3b0289718fc295f362753845c41a0c94ee",
     "yargs@^16.0.0": "https://registry.yarnpkg.com/yargs/-/yargs-16.2.0.tgz#1c82bf0f6b6a66eafce7ef30e376f49a12477f66",
     "yargs@^16.2.0": "https://registry.yarnpkg.com/yargs/-/yargs-16.2.0.tgz#1c82bf0f6b6a66eafce7ef30e376f49a12477f66",
-    "yarn@^1.22.22": "https://registry.yarnpkg.com/yarn/-/yarn-1.22.22.tgz#ac34549e6aa8e7ead463a7407e1c7390f61a6610",
     "yocto-queue@^0.1.0": "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   },
   "files": [],

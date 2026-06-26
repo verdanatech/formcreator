@@ -181,10 +181,11 @@ class RequestTypeField extends SelectField
       $available = $this->getAvailableValues();
       $TRANSLATE->setLocale($oldLocale);
       $_SESSION['glpilanguage'] = $oldLocale;
+
       if (!isset($available[$this->value])) {
          return false;
       }
-      return strcasecmp(__($available[$this->value]), $value) === 0;
+      return strcasecmp($available[$this->value], $value) === 0;
    }
 
    public function notEquals($value): bool {
@@ -216,7 +217,7 @@ class RequestTypeField extends SelectField
       if (!isset($available[$this->value])) {
          return false;
       }
-      return strcasecmp(__($available[$this->value]), $value) > 0;
+      return strcasecmp($available[$this->value], $value) > 0;
    }
 
    public function lessThan($value): bool {

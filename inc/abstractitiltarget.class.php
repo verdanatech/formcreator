@@ -1351,7 +1351,7 @@ SCRIPT;
             'OR' => [
                'fieldtype' => 'actor',
                'AND' => [
-                  'fieldtype' => 'glpiselect',
+                  'fieldtype' => ['glpiselect', 'ldapselect'],
                   'itemtype'  => 'User',
                ]
             ]

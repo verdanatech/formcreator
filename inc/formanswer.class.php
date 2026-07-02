@@ -1370,6 +1370,9 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
                }
             }
          }
+         if ($question->fields['fieldtype'] == "ldapselect" && $question->fields['itemtype'] == "User") {
+            $value =  getUserName($value);
+         }
          $content = str_replace('##answer_' . $questionId . '##', $value ?? '', $content);
 
          if ($this->questionFields[$questionId] instanceof DropdownField) {

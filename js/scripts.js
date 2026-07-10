@@ -434,39 +434,39 @@ function buildTiles(list) {
 
       if (item.type == 'form') {
          var base = `
+            <div class="col-12 col-md-6 col-lg-4">
+            <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100">
+               <div class="card-header" style="background-color: ${item.background_color};">
+                  <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
+                  <a href="${url}" class="card-title text-white stretched-link">
+                     ${item.name}
+                  </a>
+               </div>
+               <div class="card-body text-start card-body-content mb-2">
+                  ${description}
+               </div>
+            </div>
+         </div>`;
+         if(item.description){
+         var base = `
          <div class="col-12 col-md-6 col-lg-4">
-         <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100">
-            <div class="card-header" style="background-color: ${item.background_color};">
-               <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
-               <a href="${url}" class="card-title text-white stretched-link">
-                  ${item.name}
-               </a>
-            </div>
-            <div class="card-body text-start card-body-content mb-2">
-               ${description}
-            </div>
-         </div>
-      </div>`;
-      if(item.description){
-      var base = `
-      <div class="col-12 col-md-6 col-lg-4">
-         <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.description}" data-bs-html="true">
-            <div class="card-header" style="background-color: ${item.background_color};">
-               <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
-               <a href="${url}" class="card-title text-white stretched-link">
-                  ${item.name}
-               </a>
-            </div>
-            <div class="card-body text-start card-body-content mb-2">
-               ${description}
+            <div id="PluginFormcreatorForm" data-itemtype="PluginFormcreatorForm" data-id="${item.id}" class="card h-100" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.description}" data-bs-html="true">
+               <div class="card-header" style="background-color: ${item.background_color};">
+                  <span class="${item.icon} pe-3 fs-1" style="color: ${item.icon_color}"></span>
+                  <a href="${url}" class="card-title text-white stretched-link">
+                     ${item.name}
+                  </a>
+               </div>
+               <div class="card-body text-start card-body-content mb-2">
+                  ${description}
+               </div>
             </div>
          </div>
-      </div>
-   `;
-      }
-      forms.push(base);
+      `;
+         }
+         forms.push(base);
       } else {
-         faqs.push(`
+            faqs.push(`
             <div class="col-12 col-md-6 col-lg-4">
             <div class="card h-100">
                <div class="card-header " style="background-color: ${item.background_color};" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="${item.name}" data-bs-html="true">
@@ -483,9 +483,9 @@ function buildTiles(list) {
 
    // concatenate all HTML parts
    html = '<div id="plugin_formcreator_formlist" class="row row-cols-3 g-3 mb-4">'
-      + forms.join("")
-      + '</div><div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">'
-         + faqs.join("")
+   + forms.join("")
+   + '</div><div id="plugin_formcreator_faqlist" class="row row-cols-3 g-3 mt-4">'
+   + faqs.join("")
    + '</div>'
 
    return html;
@@ -1403,8 +1403,13 @@ var plugin_formcreator = new function() {
             displayAjaxMessageAfterRedirect();
             return;
          }
-         if (typeof(xhr.responseJSON) == 'undefined') {
-            alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
+         if (xhr.status == 200) {
+            window.location = "formlist.php";
+         } else {
+
+            if (typeof(xhr.responseJSON) == 'undefined') {
+               alert(i18n.textdomain('formcreator').__('An internal error occurred. Please report it to administrator.', 'formcreator'));
+            }
          }
          if (typeof(xhr.responseJSON.message) == 'undefined') {
             displayAjaxMessageAfterRedirect();

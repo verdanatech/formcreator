@@ -86,7 +86,7 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
     *
     * @return boolean True if he can create and modify requests
     */
-   public static function canCreate() {
+   public static function canCreate(): bool {
       return true;
    }
 
@@ -95,11 +95,11 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
     *
     * @return boolean True if he can read requests
     */
-   public static function canView() {
+   public static function canView(): bool {
       return true;
    }
 
-   public function canViewItem() {
+   public function canViewItem(): bool {
       global $DB;
 
       if (Plugin::isPluginActive(PLUGIN_FORMCREATOR_ADVANCED_VALIDATION)) {
@@ -213,11 +213,11 @@ class PluginFormcreatorFormAnswer extends CommonDBTM
       return false;
    }
 
-   public static function canPurge() {
+   public static function canPurge(): bool {
       return true;
    }
 
-   public function canPurgeItem() {
+   public function canPurgeItem(): bool {
       return Session::haveRight('entity', UPDATE);
    }
 
